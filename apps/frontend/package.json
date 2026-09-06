@@ -4,11 +4,15 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port 0",
+    "dev:desk": "vite --config vite.desk.config.ts --open /desk.html",
+    "build:desk": "tsc -p tsconfig.desk.json && vite build --config vite.desk.config.ts",
+    "test:desk": "playwright test --config playwright.desk.config.ts",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -b --pretty false",
+    "test:e2e": "playwright test --config playwright.experience.config.ts",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -20,6 +24,7 @@
     "@tailwindcss/vite": "^4",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.2.5",
+    "lucide-react": "^1.41.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "shadcn": "^4.21.0",
@@ -28,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
