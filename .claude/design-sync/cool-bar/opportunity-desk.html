@@ -1,0 +1,120 @@
+<!-- @dsCard group="Product UX" -->
+<title>Opportunity desk</title>
+<style>
+  :root { --ink:#10212b; --muted:#65747d; --line:#d9e1df; --canvas:#f5f7f5; --panel:#fffefa; --deep:#102b34; --teal:#0c7c79; --teal-soft:#d9f1eb; --lime:#c5e57b; --amber:#b26d22; --amber-soft:#fff0da; --red:#b84435; --shadow:0 18px 42px rgba(16,43,52,.10); }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--canvas); color:var(--ink); font-family:Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; letter-spacing:-.012em; }
+  .app { min-height:100vh; display:grid; grid-template-columns:238px minmax(0,1fr); }
+  .rail { background:var(--deep); color:#e9f5f1; padding:24px 14px; display:flex; flex-direction:column; gap:26px; }
+  .brand { display:flex; gap:10px; align-items:center; padding:0 10px; font-weight:760; font-size:20px; letter-spacing:-.055em; }
+  .brand-mark { width:26px; height:26px; display:grid; place-items:center; background:var(--lime); color:var(--deep); border-radius:8px 8px 8px 2px; font-size:16px; }
+  .new-chat { border:0; border-radius:10px; padding:12px 14px; background:var(--lime); color:var(--deep); font:inherit; font-weight:750; text-align:left; }
+  .nav { display:grid; gap:5px; }
+  .nav a { color:#b9cbc8; text-decoration:none; padding:10px 12px; font-size:14px; border-radius:9px; }
+  .nav a.active { color:#f7fffc; background:rgba(255,255,255,.1); font-weight:700; }
+  .nav span { margin-right:9px; opacity:.76; }
+  .recent-label { color:#8ba5a0; text-transform:uppercase; font-size:10px; letter-spacing:.11em; padding:0 12px; margin-top:7px; }
+  .thread { padding:9px 12px; color:#cae0db; font-size:13px; border-radius:8px; line-height:1.2; }
+  .thread small { display:block; color:#8ba5a0; margin-top:4px; font-size:11px; }
+  .wallet { margin-top:auto; border:1px solid rgba(255,255,255,.13); border-radius:12px; padding:12px; background:rgba(255,255,255,.05); }
+  .wallet-top { display:flex; align-items:center; justify-content:space-between; font-size:12px; color:#cce0db; }
+  .wallet-id { font-weight:700; color:white; margin-top:8px; font-size:14px; }
+  .network { display:inline-flex; align-items:center; gap:5px; margin-top:7px; font-size:11px; color:#9fbbb5; }
+  .dot { width:7px; height:7px; background:#67d7b3; border-radius:50%; }
+  main { max-width:1480px; width:100%; margin:0 auto; padding:28px 38px 42px; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:35px; }
+  .crumb { font-size:14px; color:var(--muted); }
+  .crumb strong { color:var(--ink); }
+  .actions { display:flex; align-items:center; gap:11px; }
+  .fresh { display:flex; gap:7px; align-items:center; color:var(--muted); font-size:12px; padding-right:8px; }
+  .fresh .dot { background:var(--teal); }
+  .icon-button { width:35px; height:35px; border:1px solid var(--line); border-radius:9px; background:var(--panel); color:var(--ink); }
+  h1 { font-size:35px; line-height:1.08; letter-spacing:-.052em; margin:0; max-width:720px; }
+  .intro { display:flex; justify-content:space-between; align-items:flex-end; gap:28px; }
+  .intro p { color:var(--muted); font-size:15px; line-height:1.5; max-width:650px; margin:12px 0 0; }
+  .scope { display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  .chip { border:1px solid var(--line); border-radius:999px; padding:7px 10px; background:#fafdfa; color:#405057; font-size:12px; white-space:nowrap; }
+  .chip strong { color:var(--ink); }
+  .composer { display:flex; align-items:center; gap:12px; background:var(--panel); border:1px solid #cfdad6; border-radius:14px; padding:11px 12px 11px 17px; box-shadow:0 6px 14px rgba(16,43,52,.05); margin:29px 0 31px; }
+  .composer p { flex:1; margin:0; color:#52636a; font-size:15px; }
+  .send { width:39px; height:39px; border:0; border-radius:10px; background:var(--teal); color:white; font-size:18px; }
+  .grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(320px,.9fr); gap:22px; }
+  .section-head { display:flex; align-items:center; justify-content:space-between; margin:0 0 13px; }
+  h2 { font-size:16px; margin:0; letter-spacing:-.025em; }
+  .source { font-size:11px; color:var(--muted); }
+  .market-card { background:var(--panel); border:1px solid var(--line); border-radius:15px; overflow:hidden; box-shadow:0 7px 18px rgba(16,43,52,.035); }
+  .market-row { display:grid; grid-template-columns:1.3fr .7fr .9fr .7fr .75fr 24px; align-items:center; gap:12px; padding:17px 18px; border-top:1px solid #e8ece9; }
+  .market-row:first-child { border-top:0; }
+  .market-row:hover { background:#fbfdfb; }
+  .market { display:flex; align-items:center; gap:11px; }
+  .token { width:34px; height:34px; border-radius:50%; background:#2775ca; color:white; font-weight:800; display:grid; place-items:center; font-size:11px; box-shadow:inset 0 0 0 3px #e3effd; }
+  .market-name { font-size:14px; font-weight:740; }
+  .market-sub { color:var(--muted); font-size:11px; margin-top:3px; }
+  .metric label { display:block; color:var(--muted); font-size:10px; margin-bottom:3px; }
+  .metric b { font-size:14px; }
+  .positive { color:#087b60; }
+  .arrow { color:#7d8d91; font-size:17px; text-align:right; }
+  .recommend { padding:16px 18px 17px; background:#e5f5ee; border-top:1px solid #cfebe0; display:flex; align-items:flex-start; gap:11px; }
+  .recommend-icon { background:var(--teal); color:white; border-radius:8px; width:25px; height:25px; display:grid; place-items:center; flex:0 0 auto; font-size:13px; }
+  .recommend h3 { margin:0 0 3px; font-size:13px; }
+  .recommend p { margin:0; font-size:12px; line-height:1.45; color:#3b5f58; }
+  .side { display:grid; gap:22px; align-content:start; }
+  .panel { padding:18px; background:var(--panel); border:1px solid var(--line); border-radius:15px; box-shadow:0 7px 18px rgba(16,43,52,.035); }
+  .prompt-list { display:grid; gap:7px; margin-top:12px; }
+  .prompt { width:100%; text-align:left; background:#f8fbf9; border:1px solid #e2e9e5; border-radius:10px; padding:11px; color:#33454a; font:inherit; font-size:12px; line-height:1.35; }
+  .prompt::before { content:"Ask"; display:inline-block; color:var(--teal); font-weight:800; font-size:10px; text-transform:uppercase; letter-spacing:.07em; margin-right:7px; }
+  .trend { margin-top:11px; }
+  .trend-top { display:flex; justify-content:space-between; align-items:baseline; }
+  .trend-top b { font-size:26px; letter-spacing:-.05em; }
+  .trend-top span { color:#0b7b60; font-size:12px; font-weight:700; }
+  .trend-chart { margin-top:11px; height:81px; background:#f5faf8; border-radius:9px; position:relative; overflow:hidden; }
+  .trend-chart svg { width:100%; height:100%; position:absolute; inset:0; }
+  .chart-labels { display:flex; justify-content:space-between; margin-top:5px; color:#839197; font-size:10px; }
+  .notice { display:flex; gap:10px; padding:12px; margin-top:15px; border-radius:9px; background:var(--amber-soft); color:#795120; font-size:11px; line-height:1.4; }
+  .notice b { color:#704411; }
+  .bottom { display:grid; grid-template-columns:1.1fr .9fr; gap:22px; margin-top:29px; }
+  .stack { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+  .risk { padding:7px 9px; border-radius:8px; background:#f8f5ed; color:#665632; font-size:11px; }
+  .risk strong { color:#4c4023; }
+  .status { display:flex; justify-content:space-between; gap:10px; align-items:center; padding:10px 0; border-bottom:1px solid #e7ece9; font-size:12px; }
+  .status:last-child { border-bottom:0; padding-bottom:0; }
+  .state { color:#176e61; font-weight:700; font-size:11px; }
+  @media (max-width:1000px) { .app { grid-template-columns:1fr; } .rail { display:none; } main { padding:24px; } .grid,.bottom { grid-template-columns:1fr; } }
+</style>
+<div class="app">
+  <aside class="rail">
+    <div class="brand"><div class="brand-mark">C</div>cool bar</div>
+    <button class="new-chat">+ New research</button>
+    <nav class="nav">
+      <a class="active" href="#"><span>⌂</span>Opportunity desk</a>
+      <a href="#"><span>◌</span>Research threads</a>
+      <a href="#"><span>◫</span>Portfolio</a>
+      <a href="#"><span>⇄</span>Share AI access</a>
+    </nav>
+    <div class="recent-label">Recent</div>
+    <div class="thread">USDC supply across L2s<small>12 minutes ago</small></div>
+    <div class="thread">ETH stable pool fees<small>Yesterday</small></div>
+    <div class="wallet"><div class="wallet-top"><span>Wallet connected</span><span>•••</span></div><div class="wallet-id">0x71D...8A2e</div><div class="network"><i class="dot"></i> Ethereum</div></div>
+  </aside>
+  <main>
+    <header class="topbar"><div class="crumb"><strong>Research</strong> / opportunity desk</div><div class="actions"><div class="fresh"><i class="dot"></i>Data refreshed 2m ago</div><button class="icon-button">?</button><button class="icon-button">◐</button></div></header>
+    <section class="intro"><div><h1>Find a place for your stablecoins.</h1><p>Live lending and liquidity data, made comparable before you decide what to do with it.</p></div><div class="scope"><span class="chip"><strong>3</strong> chains</span><span class="chip"><strong>2</strong> protocols</span><span class="chip">USDC</span></div></section>
+    <div class="composer"><span>⌕</span><p>Which USDC lending market has the strongest supply yield this week?</p><button class="send">↑</button></div>
+    <section class="grid">
+      <div>
+        <div class="section-head"><h2>USDC supply markets</h2><span class="source">Aave V3 · observed Sep 05, 14:32 UTC</span></div>
+        <div class="market-card">
+          <div class="market-row"><div class="market"><div class="token">USDC</div><div><div class="market-name">Aave V3 · Base</div><div class="market-sub">Base · stablecoin lending</div></div></div><div class="metric"><label>Supply APY</label><b class="positive">6.48%</b></div><div class="metric"><label>Available</label><b>$8.4m</b></div><div class="metric"><label>Utilization</label><b>82.1%</b></div><div class="metric"><label>Incentives</label><b>0.43%</b></div><div class="arrow">›</div></div>
+          <div class="market-row"><div class="market"><div class="token">USDC</div><div><div class="market-name">Aave V3 · Arbitrum</div><div class="market-sub">Arbitrum · stablecoin lending</div></div></div><div class="metric"><label>Supply APY</label><b class="positive">5.93%</b></div><div class="metric"><label>Available</label><b>$13.1m</b></div><div class="metric"><label>Utilization</label><b>76.5%</b></div><div class="metric"><label>Incentives</label><b>0.18%</b></div><div class="arrow">›</div></div>
+          <div class="market-row"><div class="market"><div class="token">USDC</div><div><div class="market-name">Aave V3 · Ethereum</div><div class="market-sub">Ethereum · stablecoin lending</div></div></div><div class="metric"><label>Supply APY</label><b class="positive">4.81%</b></div><div class="metric"><label>Available</label><b>$34.7m</b></div><div class="metric"><label>Utilization</label><b>64.2%</b></div><div class="metric"><label>Incentives</label><b>0.00%</b></div><div class="arrow">›</div></div>
+          <div class="recommend"><div class="recommend-icon">✓</div><div><h3>Start with Base if your priority is supply yield.</h3><p>It currently has the highest displayed APY, but this is a point-in-time view. Open the research thread to compare its seven-day range, liquidity, bridge cost, and contract risk.</p></div></div>
+        </div>
+      </div>
+      <div class="side">
+        <section class="panel"><div class="section-head"><h2>Supply yield this week</h2><span class="source">Aave V3</span></div><div class="trend"><div class="trend-top"><b>6.48%</b><span>+0.71 pts</span></div><div class="trend-chart"><svg viewBox="0 0 310 82" role="img" aria-label="Base supply yield rises across seven days"><path d="M0 65 L42 55 L82 60 L122 41 L165 47 L205 25 L250 32 L310 11 L310 82 L0 82Z" fill="#d9f1eb"></path><path d="M0 65 L42 55 L82 60 L122 41 L165 47 L205 25 L250 32 L310 11" fill="none" stroke="#0c7c79" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"></path><circle cx="310" cy="11" r="4.2" fill="#fffefa" stroke="#0c7c79" stroke-width="2.5"></circle></svg></div><div class="chart-labels"><span>Aug 30</span><span>Sep 02</span><span>Today</span></div></div><div class="notice"><span>!</span><div><b>Yield is variable.</b> Supply APY includes a 0.43% incentive component that can change or end.</div></div></section>
+        <section class="panel"><div class="section-head"><h2>Research starters</h2><span class="source">Editable</span></div><div class="prompt-list"><button class="prompt">Compare USDC supply on Base, Arbitrum, and Ethereum.</button><button class="prompt">What do I give up by moving from Ethereum to Base?</button><button class="prompt">Find ETH stable pools with at least $1m TVL.</button></div></section>
+      </div>
+    </section>
+    <section class="bottom"><section class="panel"><div class="section-head"><h2>What the current data does not answer</h2><span class="source">Ask a follow-up</span></div><div class="stack"><span class="risk"><strong>Chain cost</strong> Bridge and gas costs are separate.</span><span class="risk"><strong>Contract risk</strong> Aave V3 has protocol risk.</span><span class="risk"><strong>Liquidity</strong> Available liquidity changes as users borrow.</span></div></section><section class="panel"><div class="section-head"><h2>Coverage</h2><span class="source">Transparent by default</span></div><div class="status"><span>Aave V3 lending markets</span><span class="state">Live data</span></div><div class="status"><span>Uniswap V3 pool research</span><span class="state">Live data</span></div><div class="status"><span>Wallet transaction execution</span><span class="state">Supported flows only</span></div></section></section>
+  </main>
+</div>
