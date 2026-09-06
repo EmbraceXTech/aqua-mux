@@ -1,0 +1,620 @@
+<title>Cool Bar Project Brief</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg: #f5f3ed;
+    --panel: #ffffff;
+    --ink: #17211d;
+    --muted: #5b655f;
+    --line: #ddd7c8;
+    --accent: #0e6b5c;
+    --accent-ink: #ffffff;
+    --accent-soft: #e3efeb;
+    --warn: #9a5b23;
+    --warn-soft: #f2e6d8;
+    --shadow: 0 1px 2px rgba(23, 33, 29, 0.06);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1f1d;
+      --panel: #222723;
+      --ink: #eceee8;
+      --muted: #9aa39d;
+      --line: #343b36;
+      --accent: #55c1a8;
+      --accent-ink: #0f1a17;
+      --accent-soft: #253530;
+      --warn: #e0a264;
+      --warn-soft: #33291c;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #1b1f1d;
+    --panel: #222723;
+    --ink: #eceee8;
+    --muted: #9aa39d;
+    --line: #343b36;
+    --accent: #55c1a8;
+    --accent-ink: #0f1a17;
+    --accent-soft: #253530;
+    --warn: #e0a264;
+    --warn-soft: #33291c;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  ::selection { background: var(--accent-soft); color: var(--ink); }
+
+  a { color: var(--accent); }
+
+  .mono {
+    font-family: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 56px 32px 120px;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 700px);
+    gap: 64px;
+    justify-content: center;
+  }
+
+  @media (max-width: 900px) {
+    .shell { grid-template-columns: minmax(0, 1fr); padding: 32px 20px 80px; }
+    .toc { display: none; }
+  }
+
+  /* ---- masthead ---- */
+  .masthead {
+    grid-column: 1 / -1;
+    max-width: 700px;
+    margin: 0 auto 8px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 14px;
+  }
+
+  h1.title {
+    font-family: 'Newsreader', Georgia, serif;
+    font-weight: 500;
+    font-size: clamp(2.4rem, 4.5vw, 3.4rem);
+    line-height: 1.05;
+    margin: 0 0 6px;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    font-family: 'Newsreader', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.35rem;
+    color: var(--muted);
+    margin: 0 0 22px;
+  }
+
+  .lede {
+    font-size: 1.08rem;
+    max-width: 62ch;
+    color: var(--ink);
+  }
+
+  .lede + .lede { margin-top: 12px; color: var(--muted); }
+
+  .facts {
+    margin-top: 28px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  @media (max-width: 640px) { .facts { grid-template-columns: 1fr; } }
+
+  .fact {
+    background: var(--panel);
+    padding: 16px 18px;
+  }
+
+  .fact .k {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .fact .v { font-size: 0.95rem; }
+
+  /* ---- toc ---- */
+  .toc {
+    position: sticky;
+    top: 40px;
+    align-self: start;
+    font-size: 13.5px;
+  }
+
+  .toc .toc-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 12px;
+  }
+
+  .toc ol {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: toc;
+    border-left: 1px solid var(--line);
+  }
+
+  .toc li {
+    counter-increment: toc;
+    margin: 0;
+  }
+
+  .toc a {
+    display: block;
+    padding: 7px 0 7px 16px;
+    margin-left: -1px;
+    border-left: 1px solid transparent;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .toc a:hover, .toc a:focus-visible {
+    color: var(--ink);
+    border-left-color: var(--accent);
+  }
+
+  .toc a::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent);
+    margin-right: 8px;
+  }
+
+  /* ---- article ---- */
+  article { min-width: 0; }
+
+  section { padding: 46px 0; border-bottom: 1px solid var(--line); scroll-margin-top: 32px; }
+  section:last-child { border-bottom: none; padding-bottom: 0; }
+
+  h2 {
+    font-family: 'Newsreader', Georgia, serif;
+    font-weight: 500;
+    font-size: 1.7rem;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 28px 0 10px;
+  }
+
+  section p { margin: 0 0 14px; max-width: 66ch; }
+  section p:last-child { margin-bottom: 0; }
+
+  section ul, section ol.plain {
+    margin: 0 0 14px;
+    padding-left: 22px;
+  }
+  section li { margin-bottom: 6px; }
+
+  strong { font-weight: 600; }
+
+  /* ---- naming table ---- */
+  table.names {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+    margin: 18px 0;
+  }
+  table.names th, table.names td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.names th {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-weight: 500;
+  }
+  table.names td.name { font-weight: 600; white-space: nowrap; }
+
+  /* ---- core loop ---- */
+  ol.loop {
+    counter-reset: loop;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  ol.loop li {
+    counter-increment: loop;
+    display: grid;
+    grid-template-columns: 28px 1fr;
+    gap: 4px 14px;
+    padding: 10px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  ol.loop li:last-child { border-bottom: none; }
+  ol.loop li::before {
+    content: counter(loop);
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent);
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  /* ---- query chips ---- */
+  .queries {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 18px 0;
+  }
+  .query {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px 14px;
+    box-shadow: var(--shadow);
+  }
+  .query::before { content: "> "; color: var(--accent); }
+
+  /* ---- comparison table (AI access) ---- */
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 18px 0;
+    font-size: 0.92rem;
+  }
+  table.compare th, table.compare td {
+    text-align: left;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.compare thead th {
+    background: var(--accent-soft);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  table.compare td:first-child {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    width: 130px;
+  }
+
+  /* ---- trust callout ---- */
+  .callout {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 20px 22px;
+    box-shadow: var(--shadow);
+  }
+  .callout ul { margin: 0; padding-left: 20px; }
+  .callout li { margin-bottom: 8px; }
+  .callout li:last-child { margin-bottom: 0; }
+
+  .risk-note {
+    font-size: 0.88rem;
+    color: var(--warn);
+    background: var(--warn-soft);
+    border-radius: 4px;
+    padding: 8px 12px;
+    display: inline-block;
+    margin-top: 10px;
+  }
+
+  /* ---- hackathon tracks ---- */
+  .tracks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 14px;
+    margin: 18px 0;
+  }
+  .track {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px 16px 18px;
+    box-shadow: var(--shadow);
+  }
+  .track .tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .track h4 {
+    margin: 0 0 6px;
+    font-family: 'Newsreader', Georgia, serif;
+    font-weight: 500;
+    font-size: 1.15rem;
+  }
+  .track p { margin: 0; font-size: 0.88rem; color: var(--muted); }
+
+  footer.colophon {
+    grid-column: 1 / -1;
+    max-width: 700px;
+    margin: 0 auto;
+    padding-top: 32px;
+    font-size: 0.82rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    section { animation: rise 0.5s ease-out both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+</style>
+
+<div class="shell">
+
+  <div class="masthead">
+    <p class="eyebrow">Product brief &middot; working draft &middot; ETHOnline 2026</p>
+    <h1 class="title">Cool Bar</h1>
+    <p class="subtitle">Ask, compare, act on DeFi.</p>
+    <p class="lede">Cool Bar is an agent-assisted DeFi research and execution app. It turns public on-chain and protocol data into clear answers, comparisons, and wallet-confirmed actions &mdash; the kind of question a person actually has, such as <em>&ldquo;which Ethereum USDC lending market had the strongest supply yield this week?&rdquo;</em>, answered with evidence and, if the user chooses, a transaction they confirm themselves.</p>
+    <p class="lede">This brief is the working specification: the problem, the product, the trust rules that constrain it, and the three-track hackathon plan.</p>
+
+    <div class="facts">
+      <div class="fact"><span class="k">Category</span><span class="v">DeFi research + execution agent</span></div>
+      <div class="fact"><span class="k">Primary data source</span><span class="v">The Graph subgraphs</span></div>
+      <div class="fact"><span class="k">Prize tracks</span><span class="v">The Graph &middot; Hedera &middot; 1inch</span></div>
+    </div>
+  </div>
+
+  <nav class="toc">
+    <p class="toc-label">Contents</p>
+    <ol>
+      <li><a href="#naming">Naming</a></li>
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#product">Product</a></li>
+      <li><a href="#users">Primary users</a></li>
+      <li><a href="#direction">Product direction</a></li>
+      <li><a href="#loop">Core product loop</a></li>
+      <li><a href="#discovery">Homepage &amp; discovery</a></li>
+      <li><a href="#chat">Agent chat &amp; results</a></li>
+      <li><a href="#research">Live protocol research</a></li>
+      <li><a href="#access">AI access methods</a></li>
+      <li><a href="#shared">Shared AI access</a></li>
+      <li><a href="#execution">Wallet-connected execution</a></li>
+      <li><a href="#portfolio">Portfolio monitoring</a></li>
+      <li><a href="#trust">Trust rules</a></li>
+      <li><a href="#hackathon">Hackathon plan</a></li>
+      <li><a href="#expansion">Expansion</a></li>
+    </ol>
+  </nav>
+
+  <article>
+
+    <section id="naming">
+      <h2>Working name and positioning</h2>
+      <p>Cool Bar is a working name. Four alternatives stayed on the shortlist, each with a real tradeoff against the product's actual scope.</p>
+      <table class="names">
+        <thead><tr><th>Name</th><th>Read</th></tr></thead>
+        <tbody>
+          <tr><td class="name">Poolside</td><td>Short and memorable, but narrower than the product &mdash; Cool Bar also covers lending and portfolios, not only pools.</td></tr>
+          <tr><td class="name">DeFi Lens</td><td>The clearest description of the research product itself.</td></tr>
+          <tr><td class="name">Yield Atlas</td><td>Strong fit if yield discovery becomes the primary homepage experience.</td></tr>
+          <tr><td class="name">LiquiScope / Vaultwise</td><td>Still on the shortlist, not yet weighed against the current scope.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="problem">
+      <h2>Problem</h2>
+      <p>DeFi data is public, but using it well is still difficult. Researching liquidity pools, lending markets, or a personal position means moving between explorers, dashboards, protocol interfaces, and raw GraphQL responses &mdash; each with a different schema, timestamp convention, and token format.</p>
+      <p>Even when the numbers line up, the user still has to decide which comparison is fair. A pool's headline yield may come from short-lived incentives, a narrow observation window, volatile assets, or risk the user never intended to take. Dashboards mostly leave that filtering to the user. Chat interfaces can produce a confident-sounding answer without showing the query, the data window, the assumptions, or what a transaction would actually do.</p>
+      <p>There's a second, separate problem: people who already pay for Claude Code or Codex have no simple way to bring that subscription into a DeFi app, and people without one still want the research experience with a transparent way to pay per request.</p>
+    </section>
+
+    <section id="product">
+      <h2>Product</h2>
+      <p>Cool Bar combines a live DeFi data layer, an AI research agent, wallet-connected execution, and an optional AI access marketplace in one web app. The agent turns a natural-language question into protocol-specific queries, normalizes the results, applies a stated comparison method, and returns a table, chart, pool card, or portfolio diagnosis.</p>
+      <p>Aave V3 stablecoin supply markets and Uniswap V3 liquidity-pool analysis on Ethereum, Base, and Arbitrum are the initial research surface; 1inch swaps and Aave deposits are the initial execution paths. Every investment-related answer names its source protocol, chain, token, time range, calculation method, and material risks.</p>
+      <p>Cool Bar can suggest an action. It never trades, deposits, borrows, rebalances, or moves funds without a separate wallet confirmation, and it doesn't call something &ldquo;best&rdquo; without first applying the constraints the user actually gave it.</p>
+    </section>
+
+    <section id="users">
+      <h2>Primary users</h2>
+      <p>The first user understands wallets and tokens but doesn't want to write GraphQL or hand-compare protocol dashboards. They're likely deciding where to supply stablecoins, provide liquidity, swap an asset, or check on a position they already hold &mdash; they want a concise answer, the evidence behind it, and a direct path to act if they agree.</p>
+      <p>A second user already has an AI subscription and wants to use it inside Cool Bar, or share unused capacity for payment.</p>
+    </section>
+
+    <section id="direction">
+      <h2>Product direction</h2>
+      <p>The goal is to support research and user-approved interaction across protocols, chains, and strategies: lending, borrowing, liquidity provision, staking, liquid staking, restaking, swaps, bridges, derivatives, vaults, liquidation risk, governance, and a personal portfolio, through one consistent interface.</p>
+      <p>Aave V3, Uniswap V3, 1inch swaps, and Aave deposits are concrete examples of that experience, not limits on it. Every result names its protocol, chain, source, observation time, and known coverage limits. When an interaction is supported, Cool Bar prepares the transaction or transaction sequence for the user to review and confirm in their own wallet &mdash; a connected wallet enables signing, nothing more. The agent gets portfolio context only after the user explicitly includes it in a request.</p>
+      <p>A shared AI-access network is part of the direction too, built on provider-controlled local runtimes, metered availability, earnings records, and a sharing switch the provider can flip off at any time. Encryption alone is never treated as a solution to credential security or provider trust.</p>
+    </section>
+
+    <section id="loop">
+      <h2>Core product loop</h2>
+      <ol class="loop">
+        <li>A user opens Cool Bar and sees live stablecoin supply opportunities and AMM research prompts.</li>
+        <li>They choose a starter question or enter their own.</li>
+        <li>Before the first request, they choose how the agent should run.</li>
+        <li>They connect their own local AI CLI subscription, or select paid access with a maximum budget.</li>
+        <li>The agent queries supported protocol data and applies an explicit comparison method.</li>
+        <li>Cool Bar streams the agent's progress, including the sources and analysis steps in use.</li>
+        <li>Cool Bar returns an answer with sources, a data timestamp, result artifacts, assumptions, and risks.</li>
+        <li>For a supported opportunity, Cool Bar presents action cards for the relevant swap, deposit, withdrawal, liquidity, or bridge transaction.</li>
+        <li>The user reviews and confirms each transaction through their connected wallet.</li>
+        <li>Cool Bar stores the resulting tracked position in local browser state and surfaces it in the portfolio view.</li>
+        <li>On a later visit, the user can choose to include tracked positions in a new research request.</li>
+      </ol>
+    </section>
+
+    <section id="discovery">
+      <h2>Homepage and discovery</h2>
+      <p>The homepage shows understandable opportunities and research ideas, not generic market statistics: stablecoin supply markets with supply APY, available liquidity, utilization, chain, and data age; active AMM pools with recent fees, volume, TVL, fee tier, chain, and a plain reminder that fees are not net returns; yield changes and liquidation-risk signals framed as starter prompts. Portfolio value stays hidden until a wallet is connected and the user explicitly asks the app to read it.</p>
+      <h3>Starter questions</h3>
+      <div class="queries">
+        <div class="query">Show the top USDC lending markets on Ethereum by supply APY over the last seven days.</div>
+        <div class="query">Which Uniswap pools generated the most fees in the last three days, excluding incentive rewards?</div>
+        <div class="query">Compare USDC supply opportunities on Base, Arbitrum, and Ethereum.</div>
+        <div class="query">Find high-volume ETH stablecoin pools with at least $1 million in TVL.</div>
+        <div class="query">Which of my tracked positions changed the most since I opened them?</div>
+        <div class="query">What would I give up if I moved my USDC from Aave to the highest-yield supported market?</div>
+      </div>
+      <p>Selecting a starter drops it into the chat composer for editing, it never sends on its own.</p>
+    </section>
+
+    <section id="chat">
+      <h2>Agent chat and result experience</h2>
+      <p>Users can start a new chat, revisit prior threads, and pick a model through whichever AI access method they chose. A thread keeps its questions, sources, artifacts, and action cards. The progress view makes the work visible without drowning the user in it &mdash; stages like understanding the request, fetching supported protocol data, comparing candidates, checking constraints, and preparing a result.</p>
+      <p>The final answer separates facts, calculations, assumptions, and optional recommendations, and every result carries its sources, observation time, selected window, calculation method, comparable candidates, and caveats. A table compares several opportunities; a chart appears only when it makes a trend or comparison genuinely easier to read; an action card appears only when the user has a real next step to take.</p>
+    </section>
+
+    <section id="research">
+      <h2>Live protocol research</h2>
+      <p>Cool Bar normalizes token units, chain identifiers, timestamps, time windows, and comparable metrics before it ranks anything. For an AMM pool it separates trading fees from token incentives and shows recent fee generation, volume, TVL, fee tier, chain, token pair, and the measurement period, alongside impermanent loss, asset volatility, liquidity depth, incentive expiry, and smart-contract risk. For a lending market it shows supply APY, included incentives, utilization, available liquidity, relevant collateral context, chain, and the observation time.</p>
+      <p>When a request is missing a decision-critical constraint &mdash; chain, asset, time window, tolerance for volatile assets &mdash; the agent asks. For the hackathon build, the agent works from a defined supported-protocol list rather than claiming universal DeFi coverage.</p>
+    </section>
+
+    <section id="access">
+      <h2>AI access methods</h2>
+      <p>Two paths for running a request, meant to feel equivalent once set up.</p>
+      <table class="compare">
+        <thead><tr><th></th><th>Use your own subscription</th><th>Pay to use shared access</th></tr></thead>
+        <tbody>
+          <tr><td>Setup</td><td>Run a one-line runtime connection command on your own device; Cool Bar sends a lightweight verification request to confirm the CLI is reachable and authorized.</td><td>Set a maximum spend (e.g. 10 USDC) and confirm the budget before the request runs.</td></tr>
+          <tr><td>Cost basis</td><td>Your existing subscription and usage limits.</td><td>Estimated price shown up front where possible; spend is capped at the approved maximum and the settled amount is reported afterward.</td></tr>
+          <tr><td>Settlement</td><td>N/A &mdash; handled by your own CLI provider.</td><td>x402-compatible payment requests, Hedera-based settlement for the hackathon prototype.</td></tr>
+          <tr><td>Visible state</td><td>Connection state, selected provider, selected model, any reported request limits.</td><td>Same research flow: ask, watch progress, get the answer, act through the wallet when supported.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section id="shared">
+      <h2>Shared AI access</h2>
+      <p>People with unused subscription capacity can opt in to share it: pick the supported local runtime, turn sharing on, set availability and any spending or usage limits. A dedicated page tracks active shared connections, total earnings, recent invocations, payment status, and a transaction list &mdash; and the provider can turn sharing off at any time.</p>
+      <p>The intended architecture isolates runtime operations in a trusted execution environment with attestation, proving the state of the environment that handles them, without ever exposing reusable provider credentials to Cool Bar. Chainlink may support the trusted-runtime or verification layer if it fits the final technical design.</p>
+      <p class="risk-note">Encryption alone is never described as a solution to credential security or provider trust.</p>
+    </section>
+
+    <section id="execution">
+      <h2>Wallet-connected execution</h2>
+      <p>An action card only appears when Cool Bar can construct a specific transaction from a supported protocol integration. It names the protocol, chain, asset, amount, expected outcome, estimated cost where available, and relevant risks before the wallet ever opens, and the amount stays editable right up to that point. Swaps route through 1inch Aqua and SwapVM where the transaction matches their supported flows.</p>
+      <p>The wallet is the final authority on every on-chain transaction. Cool Bar never asks for a seed phrase or private key, and it handles rejection, simulation failure, insufficient funds, wrong network, and pending-transaction states as first-class cases, not edge cases.</p>
+    </section>
+
+    <section id="portfolio">
+      <h2>Portfolio monitoring</h2>
+      <p>Tracked positions group by protocol and chain, each showing asset, deposited or supplied amount, transaction reference, local tracking status, current status when refreshed, and a link back to the source protocol. Positions persist in local browser storage after a user-approved transaction, clearly labeled as local tracking &mdash; the full product later indexes wallet activity and reconciles positions from supported protocols directly.</p>
+      <p>The agent uses tracked-position context only when the user explicitly includes it; connecting a wallet by itself grants no access to portfolio data. Users can ask how a position has changed, compare it with current alternatives, or request a rebalance analysis &mdash; Cool Bar explains the tradeoffs and prepares a transaction, but it never rebalances on its own.</p>
+    </section>
+
+    <section id="trust">
+      <h2>Trust rules</h2>
+      <div class="callout">
+        <ul>
+          <li>Facts, calculations, assumptions, and recommendations are always shown separately.</li>
+          <li>Every result shows its sources and time windows.</li>
+          <li>Portfolio data never enters an agent prompt silently.</li>
+          <li>No wallet private key, seed phrase, reusable AI credential, or raw payment secret is ever retained.</li>
+          <li>No financial transaction executes without explicit wallet confirmation.</li>
+          <li>Paid-agent cost is capped before a request runs, and the settled cost is shown afterward.</li>
+          <li>Data freshness stays visible, because DeFi metrics move fast.</li>
+          <li>Cool Bar warns when a result relies on incomplete chain coverage, stale data, unsupported assumptions, or a metric that isn't comparable across candidates.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="hackathon">
+      <h2>Hackathon integration plan</h2>
+      <p>ETHOnline 2026 allows at most three sponsor prize tracks per submission. These three form the first build.</p>
+      <div class="tracks">
+        <div class="track">
+          <span class="tag">Data</span>
+          <h4>The Graph</h4>
+          <p>Public DeFi data ingestion through protocol subgraphs and GraphQL queries.</p>
+        </div>
+        <div class="track">
+          <span class="tag">Settlement</span>
+          <h4>Hedera</h4>
+          <p>Payment and settlement for paid agent access, including x402-style per-request payment.</p>
+        </div>
+        <div class="track">
+          <span class="tag">Execution</span>
+          <h4>1inch</h4>
+          <p>Wallet-confirmed swaps and supported transaction execution.</p>
+        </div>
+      </div>
+      <p>Chainlink stays relevant for a future trusted-runtime or verification design but isn't required for these three. ENS and World could later anchor an identity layer for published strategy research or reusable agent prompts &mdash; outside the core loop for this build.</p>
+    </section>
+
+    <section id="expansion">
+      <h2>Initial examples and expansion</h2>
+      <p>Aave V3 research, Uniswap V3 research, 1inch swaps, Aave deposits, and coverage on Ethereum, Base, and Arbitrum demonstrate the product; they don't define its boundary. Cool Bar grows through more public data sources, protocol integrations, chains, assets, position types, and transaction flows &mdash; and every expansion has to hold the same standard for source evidence, calculation transparency, explicit portfolio-context controls, spending limits, and user-confirmed wallet execution.</p>
+      <p>The ETHOnline submission demonstrates one clear path through the broader product: a stablecoin supply question, a 1inch swap when needed, an Aave deposit, and a portfolio question.</p>
+    </section>
+
+  </article>
+
+  <footer class="colophon">
+    <span>Cool Bar &mdash; product brief</span>
+    <span>Source: PROJECT.md</span>
+  </footer>
+
+</div>
