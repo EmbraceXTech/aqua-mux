@@ -8,6 +8,7 @@ import {
   ArrowDownUp,
   ArrowRight,
   ArrowUpRight,
+  Bell,
   Check,
   ChevronDown,
   Copy,
@@ -46,6 +47,15 @@ import {
   type BatchStatus,
 } from "@/lib/wallet";
 type Leg = { address: Address; bps: number; amount: string };
+type TransactionRecord = {
+  id: string;
+  chainId: number;
+  account: Address;
+  mode: string;
+  submittedAt: number;
+  read: boolean;
+  status?: BatchStatus;
+};
 type Quote = {
   legs: { address: string; amountOut: string; minAmountOut: string }[];
   quotedAt: number;
@@ -75,6 +85,26 @@ function TokenIcon({ token, size = 36 }: { token: Token; size?: number }) {
       className="token-icon"
       src={token.logo}
       alt={`${token.symbol} icon`}
+      width={size}
+      height={size}
+    />
+  );
+}
+function NetworkIcon({
+  chainId,
+  size = 23,
+}: {
+  chainId: number;
+  size?: number;
+}) {
+  const token = tokens(chainId).find((item) =>
+    chainId === 42161 ? item.symbol === "ARB" : item.address === NATIVE,
+  )!;
+  return (
+    <Image
+      className="network-icon"
+      src={token.logo}
+      alt={`${network(chainId).name} token logo`}
       width={size}
       height={size}
     />
@@ -172,6 +202,9 @@ export function AquaMux() {
       mode: string;
     }>(),
     [status, setStatus] = useState<BatchStatus>(),
+    [transactions, setTransactions] = useState<TransactionRecord[]>([]),
+    [transactionsLoaded, setTransactionsLoaded] = useState(false),
+    [activityOpen, setActivityOpen] = useState(false),
     [receiptOpen, setReceiptOpen] = useState(false),
     [copied, setCopied] = useState(false),
     [now, setNow] = useState(0),
@@ -183,7 +216,9 @@ export function AquaMux() {
     src = catalog.find((t) => t.address === source)!,
     base = source === NATIVE ? wrapped(chainId) : src;
   const total = legs.reduce((s, l) => s + l.bps, 0),
-    ready = health?.networks.find((x) => x.id === chainId),
+    unreadTransactions = transactions.filter(
+      (transaction) => !transaction.read,
+    ).length,
     basket: Basket = {
       chainId,
       mode,
@@ -270,30 +305,58 @@ export function AquaMux() {
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
-        const saved = sessionStorage.getItem("aquamux:last-batch");
-        if (!saved) return;
-        const parsed = JSON.parse(saved);
-        if (
-          typeof parsed.id !== "string" ||
-          !/^0x[0-9a-fA-F]{40}$/.test(parsed.account)
-        )
-          return;
-        network(parsed.chainId);
-        setBatch(parsed);
-        setStatus({ status: 100 });
+        const saved = sessionStorage.getItem("aquamux:transactions");
+        const legacy = sessionStorage.getItem("aquamux:last-batch");
+        const parsed = saved
+          ? JSON.parse(saved)
+          : legacy
+            ? [JSON.parse(legacy)]
+            : [];
+        const valid = (Array.isArray(parsed) ? parsed : [])
+          .filter((item) => {
+            try {
+              network(item.chainId);
+              return (
+                typeof item.id === "string" &&
+                /^0x[0-9a-fA-F]{40}$/.test(item.account)
+              );
+            } catch {
+              return false;
+            }
+          })
+          .slice(0, 10)
+          .map((item) => ({
+            ...item,
+            submittedAt: item.submittedAt || Date.now(),
+            read: item.read ?? true,
+            status: item.status ?? { status: 100 },
+          })) as TransactionRecord[];
+        setTransactions(valid);
+        if (valid[0]) {
+          setBatch(valid[0]);
+          setStatus(valid[0].status);
+        }
       } catch {
         /* Storage may be unavailable in private browser contexts. */
+      } finally {
+        setTransactionsLoaded(true);
       }
     }, 0);
     return () => clearTimeout(timer);
   }, []);
   useEffect(() => {
-    if (!batch) return;
+    if (!transactionsLoaded) return;
     try {
-      sessionStorage.setItem("aquamux:last-batch", JSON.stringify(batch));
+      sessionStorage.setItem(
+        "aquamux:transactions",
+        JSON.stringify(transactions),
+      );
     } catch {
       /* The wallet still retains its activity. */
     }
+  }, [transactions, transactionsLoaded]);
+  useEffect(() => {
+    if (!batch) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
@@ -304,13 +367,28 @@ export function AquaMux() {
           s.status === 200 &&
           (s.atomic === false || s.receipts?.some((r) => r.status !== "0x1"))
         ) {
-          setStatus({ ...s, status: 500 });
+          const failed = { ...s, status: 500 } as BatchStatus;
+          setStatus(failed);
+          setTransactions((old) =>
+            old.map((transaction) =>
+              transaction.id === batch.id
+                ? { ...transaction, status: failed }
+                : transaction,
+            ),
+          );
           setError(
             "The wallet returned an inconsistent receipt. Check its activity before retrying.",
           );
           return;
         }
         setStatus(s);
+        setTransactions((old) =>
+          old.map((transaction) =>
+            transaction.id === batch.id
+              ? { ...transaction, status: s }
+              : transaction,
+          ),
+        );
         if (s.status === 100) timer = setTimeout(poll, 2500);
         else setRevision((v) => v + 1);
       } catch {
@@ -448,13 +526,20 @@ export function AquaMux() {
       setError("");
       setBusy(true);
       const id = await submitPlan(plan);
-      setBatch({
+      const transaction: TransactionRecord = {
         id,
         chainId: plan.chainId,
         account: plan.account,
         mode: plan.mode,
-      });
-      setStatus({ status: 100 });
+        submittedAt: Date.now(),
+        read: false,
+        status: { status: 100 },
+      };
+      setBatch(transaction);
+      setTransactions((old) =>
+        [transaction, ...old.filter((item) => item.id !== id)].slice(0, 10),
+      );
+      setStatus(transaction.status);
       setReview(false);
       setReceiptOpen(true);
     } catch (e) {
@@ -488,7 +573,6 @@ export function AquaMux() {
           <span>
             Aqua<span className="brand-light">Mux</span>
           </span>
-          <span className="beta">BETA</span>
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
           <button
@@ -511,19 +595,84 @@ export function AquaMux() {
           </a>
         </nav>
         <div className="header-actions">
+          <div className="activity-popover">
+            <button
+              className="activity-button"
+              aria-label={`Recent transactions${unreadTransactions ? `, ${unreadTransactions} unread` : ""}`}
+              aria-expanded={activityOpen}
+              onClick={() => {
+                setActivityOpen((open) => !open);
+                setTransactions((old) =>
+                  old.map((transaction) => ({ ...transaction, read: true })),
+                );
+              }}
+            >
+              <Bell size={17} />
+              {unreadTransactions > 0 && (
+                <span className="activity-count">{unreadTransactions}</span>
+              )}
+            </button>
+            {activityOpen && (
+              <div
+                className="activity-menu"
+                role="dialog"
+                aria-label="Recent transactions"
+              >
+                <strong>Recent transactions</strong>
+                {transactions.length ? (
+                  <div className="activity-list">
+                    {transactions.map((transaction) => (
+                      <button
+                        key={transaction.id}
+                        onClick={() => {
+                          setBatch(transaction);
+                          setStatus(transaction.status ?? { status: 100 });
+                          setActivityOpen(false);
+                          setReceiptOpen(true);
+                        }}
+                      >
+                        <span>
+                          <NetworkIcon
+                            chainId={transaction.chainId}
+                            size={24}
+                          />
+                          <span>
+                            <strong>
+                              {transaction.mode === "swap"
+                                ? "Multi-swap"
+                                : "Liquidity"}
+                            </strong>
+                            <small>
+                              {network(transaction.chainId).name} ·{" "}
+                              {new Date(
+                                transaction.submittedAt,
+                              ).toLocaleString()}
+                            </small>
+                          </span>
+                        </span>
+                        <small
+                          className={`transaction-state state-${transaction.status?.status ?? 100}`}
+                        >
+                          {transaction.status?.status === 200
+                            ? "Confirmed"
+                            : transaction.status?.status === 100
+                              ? "Pending"
+                              : "Check status"}
+                        </small>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p>No recent transactions.</p>
+                )}
+              </div>
+            )}
+          </div>
           <button
             className="network-button"
             onClick={() => setChainPicker(true)}
           >
-            <span
-              className="network-icon"
-              style={{
-                background: n.color,
-                color: chainId === 4663 ? "#172700" : "white",
-              }}
-            >
-              {n.mark}
-            </span>
+            <NetworkIcon chainId={chainId} />
             <span>{n.name}</span>
             <ChevronDown size={14} />
           </button>
@@ -539,11 +688,8 @@ export function AquaMux() {
           </Button>
         </div>
       </header>
-      <main>
+      <main className="app-main">
         <div className="intro">
-          <div className="eyebrow">
-            <span className="live-dot" /> BUILT ON 1INCH AQUA
-          </div>
           <h1>
             One token.
             <br className="mobile-break" /> <span>Many possibilities.</span>
@@ -624,11 +770,21 @@ export function AquaMux() {
                     ? `Shared across ${legs.length} pairs`
                     : "Enter the total to split"}
                 </span>
-                <span>
-                  {account
-                    ? `Balance: ${compact(balances[source])}`
-                    : "Wallet not connected"}
-                </span>
+                {account ? (
+                  <button
+                    className="balance-button"
+                    disabled={balances[source] == null}
+                    onClick={() => {
+                      if (balances[source] == null) return;
+                      change();
+                      setAmount(balances[source]!);
+                    }}
+                  >
+                    Balance: {compact(balances[source])}
+                  </button>
+                ) : (
+                  <span>Wallet not connected</span>
+                )}
               </div>
             </div>
             <div className="split-divider">
@@ -693,11 +849,7 @@ export function AquaMux() {
                             ? `${base.symbol} / ${t.symbol}`
                             : t.symbol}
                         </strong>
-                        <small>
-                          {mode === "liquidity"
-                            ? `Balance: ${account ? compact(balances[t.address]) : "Connect wallet"}`
-                            : t.name}
-                        </small>
+                        <small>{t.name}</small>
                       </span>
                       <ChevronDown size={13} />
                     </button>
@@ -736,7 +888,30 @@ export function AquaMux() {
                               );
                             }}
                           />
-                          <small>{t.symbol} in your wallet</small>
+                          {account ? (
+                            <button
+                              className="balance-button output-balance"
+                              disabled={balances[t.address] == null}
+                              onClick={() => {
+                                if (balances[t.address] == null) return;
+                                change();
+                                setLegs((old) =>
+                                  old.map((item, index) =>
+                                    index === i
+                                      ? {
+                                          ...item,
+                                          amount: balances[t.address]!,
+                                        }
+                                      : item,
+                                  ),
+                                );
+                              }}
+                            >
+                              Balance: {compact(balances[t.address])}
+                            </button>
+                          ) : (
+                            <small>Connect wallet</small>
+                          )}
                         </>
                       )}
                     </div>
@@ -866,14 +1041,6 @@ export function AquaMux() {
                 i
               </button>
             </div>
-            {batch && (
-              <button
-                className="activity-link"
-                onClick={() => setReceiptOpen(true)}
-              >
-                View latest transaction <ArrowUpRight size={12} />
-              </button>
-            )}
             {error && (
               <div role="alert" className="error-box">
                 {error}
@@ -910,18 +1077,11 @@ export function AquaMux() {
               )}
               {!busy && !blocked && <ArrowRight size={17} />}
             </Button>
-            <div className="composer-foot">
-              {mode === "swap"
-                ? `Slippage tolerance ${slippageBps / 100}%`
-                : "Approvals and positions are included in the batch"}
-              <span className="dot-separator" />
-              {legs.length} {mode === "swap" ? "outputs" : "pairs"}
-            </div>
           </section>
           <aside className="sidebar">
             <section className="flow-card">
               <div className="section-kicker">
-                {mode === "swap" ? "THE BIG PICTURE" : "SHARED LIQUIDITY"}
+                {mode === "swap" ? "PREVIEW" : "SHARED LIQUIDITY"}
               </div>
               <h2>
                 {mode === "swap"
@@ -987,10 +1147,7 @@ export function AquaMux() {
                 <div>
                   <dt>Network</dt>
                   <dd>
-                    <span
-                      className="mini-network"
-                      style={{ background: n.color }}
-                    />
+                    <NetworkIcon chainId={chainId} size={12} />
                     {n.name}
                   </dd>
                 </div>
@@ -1020,16 +1177,6 @@ export function AquaMux() {
                   </dd>
                 </div>
               </dl>
-              <div className="status-note">
-                <span
-                  className={`live-dot ${ready?.online ? "" : "offline"}`}
-                />
-                {!health
-                  ? "Checking network"
-                  : ready?.online && ready.aqua && ready.swapVm
-                    ? "Aqua & SwapVM verified on chain"
-                    : "Network verification unavailable"}
-              </div>
               {mode === "swap" && health && !health.swapApiConfigured && (
                 <p className="api-note">
                   Live quotes need a 1inch API key. Your basket is ready to
@@ -1037,51 +1184,26 @@ export function AquaMux() {
                 </p>
               )}
             </section>
-            <a
-              className="portfolio-card"
-              href={portfolio}
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="portfolio-icon">
-                <ArrowUpRight size={21} />
-              </span>
-              <div>
-                <strong>Your positions, in one place</strong>
-                <p>
-                  {account
-                    ? "Track your portfolio on 1inch"
-                    : "Explore the example portfolio on 1inch"}
-                </p>
-              </div>
-              <ExternalLink size={14} />
-            </a>
             <button className="how-link" onClick={() => setHowOpen(true)}>
               New to shared liquidity? See how it works{" "}
               <ArrowUpRight size={13} />
             </button>
           </aside>
         </div>
-        <div className="bottom-note">
-          <Layers3 size={13} /> Powered by <strong>1inch Aqua</strong>
-          <span className="dot-separator" />
-          Atomic wallet batching.
-        </div>
       </main>
-      <footer>
+      <footer className="app-footer">
         <span>
-          AquaMux{" "}
-          <span className="muted">/ An independent hackathon project</span>
+          <span className="muted">© AquaMux 2026</span>
         </span>
-        <div>
+        <div className="bottom-note">
+          <Layers3 size={13} /> Powered by{" "}
           <a
-            href="https://business.1inch.com/portal/documentation/aqua/overview"
+            href="https://1inch.com/aqua/overview"
             target="_blank"
             rel="noreferrer"
           >
-            Aqua docs <ArrowUpRight size={12} />
+            <strong>1inch Aqua</strong>
           </a>
-          <button onClick={() => setHowOpen(true)}>How it works</button>
         </div>
       </footer>
       <Modal
@@ -1093,9 +1215,7 @@ export function AquaMux() {
         <div className="picker-list">
           {networks.map((net) => (
             <button key={net.id} onClick={() => setNetwork(net.id)}>
-              <span className="network-icon" style={{ background: net.color }}>
-                {net.mark}
-              </span>
+              <NetworkIcon chainId={net.id} size={30} />
               <span>
                 <strong>{net.name}</strong>
                 <small>

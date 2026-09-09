@@ -13,6 +13,7 @@
 }
 body {
   margin: 0;
+  min-height: 100vh;
   color: var(--foreground);
   background: var(--background);
   font-family: var(--font-sans);
@@ -152,6 +153,115 @@ p {
   align-items: center;
   gap: 12px;
 }
+.activity-popover {
+  position: relative;
+}
+.activity-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: white;
+  color: #69758a;
+}
+.activity-button:hover {
+  background: #f4f7fd;
+}
+.activity-count {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  border-radius: 9px;
+  background: var(--blue);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+}
+.activity-menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(360px, calc(100vw - 28px));
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 18px 45px #2632521c;
+}
+.activity-menu > strong {
+  display: block;
+  margin: 2px 4px 10px;
+  font-size: 12px;
+}
+.activity-menu > p {
+  padding: 18px 4px 8px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 330px;
+  overflow: auto;
+}
+.activity-list > button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 8px;
+  border-radius: 8px;
+  background: transparent;
+  text-align: left;
+}
+.activity-list > button:hover {
+  background: #f4f7fd;
+}
+.activity-list > button > span {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.activity-list > button > span > span {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.activity-list strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+.activity-list small {
+  color: var(--muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+.transaction-state {
+  flex-shrink: 0;
+  color: #c17c1b !important;
+}
+.transaction-state.state-200 {
+  color: #258c73 !important;
+}
+.transaction-state.state-500 {
+  color: #c04e5b !important;
+}
 .network-button {
   display: flex;
   gap: 9px;
@@ -167,12 +277,8 @@ p {
   width: 23px;
   height: 23px;
   border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 11px;
-  font-weight: 700;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 .ui-button {
   display: inline-flex;
@@ -370,6 +476,18 @@ p {
   font-size: 10px;
   gap: 10px;
 }
+.balance-button {
+  padding: 0;
+  background: none;
+  color: var(--blue);
+  font-size: inherit;
+}
+.balance-button:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.balance-button:disabled {
+  color: #919bab;
+}
 .split-divider {
   display: flex;
   align-items: center;
@@ -490,6 +608,11 @@ p {
 .output-value small {
   font-size: 8px;
   color: #a2aaba;
+  white-space: nowrap;
+}
+.output-balance {
+  align-self: flex-end;
+  font-size: 8px;
   white-space: nowrap;
 }
 .output-value input {
@@ -815,12 +938,6 @@ p {
   font-weight: 500;
   color: #637189;
 }
-.mini-network {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  display: inline-block;
-}
 .status-note {
   display: flex;
   align-items: center;
@@ -890,12 +1007,11 @@ p {
 }
 .bottom-note {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 5px;
   color: #a5afbf;
   font-size: 10px;
-  margin: 29px auto 43px;
+  margin-left: auto;
 }
 .bottom-note strong {
   font-weight: 600;
@@ -909,12 +1025,20 @@ p {
   font-size: 18px;
   line-height: 1;
 }
-footer {
+.app-shell {
+  min-height: 100vh;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+}
+.app-main {
+  flex: 1;
+  padding-bottom: 48px;
+}
+.app-footer {
+  display: flex;
   align-items: center;
   border-top: 1px solid var(--border);
-  padding: 21px 48px;
+  padding: 12px 48px;
   color: #8c99af;
   font-size: 9px;
 }
@@ -1061,7 +1185,7 @@ footer button {
 .picker-list > button > svg {
   color: var(--blue);
 }
-.picker-list > .network-icon {
+.picker-list > button > .network-icon {
   width: 30px;
   height: 30px;
 }
@@ -1209,9 +1333,6 @@ footer button {
     padding-top: 18px;
     padding-bottom: 18px;
   }
-  .bottom-note {
-    margin-bottom: 60px;
-  }
 }
 @media (max-width: 1050px) {
   .topbar {
@@ -1270,6 +1391,15 @@ footer button {
   }
   .network-button {
     padding: 6px 8px;
+  }
+  .activity-button {
+    width: 35px;
+    height: 35px;
+  }
+  .activity-menu {
+    position: fixed;
+    top: 67px;
+    right: 14px;
   }
   .network-button > span:nth-child(2) {
     display: none;
@@ -1377,13 +1507,16 @@ footer button {
   .bottom-note {
     font-size: 8px;
     flex-wrap: wrap;
-    margin: 25px auto 28px;
+    margin-left: auto;
   }
   .bottom-note .aqua-drop {
     display: none;
   }
-  footer {
-    padding: 18px;
+  .app-main {
+    padding-bottom: 32px;
+  }
+  .app-footer {
+    padding: 12px 18px;
     gap: 10px;
     align-items: flex-start;
   }
@@ -1410,17 +1543,6 @@ footer button {
     animation-duration: 0.01ms !important;
     transition: none !important;
   }
-}
-.activity-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 5px;
-  color: var(--blue);
-  background: none;
-  font-size: 11px;
-  width: 100%;
-  padding: 0 0 12px;
 }
 .intro p,
 .field-top,
