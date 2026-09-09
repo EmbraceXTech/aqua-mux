@@ -18,11 +18,11 @@ AquaMux makes that shared-liquidity model practical through a focused workflow: 
 
 ## Features
 
-- **One input, many outputs** — Swap one token into two to six selected assets in one atomic transaction. Allocations total 100%, and integer arithmetic preserves the full input amount.
-- **Shared-liquidity LPs** — Use the full selected base-token amount as a shared virtual balance across multiple Aqua strategies, including different paired assets and fee settings.
-- **Atomic execution** — Combines wrapping (when needed), approvals, swaps, and Aqua `ship` calls with EIP-5792 `wallet_sendCalls` and `atomicRequired: true`.
-- **Self-custody** — Tokens remain in the connected wallet under Aqua allowance; AquaMux does not deploy a custody contract or access signing keys.
-- **Multi-chain** — Ethereum, Arbitrum, Robinhood Chain, and BNB Chain.
+- **One input, many outputs:** Swap one token into two to six selected assets in one atomic transaction. Allocations total 100%, and integer arithmetic preserves the full input amount.
+- **Shared-liquidity LPs:** Use the full selected base-token amount as a shared virtual balance across multiple Aqua strategies, including different paired assets and fee settings.
+- **Atomic execution:** Combines wrapping (when needed), approvals, swaps, and Aqua `ship` calls with EIP-5792 `wallet_sendCalls` and `atomicRequired: true`.
+- **Self-custody:** Tokens remain in the connected wallet under Aqua allowance; AquaMux does not deploy a custody contract or access signing keys.
+- **Multi-chain:** Ethereum, Arbitrum, Robinhood Chain, and BNB Chain.
 
 ## How it works
 
@@ -60,7 +60,7 @@ AquaMux checks wallet atomic-batch capability and never silently falls back to s
 
 ## Documentation
 
-- **[Frontend guide](apps/frontend/README.md)** — environment variables, all commands, tests, and fork/live verification.
+- **[Frontend guide](apps/frontend/README.md):** environment variables, all commands, tests, and fork/live verification.
 - [Aqua 1.0 whitepaper](references/whitepaper-aqua-1.0.pdf)
 - [SwapVM 1.0 whitepaper](references/whitepaper-swap-vm-1.0.pdf)
 - [Vendored Aqua implementation](references/aqua)
