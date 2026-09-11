@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, unlink, writeFile } from "node:fs/promises";
 import { format } from "prettier";
 
 const CHAINS = [1, 56, 42161, 4663];
@@ -54,6 +54,11 @@ const LOGO_HOSTS = new Set([
   "cdn.robinhood.com",
   "cdn.dexscreener.com",
 ]);
+const IMAGE_EXTENSIONS = new Map([
+  ["image/png", "png"],
+  ["image/webp", "webp"],
+  ["image/jpeg", "jpg"],
+]);
 
 function validateToken(chain, token) {
   if (
@@ -104,7 +109,23 @@ for (const chain of CHAINS) {
         throw new Error(`Logo failed: ${chain} ${token.address}`);
       }
       const address = token.address.toLowerCase();
-      const localLogo = `/tokens/${chain}-${address}.png`;
+      const contentType = logoResponse.headers
+        .get("content-type")
+        ?.split(";")[0];
+      const extension = contentType && IMAGE_EXTENSIONS.get(contentType);
+      if (!extension) {
+        throw new Error(`Unsupported logo format: ${chain} ${token.address}`);
+      }
+      const basename = `${chain}-${address}`;
+      const localLogo = `/tokens/${basename}.${extension}`;
+      for (const oldExtension of IMAGE_EXTENSIONS.values()) {
+        if (oldExtension === extension) continue;
+        await unlink(`public/tokens/${basename}.${oldExtension}`).catch(
+          (error) => {
+            if (error?.code !== "ENOENT") throw error;
+          },
+        );
+      }
       await writeFile(
         `public${localLogo}`,
         Buffer.from(await logoResponse.arrayBuffer()),

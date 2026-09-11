@@ -1,5 +1,5 @@
 {
-  "capturedAt": "2026-09-11T20:14:21.601Z",
+  "capturedAt": "2026-09-11T20:20:08.105Z",
   "source": "https://tokens.1inch.io/v1.2/{chainId}",
   "chains": {
     "1": [
@@ -96,7 +96,7 @@
         "symbol": "USDT",
         "name": "Tether USD",
         "decimals": 6,
-        "logo": "/tokens/1-0xdac17f958d2ee523a2206206994597c13d831ec7.png",
+        "logo": "/tokens/1-0xdac17f958d2ee523a2206206994597c13d831ec7.webp",
         "source": "https://tokens-data.1inch.io/images/1/0xdac17f958d2ee523a2206206994597c13d831ec7_0xc047483b8988ef2766792d8bfc95e22756b57c1fd130c69035645f15c6c31a09.webp",
         "tags": [
           "GROUP:USDT",
@@ -132,7 +132,7 @@
         "symbol": "WBTC",
         "name": "Wrapped BTC",
         "decimals": 8,
-        "logo": "/tokens/1-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png",
+        "logo": "/tokens/1-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.webp",
         "source": "https://tokens-data.1inch.io/images/1/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599_0xb818b82ac32dc885c17f83c5adf2455258d93aa23712006b48a9efada43d4672.webp",
         "tags": [
           "GROUP:WBTC",
@@ -296,7 +296,7 @@
         "symbol": "1INCH",
         "name": "1INCH Token",
         "decimals": 18,
-        "logo": "/tokens/1-0x111111111117dc0aa78b770fa6a738034120c302.png",
+        "logo": "/tokens/1-0x111111111117dc0aa78b770fa6a738034120c302.webp",
         "source": "https://tokens-data.1inch.io/images/1/0x111111111117dc0aa78b770fa6a738034120c302_0x2b2c127f11a6604d4319c936334506b86c339a3773b6f2731db0ed4a4fb7fb72.webp",
         "tags": [
           "GROUP:1INCH",
@@ -326,7 +326,7 @@
         "symbol": "AAVE",
         "name": "Aave Token",
         "decimals": 18,
-        "logo": "/tokens/1-0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9.png",
+        "logo": "/tokens/1-0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9.webp",
         "source": "https://tokens-data.1inch.io/images/1/0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9_0x5dcbf3ab535b2534d32c8b3919c9550e6765cfd8d508ff638c99ab4ccc03a5f1.webp",
         "tags": [
           "GROUP:AAVE",
@@ -479,7 +479,7 @@
         "symbol": "ETH",
         "name": "Ethereum Token",
         "decimals": 18,
-        "logo": "/tokens/56-0x2170ed0880ac9a755fd29b2688956bd959f933f8.png",
+        "logo": "/tokens/56-0x2170ed0880ac9a755fd29b2688956bd959f933f8.webp",
         "source": "https://tokens-data.1inch.io/images/56/0x2170ed0880ac9a755fd29b2688956bd959f933f8_0x766bd395be8bfa3923ad0ac075487c0d5f2df36d23946e97f2839fdd0639f9f9.webp",
         "tags": [
           "GROUP:ETH",
@@ -507,7 +507,7 @@
         "symbol": "1INCH",
         "name": "1INCH Token",
         "decimals": 18,
-        "logo": "/tokens/56-0x111111111117dc0aa78b770fa6a738034120c302.png",
+        "logo": "/tokens/56-0x111111111117dc0aa78b770fa6a738034120c302.webp",
         "source": "https://tokens-data.1inch.io/images/56/0x111111111117dc0aa78b770fa6a738034120c302_0xbaf6599e3eefb67db005e26e766abf606df7119da221c355e2a0efe25af4e791.webp",
         "tags": [
           "GROUP:1INCH",
@@ -801,7 +801,7 @@
         "symbol": "1INCH",
         "name": "1inch",
         "decimals": 18,
-        "logo": "/tokens/42161-0x6314c31a7a1652ce482cffe247e9cb7c3f4bb9af.png",
+        "logo": "/tokens/42161-0x6314c31a7a1652ce482cffe247e9cb7c3f4bb9af.webp",
         "source": "https://tokens-data.1inch.io/images/42161/0x6314c31a7a1652ce482cffe247e9cb7c3f4bb9af_0x933c4b106d87b672a699ae312fbbc7373db48a585addc496d7fd929dbcd608e3.webp",
         "tags": ["GROUP:1INCH", "RISK:info", "crosschain", "tokens"],
         "providers": [
