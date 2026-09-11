@@ -1,4 +1,4 @@
-import { parseAbi } from "viem";
+import { keccak256, parseAbi } from "viem";
 import { NATIVE } from "../../config";
 import { client } from "../rpc";
 import {
@@ -36,7 +36,10 @@ export async function quoteVerifiedRoute(
   let amountOut: bigint;
   try {
     if (pool.protocol === "uniswap-v3") {
-      if (!router.quoter) throw new Error();
+      if (!router.quoter || !router.quoterCodeHash) throw new Error();
+      const quoterCode = await rpc.getCode({ address: router.quoter });
+      if (!quoterCode || keccak256(quoterCode) !== router.quoterCodeHash)
+        throw new Error();
       const { result } = await rpc.simulateContract({
         address: router.quoter,
         abi: quoterAbi,

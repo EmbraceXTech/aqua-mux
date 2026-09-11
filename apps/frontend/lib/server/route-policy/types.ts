@@ -40,6 +40,9 @@ export type RouterDeployment = {
   address: Address;
   codeHash: Hex;
   wrapped: Address;
+  wrappedCodeHash: Hex;
+  wrappedImplementation?: { address: Address; codeHash: Hex };
   sourceUrl: string;
   quoter?: Address;
+  quoterCodeHash?: Hex;
 };

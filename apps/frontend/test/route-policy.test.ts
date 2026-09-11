@@ -23,10 +23,9 @@ const now = fixture.quotedAt + 1000;
 function reject(change: (route: VerifiedRoute) => void, pattern?: RegExp) {
   const route = structuredClone(fixture);
   change(route);
-  assert.throws(
-    () => validateCompiledRoute(fixture.request, route, now),
-    pattern,
-  );
+  const validate = () => validateCompiledRoute(fixture.request, route, now);
+  if (pattern) assert.throws(validate, pattern);
+  else assert.throws(validate);
 }
 
 test("real Arbitrum calldata fixtures enforce observed output minima", () => {
@@ -182,8 +181,15 @@ test("fresh provenance checks reject wrong chain, absent code and changed pool/r
   route.expiresAt = route.quotedAt + 30_000;
   const reader = {
     getChainId: async () => 42161,
+    getStorageAt: async () => runtime.wrappedImplementationSlotValue as Hex,
     getCode: async ({ address }: { address: string }) =>
-      (address === route.call.to ? runtime.router : runtime.pool) as Hex,
+      (address === route.call.to
+        ? runtime.router
+        : address === "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+          ? runtime.wrapped
+          : address === "0x8b194beae1d3e0788a1a35173978001acdfba668"
+            ? runtime.wrappedImplementation
+            : runtime.pool) as Hex,
   };
   await verifyRouteProvenance(route, reader);
   await assert.rejects(
@@ -206,4 +212,62 @@ test("fresh provenance checks reject wrong chain, absent code and changed pool/r
       /code/,
     );
   }
+});
+
+test("provenance refuses a route that expires during RPC reads", async (t) => {
+  const route = structuredClone(fixture);
+  let clock = route.quotedAt + 1;
+  t.mock.method(Date, "now", () => clock);
+  await assert.rejects(
+    verifyRouteProvenance(route, {
+      getChainId: async () => 42161,
+      getStorageAt: async () => runtime.wrappedImplementationSlotValue as Hex,
+      getCode: async ({ address }) => {
+        clock = route.expiresAt;
+        return (
+          address === route.call.to
+            ? runtime.router
+            : address === "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+              ? runtime.wrapped
+              : address === "0x8b194beae1d3e0788a1a35173978001acdfba668"
+                ? runtime.wrappedImplementation
+                : runtime.pool
+        ) as Hex;
+      },
+    }),
+    /stale/,
+  );
+});
+
+test("same wrapped proxy code cannot conceal an implementation upgrade", async () => {
+  const route = {
+    ...structuredClone(fixture),
+    quotedAt: Date.now(),
+    expiresAt: Date.now() + 29_000,
+  };
+  for (const stored of [undefined, "0x", `0x${"0".repeat(63)}1`]) {
+    await assert.rejects(
+      verifyRouteProvenance(route, {
+        getChainId: async () => 42161,
+        getStorageAt: async () => stored as Hex | undefined,
+        getCode: async () => runtime.wrapped as Hex,
+      }),
+      /implementation/,
+    );
+  }
+  await assert.rejects(
+    verifyRouteProvenance(route, {
+      getChainId: async () => 42161,
+      getStorageAt: async () => runtime.wrappedImplementationSlotValue as Hex,
+      getCode: async ({ address }) =>
+        (address === route.call.to
+          ? runtime.router
+          : address === "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+            ? runtime.wrapped
+            : address === "0x8b194beae1d3e0788a1a35173978001acdfba668"
+              ? "0x6000"
+              : runtime.pool) as Hex,
+    }),
+    /code/,
+  );
 });

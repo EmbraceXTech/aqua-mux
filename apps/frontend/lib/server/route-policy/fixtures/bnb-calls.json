@@ -1,0 +1,66 @@
+[
+  {
+    "route": {
+      "request": {
+        "chainId": 56,
+        "maker": "0x100000000000000000000000000000000000cafe",
+        "source": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "destination": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+        "amountIn": "100000000000000",
+        "minimumAmountOut": "1",
+        "slippageBps": 100
+      },
+      "call": {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "data": "0x175accdc000000000000000000000000100000000000000000000000000000000000cafe00000000000000000000000000000000000000000000000000fef05412f08d3d2000000000000000000000005289a8dbf7029ee0b0498a84777ed3941d9acfec",
+        "value": "0x5af3107a4000",
+        "label": "Swap through verified 1inch single-pool route"
+      },
+      "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "amountIn": "100000000000000",
+      "amountOut": "72483725222404458",
+      "minimumAmountOut": "71758887970180413",
+      "quotedAt": 1789165814999,
+      "expiresAt": 1789165844999,
+      "policy": {
+        "version": 1,
+        "poolId": "bnb-wbnb-usdc-500"
+      }
+    },
+    "simulatedOutput": "72483725222404458",
+    "blockNumber": "121342188",
+    "broadcasts": 0
+  },
+  {
+    "route": {
+      "request": {
+        "chainId": 56,
+        "maker": "0x100000000000000000000000000000000000cafe",
+        "source": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "destination": "0x55d398326f99059ff775485246999027b3197955",
+        "amountIn": "100000000000000",
+        "minimumAmountOut": "1",
+        "slippageBps": 100
+      },
+      "call": {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "data": "0x175accdc000000000000000000000000100000000000000000000000000000000000cafe00000000000000000000000000000000000000000000000000feaccf7dc4c86b2000000000000000000000006fe9e9de56356f7edbfcbb29fab7cd69471a4869",
+        "value": "0x5af3107a4000",
+        "label": "Swap through verified 1inch single-pool route"
+      },
+      "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "amountIn": "100000000000000",
+      "amountOut": "72408738639154274",
+      "minimumAmountOut": "71684651252762731",
+      "quotedAt": 1789165815585,
+      "expiresAt": 1789165845585,
+      "policy": {
+        "version": 1,
+        "poolId": "bnb-wbnb-usdt-500"
+      }
+    },
+    "simulatedOutput": "72408738639154274",
+    "blockNumber": "121342189",
+    "broadcasts": 0
+  }
+]
