@@ -13,7 +13,12 @@ const original = z.toJSONSchema(reviewResultSchema, { io: "input" }) as Schema;
 
 /** Derive the provider wire shape from the shared schema; optional fields become nullable. */
 export function providerOutputSchema(): Schema {
-  return strictWireSchema(original);
+  const schema = strictWireSchema(original);
+  schema.properties!.previewId = {
+    anyOf: [{ type: "string" }, { type: "null" }],
+  };
+  schema.required!.push("previewId");
+  return schema;
 }
 
 function strictWireSchema(schema: Schema): Schema {

@@ -1,5 +1,5 @@
 import type { ManagementPolicy } from "../../managed/policy";
-import { classicRouter } from "../../config";
+import { routePolicyTargets } from "../route-policy";
 import { verifiedToken } from "./snapshot";
 import type { ProposalIntent } from "./inputs";
 import type { ManagedTokenSnapshot } from "./tokens";
@@ -23,7 +23,7 @@ export function proposalPolicy(
     id,
     version: 1,
     intervalMs: rule(intent.intervalMs),
-    cooldownMs: advisory(intent.intervalMs),
+    cooldownMs: rule(intent.intervalMs),
     maxActions: advisory(1),
     spendBudgets: advisory([
       {
@@ -33,18 +33,19 @@ export function proposalPolicy(
     ]),
     gasBudgetWei: advisory(intent.gasReserveWei),
     allowedAssets: rule(intent.permittedAssets),
-    allowedRoutes: rule([classicRouter(intent.chainId)]),
+    allowedRoutes: rule(routePolicyTargets(intent.chainId)),
     maxSlippageBps: rule(50),
     maxReferenceAgeMs: rule(60_000),
     expiresAt: rule(now + intent.holdingPeriodMs),
     allowedActions: rule([
       "hold",
       "fund-and-open",
+      ...(intent.recipeId === "wide-range-lp" ? [] : ["replace" as const]),
       "close",
       "propose-conversion",
     ]),
-    triggers: advisory({
-      rangeExit: false,
+    triggers: rule({
+      rangeExit: intent.recipeId !== "wide-range-lp",
       inventoryDriftBps: 10000,
       upwardOnly: intent.recipeId === "upward-only-lp",
     }),

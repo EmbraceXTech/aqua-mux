@@ -20,6 +20,7 @@ import {
 import { proposalPolicy } from "./policy-template";
 import { createGroup } from "./groups";
 import { ManagedError } from "./errors";
+import { attachKnownExposure } from "./exposure";
 
 type ProposalResponse = {
   review: Records["review"];
@@ -130,6 +131,7 @@ export async function proposeIntent(
         store.list("review", owner).length,
     });
     const snapshot = await (dependencies.snapshot ?? intentSnapshot)(intent);
+    if (!dependencies.snapshot) await attachKnownExposure(snapshot, store);
     review.snapshot = snapshot;
     review.coverage = snapshot.coverage;
     const policyTemplate = proposalPolicy(

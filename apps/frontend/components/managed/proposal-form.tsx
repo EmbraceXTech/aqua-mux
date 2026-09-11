@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { type Address } from "viem";
-import { networks, type ChainId } from "@/lib/config";
+import { networks, NATIVE, wrapped, type ChainId } from "@/lib/config";
 import { Button } from "../ui/button";
 import { TokenSelect, type SelectedToken } from "./token-select";
 import type { RecipeId } from "./strategy-catalog";
@@ -95,6 +95,7 @@ export function ProposalForm({
         },
         onCheck: (check) => setChecks((current) => [...current, check]),
       });
+      setChecking(false);
       await onSubmit({
         recipeId: recipe,
         chainId,
@@ -224,6 +225,12 @@ export function ProposalForm({
             ))}
           </div>
           <div className="managed-notice">
+            {funding?.address === NATIVE && (
+              <p>
+                Native funding permits wrapping into {wrapped(chainId).symbol}{" "}
+                for LP reserves. The final review shows the exact wrap amount.
+              </p>
+            )}
             Tokens listed in the registry may have no usable route. The proposal
             must verify metadata, balances, and route availability before
             preparing transactions.

@@ -22,6 +22,12 @@ import { ServiceError } from "./errors";
 
 export { reviewResultSchema };
 export const snapshotSchema = z.strictObject({
+  tokenMetadata: z
+    .strictObject({
+      chainId: chainIdSchema,
+      tokens: z.array(tokenSchema).max(32),
+    })
+    .optional(),
   observedAt: timestampSchema,
   blockNumber: integerAmountSchema,
   blockHash: hashSchema,
@@ -153,6 +159,21 @@ export function validateFreshRequest(
   const allowed = new Map(
     snapshot.balances.map((v) => [v.token.address, v.token]),
   );
+  if (
+    snapshot.tokenMetadata &&
+    (snapshot.tokenMetadata.chainId !== snapshot.chainId ||
+      new Set(snapshot.tokenMetadata.tokens.map((token) => token.address))
+        .size !== snapshot.tokenMetadata.tokens.length ||
+      snapshot.balances.some(
+        (row) =>
+          canonical(
+            snapshot.tokenMetadata!.tokens.find(
+              (token) => token.address === row.token.address,
+            ),
+          ) !== canonical(row.token),
+      ))
+  )
+    throw new ServiceError(400, "snapshot_token_mismatch");
   if (
     config?.pairs.some((p) =>
       [p.baseToken, p.quoteToken].some(

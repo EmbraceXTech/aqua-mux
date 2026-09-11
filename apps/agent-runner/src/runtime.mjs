@@ -20,15 +20,16 @@ export function validateReview(value) {
 }
 /**
  * @param {'codex' | 'claude'} provider
- * @param {{ structured?: boolean, schema?: import('ai').FlexibleSchema<unknown>, instructions?: string }} [options]
+ * @param {{ structured?: boolean, schema?: import('ai').FlexibleSchema<unknown>, instructions?: string, tools?: import('ai').ToolSet }} [options]
  */
-export function createAgent(provider, { structured = false, schema, instructions } = {}) {
+export function createAgent(provider, { structured = false, schema, instructions, tools } = {}) {
   assertSubscriptionEnvironment();
   if (!['codex', 'claude'].includes(provider)) throw new Error('Unknown provider');
   return new HarnessAgent({
     harness: provider === 'codex' ? createCodex({ auth: 'direct', reasoningEffort: 'medium' }) : createClaudeCode({ auth: 'direct', maxTurns: 8, thinking: { type: 'disabled' } }),
     model: provider === 'codex' ? 'gpt-6-astra' : 'claude-sonnet-4-6',
     permissionMode: 'allow-all',
+    ...(tools ? { tools } : {}),
     instructions: instructions ?? 'This is an isolated runtime compatibility test. Follow the exact requested response. Never inspect credentials or use tools unless the test explicitly asks for a harmless command.',
     ...(structured || schema ? { output: Output.object({ schema: schema ?? jsonSchema(reviewSchema) }) } : {}),
     debug: { enabled: false }, onLog: () => {},

@@ -6,6 +6,7 @@ import {
   integerAmountSchema,
 } from "../../managed/primitives";
 import { strategyConfigSchema } from "../../managed/config";
+import { NATIVE, wrapped } from "../../config";
 export const intentSchema = z
   .strictObject({
     recipeId: z.enum([
@@ -29,7 +30,19 @@ export const intentSchema = z
   .refine(
     (v) => new Set(v.permittedAssets).size === v.permittedAssets.length,
     "Duplicate permitted asset.",
-  );
+  )
+  .transform((intent) => ({
+    ...intent,
+    permittedAssets:
+      intent.fundingToken === NATIVE
+        ? [
+            ...new Set([
+              ...intent.permittedAssets,
+              wrapped(intent.chainId).address,
+            ]),
+          ]
+        : intent.permittedAssets,
+  }));
 export type ProposalIntent = z.infer<typeof intentSchema>;
 export const groupInputSchema = z.strictObject({
   config: strategyConfigSchema,

@@ -76,6 +76,10 @@ export class ReviewStore {
       .get(id) as StoredReview | undefined;
   }
 
+  recordTool(requestId: string, name: string): void {
+    this.event(requestId, `tool:${name}`);
+  }
+
   countSince(time: number): number {
     return Number(
       this.db

@@ -1,5 +1,5 @@
 import { erc20Abi, type Address } from "viem";
-import { AQUA, NATIVE } from "../../config";
+import { AQUA, NATIVE, wrapped } from "../../config";
 import {
   ensureManagedTokens,
   verifiedToken,
@@ -176,7 +176,11 @@ export async function intentSnapshot(
     );
   const quotes = [];
   for (const asset of intent.permittedAssets.filter(
-    (a) => a !== intent.fundingToken,
+    (a) =>
+      a !== intent.fundingToken &&
+      !(
+        intent.fundingToken === NATIVE && a === wrapped(intent.chainId).address
+      ),
   )) {
     try {
       const amountIn = (
