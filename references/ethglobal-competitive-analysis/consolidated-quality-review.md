@@ -375,3 +375,34 @@ The authenticated endpoint returns HTTP 500 with request_failed for that payload
 The successful owner fixture uses wrapped-native plus unwrap true and therefore did not cover the UI payload.
 The app owner received review-native-conversion.ts and must preserve explicit native-destination semantics through the client and reviewed plan.
 This mismatch remains open together with the signing and fresh-fill resume findings.
+
+
+## App correction verification at e2bc73b
+
+Exact commit `e2bc73b3ad101d05f0b323e02d4f52a5a256784d` passes independent frontend lint, typecheck, all 156 existing committed tests and one intentional skip.
+The runner's 16 service tests and strict typecheck also pass.
+The production frontend build passes with Next's webpack option, used because the isolated archive links dependencies from outside its project root.
+The earlier recorded Turbopack dependency-link restriction is a test-environment limitation.
+
+The authenticated HTTP fork now passes ordinary concentrated replacement, explicit policy authorization refusal, downward refusal, upward replacement, close-only and later native conversion with production receipt reconciliation.
+Replacement no longer reuses the initial native funding intent against existing ERC20 reserves.
+The control fixture seeds review decisions and ages a confirmed baseline only to isolate deterministic rules; it does not claim live model replacement or elapsed real cooldown.
+
+All four original independent reproductions now pass their corrected outcomes.
+Unsupported signing and a stale local workspace produce failed hashless attempts with no relay.
+Resume without an environment start block derives current complete fill coverage from confirmed registration blocks.
+The native destination payload returns HTTP 200 through explicit wrapped-native and unwrap normalization.
+The observer retains earlier valid coverage bounds and the resume handler checks indexed target, health and freshness.
+The explicit store now flows through attempt preparation and relay, and the preview source formatting is consistent.
+
+Indexed token movements have a focused display component and use each observed Aqua movement once.
+SwapVM amounts are not added again, and the display states that these movements do not establish profit or fee decomposition.
+No additional component split is required for these corrections.
+The retained plan screenshot was visually inspected; its desktop layout is coherent, with one minor singular/plural wording issue sent to the app owner.
+
+One related recovery defect remains reproduced.
+If another tab stops management while signing is pending, this mounted client passes its local post-sign checks and the server correctly refuses the changed generation.
+That relay failure occurs outside the client cleanup block, leaving a prepared attempt without a hash.
+The exact review-stop-during-signature.ts probe confirms that state with no broadcast.
+The owner must cancel positively known pre-broadcast relay refusals while retaining transport-ambiguous submissions.
+The four earlier findings are closed at this revision, but full app acceptance remains held for this remaining recovery case and final browser evidence.
