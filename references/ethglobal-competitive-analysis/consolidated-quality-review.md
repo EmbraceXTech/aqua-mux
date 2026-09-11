@@ -255,7 +255,7 @@ No further split is currently required in these modules.
 All 16 existing runner service tests and its strict TypeScript check pass independently in the pinned snapshot.
 Scoped frontend lint and the corrected full frontend typecheck also pass.
 The owner reports real request `84237790-366b-4d3b-bccf-91ad67538e31` with a persisted proposal_preview tool event and a successful editable native-funded LP proposal.
-That real-model result is owner-reported pending durable redacted evidence and independent inspection.
+The independent persisted-record inspection below confirms that completed result; the owner browser journey has not been independently repeated.
 The owner also reproduced a generic initial-plan error and is correcting it, so the complete proposal-to-execution journey is not accepted.
 
 
@@ -268,3 +268,15 @@ The updated controlled-provider script passes all four scenarios, including nati
 Transaction and prestate proof, expiry refusal, ambiguous relay recovery and zero public broadcasts remain explicit in the results.
 The new runtime change is a deployment-manifest entry and needs no new component split.
 This acceptance does not close the separately pending observed-fill, replacement or production receipt-reconciliation gates.
+
+
+## Completed runner record inspected
+
+The reviewer made a consistent read-only SQLite backup of the owner-supplied runner database and inspected only completed request `84237790-366b-4d3b-bccf-91ad67538e31`.
+The record is succeeded, with running, tool:proposal_preview and succeeded events over 29,670 milliseconds.
+It identifies Codex gpt-6-astra and runtime harness@1.0.108/codex@1.0.110/claude-code@1.0.112.
+Recorded usage is 27,039 input tokens and 597 output tokens, with cost null.
+The returned decision is fund-and-open with one bounded WETH/USDC pair and a program expiry.
+No container resource remains associated with that completed request.
+These persisted facts corroborate the owner's real-run report and the reviewed runtime integration at `01c7511`.
+They do not establish the separate two-pair lifecycle, current market prices, complete app planning or execution, or a repeated independent model invocation.
