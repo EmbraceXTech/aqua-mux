@@ -3,6 +3,9 @@ import { acquireContainer } from './container-policy.mjs';
 import { spawnSandboxProcess } from './process-supervisor.mjs';
 export { docker } from './docker-command.mjs';
 
+/**
+ * @param {{ identity?: import('./container-policy.mjs').ContainerIdentity, image?: string, abortSignal?: AbortSignal, restartStopped?: boolean, onAcquiring?: (identity: import('./container-policy.mjs').ContainerIdentity) => void | Promise<void> }} [options]
+ */
 export async function createDockerSandbox(options = {}) {
   const { identity, binding } = await acquireContainer(docker, options);
   const { id } = identity;

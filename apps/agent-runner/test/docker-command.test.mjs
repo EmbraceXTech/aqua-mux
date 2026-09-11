@@ -34,3 +34,30 @@ test('failed acquisition cleanup is explicit', async () => {
   };
   await assert.rejects(acquireContainer(execute), { code: 'sandbox-acquisition-cleanup-unconfirmed' });
 });
+
+test('acquisition awaits durable registration before any container is created', async () => {
+  const sequence = [];
+  const execute = async args => {
+    sequence.push(args[0]);
+    if (args[0] === 'image') return Buffer.from(JSON.stringify([{ Id: `sha256:${'a'.repeat(64)}` }]));
+    if (args[0] === 'run') throw new DockerOperationError('docker-timeout');
+    return Buffer.from('');
+  };
+  await assert.rejects(acquireContainer(execute, { onAcquiring: async identity => {
+    assert.match(identity.id, /^aquamux-runtime-/);
+    assert.equal(identity.instanceId, undefined);
+    await new Promise(resolve => setTimeout(resolve, 10));
+    sequence.push('registered');
+  } }), { code: 'docker-timeout' });
+  assert.deepEqual(sequence, ['image', 'registered', 'run', 'rm']);
+});
+
+test('failed durable registration never creates a container', async () => {
+  const calls = [];
+  const execute = async args => {
+    calls.push(args[0]);
+    return Buffer.from(JSON.stringify([{ Id: `sha256:${'a'.repeat(64)}` }]));
+  };
+  await assert.rejects(acquireContainer(execute, { onAcquiring: async () => { throw new Error('registration failed'); } }));
+  assert.deepEqual(calls, ['image']);
+});

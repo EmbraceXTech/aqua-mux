@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { DockerOperationError } from './docker-command.mjs';
 
+/** @typedef {{ id: string, imageId: string, owner: string, instanceId?: string }} ContainerIdentity */
+
 export const DEFAULT_IMAGE = 'aquamux-runtime-spike:local';
 export function containerArguments(id, imageId, owner) {
   return ['run', '-d', '--name', id, '--label', 'aquamux.runtime-spike=true',
@@ -36,13 +38,14 @@ export function validateContainer(info, identity, { allowStopped = false } = {})
   if (!restrictionsHold) throw new DockerOperationError('sandbox-policy-mismatch');
 }
 
-export async function acquireContainer(execute, { identity, image = DEFAULT_IMAGE, abortSignal, restartStopped = false } = {}) {
+export async function acquireContainer(execute, { identity, image = DEFAULT_IMAGE, abortSignal, restartStopped = false, onAcquiring } = {}) {
   let owned = false;
   let selected = identity;
   try {
     if (!selected) {
       const images = JSON.parse((await execute(['image', 'inspect', image], undefined, { abortSignal })).toString());
       selected = { id: `aquamux-runtime-${randomUUID()}`, imageId: images[0].Id, owner: randomUUID() };
+      await onAcquiring?.(Object.freeze({ ...selected }));
       // Record ownership before run: a timed-out client may still have created it.
       owned = true;
       const created = await execute(containerArguments(selected.id, selected.imageId, selected.owner), undefined, { abortSignal, timeoutMs: 30000 });
