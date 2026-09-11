@@ -342,3 +342,22 @@ The reproduction scripts are review-unsupported-provider.ts and review-stale-sig
 Their sanitized results record the method names, attempt states and zero public transactions.
 Both findings were delivered directly to the app owner and coordinator before acceptance.
 The entire app relay milestone remains held until corrections and E2E reruns pass.
+
+
+## Final delivered chain scope accepted
+
+The reviewer independently reran the exact archive at `4730813bbc005399020ab16a90dfc0b8ffed4e18`, including conversion guard correction `421c58c48ac9c3d392ab49469c8db1b08ef74134`.
+All four scenarios pass and scoped lint passes for the guard, credential fixture and lifecycle script.
+The credential assertion now accepts only exact ABI-encoded TxOriginTokenBalanceIsZero data with the expected taker origin and credential token.
+This closes the earlier broad-rejection evidence finding.
+The fourth scenario confirms close-only followed by a separate signed conversion with no retirements or new registrations, and refuses empty selected quantities.
+The correction retains fresh metadata, allowed assets, positive selected inventory and complete downstream conversion-balance checks.
+No additional split or runtime correction is required in the delivered chain scope.
+
+## Fresh-fill resume finding
+
+An additional authenticated HTTP probe at `4a7b1e1` opened an active concentrated position, stopped management and resumed with no configured observation start block.
+Resume returned HTTP 200 with the bot running and direct position health current, while indexed fill coverage was null.
+The handler checks only positions.health after observation and therefore does not establish the required fresh-fill reconciliation before Resume.
+The app owner received the exact review-resume-coverage.ts reproduction and must either establish verified registration-based coverage or refuse absent, stale or degraded fill coverage.
+This finding remains open alongside the two signing findings.
