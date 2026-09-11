@@ -20,7 +20,7 @@ Owner-reported evidence and independently rerun evidence are distinguished below
 | --- | --- | --- | --- |
 | Request-local metadata, `29a199d3bd5e07a1cdc95c08947417ac08bf0f7b` | Accepted for asynchronous metadata binding. | All 36 focused API, lease, auth, store and metadata tests pass; scoped ESLint passes. | Label normalization, inventory attribution and full app workflow remain separate. |
 | Route provenance, `a9a7c273` with `cad298a7d98837b410f77adc63a3f822fb4d0523` | Accepted for the Arbitrum and BNB route-policy scope. | Nine route tests, thirteen adapter tests, seven compiler replays, 260 independent mutations and expiry/proxy probes pass; corrected recursive route lint passes. | External execution and funded lifecycle evidence remain separate. |
-| External Phase 1 execution | Pending owner delivery. | Blanket refusal remains a safe interim boundary. | A compatible account path, simulation before journal/locks, exact transaction binding and receipt recovery. |
+| External backend, `d95f893` with `fd68e4a` and `41ae2f7` | Accepted for the named adapter and controlled-fork backend scope. | Independent three-chain funded forks, exact trace/prestate proof, expiry and signature mutations, signer code/nonce refusal, rollback and eight Robinhood compiler replays pass. | App signing journey and production receipt reconciliation; no wallet brand compatibility proven. |
 | Full initial app scope | Pending owner delivery. | Earlier narrowly scoped acceptances remain limited to their exact revisions. | Coherent app milestone and integrated browser/fork evidence. |
 
 ## Route source, authority and evidence
@@ -46,7 +46,7 @@ Adapters must still supply their independent reviewed request and bind route rec
 All seven retained compiler templates reproduced with the attested compiler hashes and source input hashes.
 The offline test derives semantic immutable values and compares the reconstructed executable bytes and full deployment hashes for eleven retained deployment records.
 The reviewer requested that the replay helper also compare compiler immutable references with the retained named offset map, so future replay verifies both template bytes and substitution locations.
-The current source attestation does not authorize Robinhood.
+That first source attestation does not authorize Robinhood; the later direct-pool milestone below has separate evidence.
 Historical RPC call fixtures use synthetic balances and are not funded lifecycle transactions or current price observations.
 
 The initial focused command passed 22 tests and failed two additional legacy basket compiler tests.
@@ -85,7 +85,8 @@ They are not new findings against the narrow accepted metadata correction.
 - Prove a compatible external execution path with exact batch, sender, destination, native value, implementation and receipt binding.
 
 The existing SQLite one-group-per-wallet uniqueness constraint is valid and is not an open finding.
-Unsupported delegated, MM, paid-service and Robinhood claims must remain absent until their distinct proof gates pass.
+Unsupported delegated, MM and paid-service claims must remain absent until their distinct proof gates pass.
+Robinhood support is limited to the separately reviewed direct-pool policy below.
 A controlled wallet provider or fork must be labelled as such; no actual MetaMask extension evidence is available in this review.
 
 ## Reproduction commands
@@ -186,3 +187,73 @@ The current fork scenario verifies the proof helper, then marks the attempt conf
 It therefore does not independently establish production reconciliation or HTTP recovery behavior.
 Those remain explicit app integration gates.
 An uncommitted management-rules import is a required dependency of the delivered chain milestone; execution verification awaits its exact commit rather than importing a changing shared file.
+
+
+## External backend and Robinhood direct-pool milestones accepted
+
+The reviewer independently executed `d95f89361e9b229cca193777345562896e1fafb6` with the exact management-rules dependency from `e032fd1227f0d98f6867a7890a9129b44df6de21`.
+Arbitrum and BNB controlled-provider forks passed without public broadcasts.
+A second isolated archive at `41ae2f7d67e3056f6aa57ab0cdea1c6e20750d90` includes Robinhood milestone `fd68e4a09e3bd8479f7880e895f33407c86d1df0` and the complete committed management dependency.
+All three controlled-provider forks passed from that exact snapshot.
+
+The accepted named adapter is simple7702-self-signed-v1.
+It requires an already delegated account and eth_signTransaction support, followed by backend relay after renewed verification.
+It does not provision delegation or prove compatibility with any wallet brand.
+Before creating an attempt, the backend checks the account designation and implementation runtime, exact assets and routes, real whole-batch eth_call, gas estimate, fees, nonce and balance reserve.
+Signed type-2 transactions are bound to the exact maker, self destination, chain, nonce, value, calldata, gas, fee fields and empty access list.
+The relay repeats preflight and the current-plan guard, records the hash before transport, and preserves ambiguous submissions for recovery.
+
+Receipt proof requires the exact root self-call and immediate batch children, plus account and dependency code from the transaction prestate.
+Proxy dependencies require the actual implementation storage slot and implementation runtime in that prestate.
+The local signer also rechecks account code, implementation code, chain and pending nonce immediately before its broadcast callback.
+Independent fork execution rejected changed code and nonce without invoking that callback, then proved the initial type-4 self-authorization transaction after restoring the fork state.
+Unknown accounts and unavailable RPCs were refused before an attempt was journaled.
+Expiry after wallet approval, altered signed calldata, atomic failure and successful two-pair entry and close-convert were exercised on every chain.
+Robinhood additionally rejected changed output, receiver, transferred input, callback bytes and an extra call through the real signed relay.
+
+All eight Robinhood compiler replays passed against retained input and compiler hashes.
+The reviewer inspected the PONS transfer restriction source: after the immutable restriction end block, its transfer path is ordinary ERC20 accounting.
+The replay binds that end block, pair token and implementation self address where applicable, then compares substituted executable runtime bytes.
+Runtime provenance pins wrapped-native and USDG proxy implementations, direct pool code, token order and factory identity.
+The direct compiler emits exact input transfer, exact pool output to the maker, empty callback data and optional exact wrapping or unwrapping.
+The validated policy is limited to the two listed WETH pools and the source-reserve bound; it does not authorize an arbitrary router.
+
+Account verification, preflight, signature handling, relay and proof remain separate focused modules.
+Direct route deployment data, calldata, provenance and quoting also have distinct ownership.
+No further component or file split is required for these backend milestones.
+Scoped ESLint passes across the route and external-adapter directories and signer changes.
+The fork logs contain no public broadcasts and identify controlled EIP1193 providers on isolated forks.
+
+The fixture still confirms attempts and releases locks directly after calling the production proof helper.
+Its ambiguous transport case proves retained-hash recovery at the relay boundary, not complete production reconciliation.
+App HTTP receipt recovery, persistent state transitions and external UI signing remain mandatory integration gates.
+The local type-4 proof also does not establish the Phase 2 app lifecycle or browser lease behavior.
+
+## Amount fixture correction accepted
+
+Correction `3e0defe90e8916852cd00258e6147c00eb4f14ba` fixes the two owned quote fixture type errors without adding coverage or editing the original dirty range schema.
+Applied as an exact single-file overlay to the isolated `41ae2f7` snapshot, it passes the full frontend typecheck.
+All 25 selected existing amount, token-resolution, captured-metadata, execution, lease and position regressions pass.
+The token-label and exact-amount code scope at `de0c0e0` is accepted with this correction.
+The actual model proposal and lifecycle remain separately reviewed integration concerns.
+
+## Management and runtime review checkpoint
+
+Management milestone `e032fd1` persists the plan configuration and confirmed active configuration instead of inventing exit attribution from conservative estimates.
+It enforces non-close policy expiry, allowed actions, replacement cooldown and upward-only pair direction with exact rational comparisons.
+Close-convert requires explicit unique verified token quantities bounded by a fresh wallet balance.
+The app owner states the conversion UI offers only pair ERC20 quantities and preserves native gas funds; native conversion destinations are a separate option.
+The reviewer requested authenticated HTTP or Orca evidence for these rules, post-close conversion and production receipt recovery before full acceptance.
+
+Runtime milestone `01c7511d82eb7e6750a38a531a6ba15c45562e6f` separates captured read tools, deterministic LP preview arithmetic and exposure collection from provider orchestration.
+The read tools receive one validated request and return copies, with cancellation and deadline checks.
+Preview identifiers bind the selected proposal to a server-retained configuration rather than reconstructed model calldata.
+The preview labels its editable fee and range defaults and explicitly says simulation was not performed.
+Known maker groups and direct backing are included while outside-app discovery remains partial.
+No further split is currently required in these modules.
+
+All 16 existing runner service tests and its strict TypeScript check pass independently in the pinned snapshot.
+Scoped frontend lint and the corrected full frontend typecheck also pass.
+The owner reports real request `84237790-366b-4d3b-bccf-91ad67538e31` with a persisted proposal_preview tool event and a successful editable native-funded LP proposal.
+That real-model result is owner-reported pending durable redacted evidence and independent inspection.
+The owner also reproduced a generic initial-plan error and is correcting it, so the complete proposal-to-execution journey is not accepted.
