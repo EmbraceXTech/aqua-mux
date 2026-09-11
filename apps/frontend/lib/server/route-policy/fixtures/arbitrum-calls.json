@@ -1,0 +1,66 @@
+[
+  {
+    "route": {
+      "request": {
+        "chainId": 42161,
+        "maker": "0x100000000000000000000000000000000000cafe",
+        "source": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "destination": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+        "amountIn": "100000000000000",
+        "minimumAmountOut": "1",
+        "slippageBps": 100
+      },
+      "call": {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "data": "0x175accdc000000000000000000000000100000000000000000000000000000000000cafe000000000000000000000000000000000000000000000000000000000003d40f208000000000000000000000c6962004f452be9203591991d15f6b388e09e8d0",
+        "value": "0x5af3107a4000",
+        "label": "Swap through verified 1inch single-pool route"
+      },
+      "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "amountIn": "100000000000000",
+      "amountOut": "253430",
+      "minimumAmountOut": "250895",
+      "quotedAt": 1789158666560,
+      "expiresAt": 1789158696560,
+      "policy": {
+        "version": 1,
+        "poolId": "arbitrum-weth-usdc-500"
+      }
+    },
+    "simulatedOutput": "253430",
+    "blockNumber": "504165431",
+    "broadcasts": 0
+  },
+  {
+    "route": {
+      "request": {
+        "chainId": 42161,
+        "maker": "0x100000000000000000000000000000000000cafe",
+        "source": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "destination": "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+        "amountIn": "100000000000000",
+        "minimumAmountOut": "1",
+        "slippageBps": 100
+      },
+      "call": {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "data": "0x175accdc000000000000000000000000100000000000000000000000000000000000cafe000000000000000000000000000000000000000000000000000000000003d43b208000000000000000000000641c00a822e8b671738d32a431a4fb6074e5c79d",
+        "value": "0x5af3107a4000",
+        "label": "Swap through verified 1inch single-pool route"
+      },
+      "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "amountIn": "100000000000000",
+      "amountOut": "253474",
+      "minimumAmountOut": "250939",
+      "quotedAt": 1789158667092,
+      "expiresAt": 1789158697092,
+      "policy": {
+        "version": 1,
+        "poolId": "arbitrum-weth-usdt-500"
+      }
+    },
+    "simulatedOutput": "253474",
+    "blockNumber": "504165432",
+    "broadcasts": 0
+  }
+]
