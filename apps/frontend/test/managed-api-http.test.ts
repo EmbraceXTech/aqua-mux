@@ -6,7 +6,9 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { managedApi } from "../lib/server/managed-service/http";
 import { walletAuth } from "../lib/server/auth";
 import { ManagedStore } from "../lib/server/store";
-import { lifecycleFixture } from "./lifecycle-fixtures";
+import { lifecycleFixture, dependenciesFixture } from "./lifecycle-fixtures";
+import { buildLifecyclePlan } from "../lib/server/lifecycle";
+import { planDigest } from "../lib/managed";
 
 test("authenticated managed HTTP creates a group, fences two tabs, stops and isolates owners", async () => {
   const store = new ManagedStore(":memory:");
@@ -83,6 +85,85 @@ test("authenticated managed HTTP creates a group, fences two tabs, stops and iso
     );
     const created = await response.json();
     const path = `groups/${created.group.id}`;
+    const generated = await buildLifecyclePlan(
+      {
+        ...lifecycleFixture(),
+        config,
+        owner: session.owner,
+        groupId: created.group.id,
+        runGeneration: created.bot.runGeneration,
+      },
+      dependenciesFixture(),
+    );
+    const plan = {
+      ...generated,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 60_000,
+    };
+    store.put("plan", plan, session.owner);
+    store.putDocument("plan-context", plan.id, session.owner, {
+      requiresLease: false,
+      sessionId: null,
+      generation: created.bot.runGeneration,
+      reviewId: null,
+    });
+    assert.equal(
+      (
+        await send(
+          `${path}/plans/${plan.id}/confirm`,
+          "POST",
+          {
+            digest: planDigest(plan),
+          },
+          session.token,
+        )
+      ).status,
+      200,
+    );
+    const attemptResponse = await send(
+      `${path}/attempts`,
+      "POST",
+      { planId: plan.id, idempotencyKey: "external-attempt" },
+      session.token,
+    );
+    assert.equal(attemptResponse.status, 409);
+    assert.equal(
+      (await attemptResponse.json()).code,
+      "external_execution_unverified",
+    );
+    assert.equal(store.list("transaction", session.owner).length, 0);
+    const forged = await send(
+      `${path}/attempts`,
+      "POST",
+      {
+        planId: plan.id,
+        idempotencyKey: "forged-capability",
+        executionCapabilities: {
+          external: { verified: true, adapter: "forged" },
+        },
+      },
+      session.token,
+    );
+    assert.equal((await forged.json()).code, "external_execution_unverified");
+    const lock = store.acquireExecutionLock(
+      42161,
+      session.owner,
+      session.owner,
+      "refusal-left-no-lock",
+      1000,
+    );
+    store.releaseExecutionLock(lock);
+    const catalog = await (await send("catalog")).json();
+    assert.equal(catalog.executionCapabilities.external.verified, false);
+    assert.equal(catalog.executionCapabilities.external.adapter, "none");
+    assert.equal(catalog.capabilities.manualExternal.enabled, false);
+    const initialDetail = await (
+      await send(path, "GET", undefined, session.token)
+    ).json();
+    assert.deepEqual(
+      initialDetail.executionCapabilities,
+      catalog.executionCapabilities,
+    );
     const firstResponse = await send(
       `${path}/bot`,
       "POST",

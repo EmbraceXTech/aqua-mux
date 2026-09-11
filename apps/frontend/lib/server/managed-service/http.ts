@@ -30,17 +30,18 @@ import {
 import { cancelGroupReview, runGroupReview } from "../automation/reviews";
 import { ManagedError, managedFailure } from "./errors";
 import { createManagedPlan, planInputSchema } from "./plans";
-import {
-  confirmManagedPlan,
-  prepareManagedExecution,
-  recordManagedSubmission,
-} from "./execution";
+import { confirmManagedPlan, recordManagedSubmission } from "./execution";
 import {
   observeManagedGroup,
   reconcileManagedTransactions,
 } from "./reconciliation";
 import { proposeIntent } from "./proposals";
 import { BROWSER_LEASE_MS } from "../automation/lease";
+import {
+  assertExternalExecutionAvailable,
+  executionCapabilities,
+  manualExternal,
+} from "./external-capability";
 
 async function body(request: Request): Promise<unknown> {
   if (!request.headers.get("content-type")?.startsWith("application/json"))
@@ -86,7 +87,8 @@ export async function managedApi(
     if (method === "GET" && segments.join("/") === "catalog")
       return ok({
         catalog: strategyCatalog,
-        capabilities,
+        capabilities: { ...capabilities, manualExternal },
+        executionCapabilities,
         leaseTimeoutMs: BROWSER_LEASE_MS,
         service: { kind: "uncharged-development", price: null },
       });
@@ -126,6 +128,7 @@ export async function managedApi(
       if (method === "GET")
         return ok({
           group,
+          executionCapabilities,
           bot: groupBot(store, owner, id),
           reviews: store.list("review", owner, id),
           plans: store.list("plan", owner, id),
@@ -224,22 +227,8 @@ export async function managedApi(
         }),
       });
     }
-    if (action === "attempts" && segments.length === 3) {
-      const input = z
-        .strictObject({
-          planId: idSchema,
-          idempotencyKey: idSchema,
-          sessionId: idSchema.optional(),
-          generation: z.number().int().nonnegative().optional(),
-        })
-        .parse(await body(request));
-      const prepared = prepareManagedExecution({
-        owner,
-        groupId: id,
-        ...input,
-      });
-      return ok({ plan: prepared.plan, attempt: prepared.attempt });
-    }
+    if (action === "attempts" && segments.length === 3)
+      assertExternalExecutionAvailable();
     if (
       action === "attempts" &&
       segments.length === 5 &&
