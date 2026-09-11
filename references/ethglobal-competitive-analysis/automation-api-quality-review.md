@@ -4,6 +4,13 @@ This independent review covers `apps/frontend/lib/server/automation/`, `managed-
 The implementation owner is dispatch `ctx_54af0d1cd065`.
 The reviewer owns this report only and did not edit implementation files.
 
+## Acceptance
+
+Accepted for the reviewed manual-execution API and browser-review scope at `645c892bce30b8cafeb59fe75666ab190aa94c0e`.
+All blocking findings in that committed scope are resolved.
+The final isolated snapshot passes 33 focused tests, scoped lint and formatting, and the full frontend typecheck.
+This acceptance does not cover subsequent uncommitted integration changes or establish live wallet compatibility.
+
 ## Initial review status
 
 Changes are required before acceptance.
@@ -47,9 +54,10 @@ Acceptance requires the owner's exact final commit and verification of the repai
    The initial `updateBot` response contains the group and bot but no submitted or unknown transaction list.
    Include outstanding attempts in the acknowledgment as required by the implementation plan.
 
-8. Group creation does not enforce the initial one-group-per-execution-wallet boundary.
-   Multiple nonclosed groups can share a chain and maker without an implemented attribution rule between groups.
-   Enforce the planned scope or obtain a separately reviewed shared-attribution design.
+8. The preliminary concern about multiple nonclosed groups was withdrawn.
+   The existing `one_group_per_wallet` SQLite unique index in `store/database.ts` already enforces the chain-and-maker boundary.
+   The owner's added HTTP duplicate-creation test returns 409 and passed during repair review.
+   No implementation correction was needed for this concern.
 
 ## Module organization
 
@@ -103,3 +111,92 @@ This is source-level evidence for the integration boundary, not proof of a live 
 The catalog refuses delegated mode.
 No Privy compatibility, paid Hedera request, live inference quality, browser rendering, or successful on-chain execution is established by this review.
 Initial proposal freshness, policy enforcement, transaction recovery, and the final committed revision remain the acceptance gates.
+
+## Repair verification checkpoint
+
+Commits `4e829e5621809b498be4ffe74b73d8294c24f644` and `5a07a890b60f9783868662a86869bb4248993193` repair execution recovery, interrupted review retries, policy labels, Stop acknowledgments, and module organization.
+The scoped suite now passes 26 tests, including the new managed HTTP and execution tests.
+Scoped ESLint, Prettier, and the frontend typecheck pass on these commits.
+
+The independent API harness now verifies explicit wallet rejection followed by successful Resume, batch-hash attachment without trusting a browser confirmation flag, refusal to reject a submitted attempt, and cancellation of expired same-key review retries.
+Prepared attempts reserve an unresolved wallet lock until explicit rejection or receipt recovery.
+A wallet status response can attach a single transaction hash, but only RPC receipt and exact execution proof can mark the attempt confirmed.
+Multiple wallet receipts or unavailable tracing leave the attempt unresolved.
+This deliberately limits the supported recovery claim.
+
+A separate local HTTP harness at `/tmp/aquamux-runner-boundary-review.ts` verified oversized-response refusal, redirect refusal, cancellation of a stalled request, and authenticated remote cancellation.
+It used a fixture server and no inference-provider credentials.
+
+At this checkpoint, route-quote expiry and matching the initial decision against the allowed-action list still needed correction.
+Token registry integration then expanded the review scope.
+The final verification below includes these corrections and the token-helper tests.
+
+## Committed revision verification
+
+The reviewed committed revision is `bbeee25aa1010fb9a033c0d98557a2e90a4b2893`, which includes final implementation commit `55e5a342c6e64e26bf19177e47fd9a02456b40ad` and its native-token test follow-up.
+An isolated `git archive` of this revision was extracted to `/tmp/aquamux-api-review.tnLmZB` with the existing installed dependencies linked for verification.
+This avoided reading half-written files from concurrent planner and UI edits.
+All 33 focused tests passed in that snapshot.
+Scoped ESLint and Prettier passed, and the complete frontend typecheck passed with incremental output disabled.
+
+```sh
+npx tsx --test test/automation-lease.test.ts test/automation-review.test.ts test/managed-runner-http.test.ts test/managed-api-http.test.ts test/managed-execution.test.ts test/managed-auth-http.test.ts test/managed-auth.test.ts test/managed-store.test.ts test/managed-freshness.test.ts test/managed-token-resolution.test.ts
+npx tsc --noEmit --incremental false
+```
+
+The final independent API harness at `/tmp/aquamux-automation-review-final.ts` also passed against this snapshot.
+It used the API's injected metadata dependency to isolate authentication and transaction recovery from network services.
+Metadata behavior was checked separately by the token-resolution tests.
+The harness made no RPC calls and sent no transactions.
+
+All blocking findings in this committed API scope are resolved.
+Initial proposals now enforce wallet and route evidence freshness and the allowed-action list.
+Aggregate limits and triggers that have no automatic enforcement are labelled advisory.
+Funding calculations and token verification have focused modules.
+The verified-token cache has a capacity limit and removes expired entries.
+New catalog selections require current selectable registry entries and independent metadata checks.
+Stored group metadata can recover without a registry request after decimal verification, including native assets without an ERC20 call.
+The tests reject mismatched stored decimals and stale registry authorization.
+
+The shared working tree temporarily failed four execution tests while uncommitted planner changes added route binding.
+It also temporarily failed typechecking while the UI token selector was being edited.
+Those failures were reported to the coordinator and are not present in the isolated committed snapshot.
+The subsequent `plans.ts` follow-up was reviewed separately as described below.
+
+This verification establishes code quality and the tested API boundaries for manual owner-confirmed execution and browser-bound reviews.
+It does not establish live delegated execution, paid service settlement, compatibility with every external wallet batch format, or current browser rendering.
+Unknown and unsupported transaction outcomes remain unresolved until sufficient independent chain evidence is available.
+
+## Final follow-up and exact acceptance scope
+
+The final accepted revision is `645c892bce30b8cafeb59fe75666ab190aa94c0e`.
+Relative to the previously verified snapshot, its only additional API change is `managed-service/plans.ts`.
+Close-only planning now reads stored pair and attributable inventory assets without resolving unrelated policy assets through the registry.
+When the compiler returns a route digest, the service checks it against the captured route records before persisting the plan.
+The captured records remain owner-scoped internal documents.
+
+The isolated archive was updated to this exact revision and all 33 focused tests passed again.
+The full frontend typecheck and the changed file's lint and formatting checks also passed.
+The other scoped files are unchanged from the preceding clean lint and formatting run.
+The current API-owned paths matched this revision when checked before reporting acceptance.
+
+The reviewer accepts the module split, ownership checks, browser lease and generation fences, interruption recovery, honest policy labels, bounded runner client, and tested metadata and transaction-recovery behavior at `645c892bce30b8cafeb59fe75666ab190aa94c0e`.
+The broader repository's later planner, signer, UI, and live workflow changes require their own integration evidence.
+No implementation files were edited by this reviewer.
+
+The coordinator confirmed final acceptance at `645c892bce30b8cafeb59fe75666ab190aa94c0e`, including the optional route-digest and close-only checks.
+Subsequent planner and broader integration changes remain outside this exact revision.
+The coordinator lifted the shared-index audit pause after accepting protocol `9fbb3b7`; report commits use its common-directory lock and private-index procedure.
+The earlier report-only commits are `7f4453f` and `4c2b201`.
+
+## Backend external execution follow-up
+
+The subsequent external-wallet capability correction is accepted at `7a2f7534ea1b998701258737c1f54c78493c32f9` for its three changed files only.
+An authenticated reproduction showed that an arbitrary atomic wallet batch with two receipt hashes could remain submitted with no reconcilable transaction hash and block Resume.
+The backend now refuses new external attempts before creating a journal entry or reserving a lock because no verified external adapter is enabled.
+Catalog and group responses advertise the same disabled contract, and browser claims cannot override it.
+Existing transaction recovery and internal development-signer preparation remain available.
+
+The isolated correction passes five focused HTTP and execution tests, scoped lint and formatting, and an independent authenticated recovery harness.
+Its full frontend typecheck exposes an unrelated committed route-policy test overload error, which was reported to the coordinator.
+The [managed policy review](managed-policy-quality-review.md) records the exact scope, reproduction, module assessment, and separate replacement acceptance gate.
