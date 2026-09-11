@@ -20,7 +20,7 @@ Owner-reported evidence and independently rerun evidence are distinguished below
 | --- | --- | --- | --- |
 | Request-local metadata, `29a199d3bd5e07a1cdc95c08947417ac08bf0f7b` | Accepted for asynchronous metadata binding. | All 36 focused API, lease, auth, store and metadata tests pass; scoped ESLint passes. | Label normalization, inventory attribution and full app workflow remain separate. |
 | Route provenance, `a9a7c273` with `cad298a7d98837b410f77adc63a3f822fb4d0523` | Accepted for the Arbitrum and BNB route-policy scope. | Nine route tests, thirteen adapter tests, seven compiler replays, 260 independent mutations and expiry/proxy probes pass; corrected recursive route lint passes. | External execution and funded lifecycle evidence remain separate. |
-| External backend, `d95f893` with `fd68e4a` and `41ae2f7` | Accepted for the named adapter and controlled-fork backend scope. | Independent three-chain funded forks, exact trace/prestate proof, expiry and signature mutations, signer code/nonce refusal, rollback and eight Robinhood compiler replays pass. | App signing journey and production receipt reconciliation; no wallet brand compatibility proven. |
+| External backend, `d95f893` with `fd68e4a` and `41ae2f7` | Accepted for the named adapter and controlled-fork backend scope. | Independent three-chain funded forks, exact trace/prestate proof, expiry and signature mutations, signer code/nonce refusal, rollback and eight Robinhood compiler replays pass. | App signing correction and persistent restart recovery; no wallet brand compatibility proven. |
 | Full initial app scope | Pending owner delivery. | Earlier narrowly scoped acceptances remain limited to their exact revisions. | Coherent app milestone and integrated browser/fork evidence. |
 
 ## Route source, authority and evidence
@@ -306,3 +306,39 @@ The new configuration, execution, resolver-fill and rollback helpers have focuse
 Scoped ESLint passes for the script and all four helpers.
 No further module split is required.
 The app owner has separately reproduced a post-close conversion guard failure through authenticated HTTP, and the chain owner is preparing a focused correction.
+
+
+## App relay and exit milestone held
+
+The reviewer isolated exact commit `4a7b1e15cb9e0e6aab873dbbd1f39dc003d894e1` and independently reran its authenticated HTTP fork script.
+Native concentrated entry, exact sign-only relay, finality-aware production receipt reconciliation, active configuration storage, cooldown refusal, explicit quantity refusal, close-only and later closed-group conversion all passed.
+The HTTP fixture deliberately seeds a deterministic opening review and is separate from the recorded real model requests.
+All transactions occurred on the isolated fork.
+
+The production API now separates body parsing, attempt dispatch and funding-route checks from the main handler.
+Explicit conversion quantities have a focused component with no automatic selection and a separate consent step.
+The editor supports program expiry and preserves exact rational price inputs.
+No further component split is required for these changes.
+The reviewer requested consistent formatting for the newly compressed proposal-preview branches.
+
+Full frontend lint and typecheck pass on the exact archive.
+The existing test run has 155 passes, one failure and one intentional skip across 157 cases.
+The failing legacy router case reaches an incomplete token-decimals RPC fixture in plan-router.test.ts.
+The owner confirmed that its passing working-tree run included an inherited uncommitted fixture correction mixed with the original range overlay and is preparing only the isolated owned correction.
+The differing test count and source overlay must remain explicit until the corrected committed snapshot passes.
+
+Two production-client E2E probes reproduce required signing corrections.
+The probes use the production submitExternalManaged client and authenticated HTTP handler with controlled providers and independently allocated forks.
+No implementation file or unit-test file was changed by the reviewer.
+
+- Unsupported eth_signTransaction returns provider error -32601 and leaves a prepared attempt without a transaction hash.
+  POST reconcile returns success but ignores that attempt, and Resume fails with recovery_required.
+  The client must release a provably unsubmitted attempt while retaining genuinely ambiguous outcomes.
+- If the workspace becomes stale while eth_signTransaction is awaiting its result, the client still calls the relay and receives submitted with a real fork transaction hash.
+  The supplied assertCurrent callback would reject the stale workspace, but neither the signing helper nor the client calls it after the wallet result.
+  A fresh workspace/provider fence is required immediately before relay, with recovery for any retained signed or ambiguous result.
+
+The reproduction scripts are review-unsupported-provider.ts and review-stale-signature.ts in the isolated `4a7b1e1` frontend scripts directory.
+Their sanitized results record the method names, attempt states and zero public transactions.
+Both findings were delivered directly to the app owner and coordinator before acceptance.
+The entire app relay milestone remains held until corrections and E2E reruns pass.
