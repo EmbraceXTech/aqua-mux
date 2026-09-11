@@ -1,7 +1,9 @@
 # Token registry code-quality review
 
 Reviewed September 12, 2026 in Asia/Bangkok.
-Verdict: request changes before integration acceptance.
+Final verdict: accept the registry-owned corrections in `65165830f28e4b98e801864187d49a09c5c184a5` for R1 through R4.
+R5 remains a managed workflow integration gate and is not covered by that scoped acceptance.
+The original request-changes findings remain below as the review history.
 This review changed only this report and submitted no transactions.
 
 ## Scope and ownership
@@ -157,3 +159,47 @@ R5 requires joint UI and managed API integration evidence before the expanded to
 Early findings were sent to the coordinator during review.
 The requested direct message to the original implementation dispatch was rejected because that dispatch had already completed, so the coordinator needs a fresh fix dispatch.
 None of the reviewed follow-ups resolves the remaining acceptance blockers.
+
+## Corrected commit review
+
+At approximately 20:33 UTC, I independently reviewed correction commit `65165830f28e4b98e801864187d49a09c5c184a5` from dispatch `ctx_87da1c298c8d`.
+This section supersedes the earlier R1 through R4 disposition.
+The accepted scope is `app/api/tokens/validate/route.ts`, `lib/token-registry.ts`, `lib/server/token-registry-source.ts`, `lib/server/token-validation*.ts`, `test/token-registry*.test.ts`, and the registry evidence report.
+
+R1 is resolved for the documented single-process deployment boundary.
+The handler authenticates before reading the body, limits streamed JSON to 1024 bytes, validates addresses and amounts, and admits upstream work through a focused limiter module.
+The limiter bounds per-owner and process request rates and concurrent validation calls, and prunes expired inactive owner records.
+This is process-local admission control, not a shared quota across multiple server replicas.
+The deployment must retain that distinction.
+
+R2 is resolved by a shared positive uint256 decimal-string predicate.
+Numeric provider amounts and overflowing values are rejected, while the uint256 maximum remains representable without rounding.
+Malformed quote JSON reports an unavailable result.
+R3 is resolved by caching the fallback with a retry deadline after cold failures and stale-window exhaustion, while preserving its original capture timestamp.
+R4 is resolved by quarantining conflicting metadata identities and merging the strongest risk for otherwise matching duplicate identities.
+
+An isolated extraction of `6516583` passed all 22 registry tests.
+The same run passed three managed token-resolution and freshness tests, for 25 total passes.
+Focused ESLint passed with zero warnings for the registry modules, routes, tests, generator, and verifier.
+The added tests cover zero-upstream-call rejection for authentication, body bounds, rate limits, and concurrency limits, as well as cold and warm outage recovery, simultaneous refresh deduplication, uint256 boundaries, numeric quote rejection, and both orders of conflicting duplicate records.
+
+The implementation worker reported live HTTP 403 without Origin and 401 with the matching Origin but no session after the correction.
+My independent repeat against the shared Next server returned HTTP 500 with a development compilation error in an actively edited `components/managed/token-select.tsx:30`.
+A second repeat returned the same non-JSON development response.
+Those HTTP results are an integration verification limit, not evidence that the corrected validation handler returned a quote anonymously.
+The coordinator received the compilation failure and the registry test results.
+
+The correction commit also contains managed-service, automation, and related test files that the correction worker reported were included through shared-index contamination.
+I did not change or rewrite those files or the commit.
+Their presence in the same SHA does not extend this registry approval to their behavior or ownership.
+The coordinator was informed and must account for those changes through the managed implementation and review owners.
+
+The managed additions demonstrate non-fallback token resolution in a unit test, but the new `managed-service/tokens.ts` verification map does not evict expired entries or enforce a size cap.
+Its selection path also skips fallback catalog addresses before checking fresh registry risk and metadata.
+I routed those concerns to the coordinator for the integration reviewer.
+The complete browser proposal flow, fresh validation of selected fallback assets, cache bounds, and server-side execution checks still need R5 acceptance evidence.
+The selector response typing and current compilation state are likewise UI-owned.
+
+Final acceptance is limited to the registry-owned R1 through R4 corrections at the exact SHA above.
+No further registry module split is required by this review.
+The earlier capped-search and generator-hardening observations remain documented limits rather than newly resolved features.
