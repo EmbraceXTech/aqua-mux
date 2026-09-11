@@ -3,18 +3,28 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.13"
   },
   "scripts": {
-    "test": "node --test test/*.test.mjs",
+    "test": "node --test test/*.test.mjs && npm run test:service",
     "spike:adapters": "node spike/adapters.mjs",
     "test:docker": "RUN_DOCKER_TESTS=1 node --test test/docker-sandbox.test.mjs",
-    "image:build": "docker build -t aquamux-runtime-spike:local ."
+    "image:build": "docker build -t aquamux-runtime-spike:local .",
+    "service": "tsx src/service/main.ts",
+    "test:service": "tsx --test test/service*.test.ts",
+    "test:service:live": "tsx test/service-live.ts",
+    "typecheck:service": "tsc --noEmit --strict --module preserve --moduleResolution bundler --target es2022 --skipLibCheck --allowJs --esModuleInterop --types node src/service/*.ts test/service*.ts"
   },
   "dependencies": {
     "@ai-sdk/harness": "1.0.108",
-    "@ai-sdk/harness-codex": "1.0.110",
     "@ai-sdk/harness-claude-code": "1.0.112",
-    "ai": "7.0.98"
+    "@ai-sdk/harness-codex": "1.0.110",
+    "ai": "7.0.98",
+    "zod": "4.5.4"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.1",
+    "tsx": "^4.23.13",
+    "typescript": "5.9.3"
   }
 }
