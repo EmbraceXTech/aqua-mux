@@ -19,7 +19,7 @@ Owner-reported evidence and independently rerun evidence are distinguished below
 | Milestone | Decision | Independent evidence | Remaining gate |
 | --- | --- | --- | --- |
 | Request-local metadata, `29a199d3bd5e07a1cdc95c08947417ac08bf0f7b` | Accepted for asynchronous metadata binding. | All 36 focused API, lease, auth, store and metadata tests pass; scoped ESLint passes. | Label normalization, inventory attribution and full app workflow remain separate. |
-| Route provenance, `a9a7c273511c4d589dcd10df3365edee6466ebc2` | Security corrections verified; script lint correction required. | Nine route tests, thirteen adapter tests, seven compiler replays, 260 independent mutations and expiry/proxy probes pass. | Seven replay-script lint errors; final corrected commit verification. |
+| Route provenance, `a9a7c273` with `cad298a7d98837b410f77adc63a3f822fb4d0523` | Accepted for the Arbitrum and BNB route-policy scope. | Nine route tests, thirteen adapter tests, seven compiler replays, 260 independent mutations and expiry/proxy probes pass; corrected recursive route lint passes. | External execution and funded lifecycle evidence remain separate. |
 | External Phase 1 execution | Pending owner delivery. | Blanket refusal remains a safe interim boundary. | A compatible account path, simulation before journal/locks, exact transaction binding and receipt recovery. |
 | Full initial app scope | Pending owner delivery. | Earlier narrowly scoped acceptances remain limited to their exact revisions. | Coherent app milestone and integrated browser/fork evidence. |
 
@@ -104,3 +104,45 @@ npx tsx --test test/automation-lease.test.ts test/automation-review.test.ts test
 The independent supplemental mutation script is an isolated-path copy of `/tmp/aquamux-route-review-final.mts`.
 Temporary scripts supplement the durable owner tests and do not replace committed regression coverage.
 Full lint, unit, build, fork and browser acceptance waits for the app owner's stable final milestone.
+
+## Route replay correction accepted
+
+The route scope is accepted through correction `cad298a7d98837b410f77adc63a3f822fb4d0523`.
+The correction replaces the CommonJS replay script with `recompile.mjs` and independently derives each immutable variable name from the compiler AST.
+The script compares the resulting named offset map to the attestation, in addition to checking compiler hashes, input hashes and runtime templates.
+All seven replays pass with these stronger checks, and recursive route-directory ESLint passes with zero warnings.
+The old Solidity 0.4.18 compiler emits a V8 asm.js warning but completes its checked replay successfully.
+The correction changes no route runtime files, so the preceding runtime tests and independent security probes remain applicable.
+No additional module split is required.
+Use `node lib/server/route-policy/fixtures/provenance/recompile.mjs /tmp/aquamux-route-policy` for the corrected replay command.
+
+## Token-label and exact-amount milestone checkpoint
+
+The app owner delivered `de0c0e0a819c2834a3f96577676eb51ad677a25c` with nine owned files.
+A separate isolated archive supplies this review snapshot.
+The shared metadata helper accepts a verified or display-mismatched result only when the registry and on-chain decimals match the selected decimals exactly.
+The actual metadata reader checks code at the selected address before reading contract metadata.
+Client request binding retains chain, source, destination and raw funding amount checks, and refuses unselectable tokens.
+The managed token snapshot uses the contract symbol after those checks.
+The helper is small and shared by client and server code, so no additional split is required.
+
+The quote consumers now require a canonical positive decimal string within uint256 before performing BigInt arithmetic.
+Numbers, zero, leading zeros, fractions, negative values, absent values and overflow are rejected.
+The maximum uint256 string remains exact through snapshot and legacy quote output.
+These checks reuse the existing bounded parser rather than creating a second amount-validation policy.
+
+Independent regression testing passes 34 of 39 tests.
+Five existing legacy integration cases fail at the already recorded range 100 versus committed numeric-schema boundary.
+Scoped lint passes for all nine changed paths.
+The full isolated frontend typecheck finds two new errors in `test/quote-amount-boundary.test.ts`, whose range value is the string `full` while the committed Basket type accepts numeric values.
+Acceptance is withheld until the owner corrects that owned fixture without importing the original dirty schema overlay.
+
+The owner reports an Orca browser reproduction of the USDC_1 label failure and three passing proposal browser regressions before the latest browser-testing rule.
+Those browser results were not independently rerun by this reviewer and do not represent a successful model response or wallet execution.
+The same owner reports that the actual proposal now reaches the runner, where a strict request schema rejects the added tokenMetadata field.
+The earlier metadata acceptance covers request-local concurrency behavior only; the proposal-to-runner integration remains blocked until its contract correction passes review.
+
+The coordinator relayed updated user rules during this checkpoint.
+Do not add or expand unit-test files, and use Orca's embedded browser commands for browser validation.
+Existing unit tests may remain regression evidence, while new behavioral evidence must use the allowed end-to-end interfaces.
+This reviewer has edited no implementation or unit-test files and has run no Playwright browser suite during this task.
