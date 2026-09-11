@@ -38,6 +38,19 @@ export const routerDeployments: Readonly<Record<number, RouterDeployment>> = {
 
 export const poolDeployments: readonly PoolDeployment[] = [
   {
+    id: "arbitrum-weth-usdce-500",
+    chainId: 42161,
+    address: "0xc31e54c7a869b9fcbecc14363cf510d1c41fa443",
+    codeHash:
+      "0xe7205558b125b1851960eec57df21743ed652c9ba1f9a7b6bfc00058f03fd6de",
+    token0: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+    token1: "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+    protocol: "uniswap-v3",
+    fee: 500,
+    sourceUrl:
+      "https://arbitrum.blockscout.com/api/v2/smart-contracts/0xc31e54c7a869b9fcbecc14363cf510d1c41fa443",
+  },
+  {
     id: "bnb-wbnb-usdc-500",
     chainId: 56,
     address: "0x5289a8dbf7029ee0b0498a84777ed3941d9acfec",

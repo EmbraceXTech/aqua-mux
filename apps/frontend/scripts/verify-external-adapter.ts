@@ -39,7 +39,13 @@ import { signExternalTransaction } from "../lib/external-adapter/sign";
 
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
 const results: unknown[] = [];
-for (const chainId of [42161, 56, 4663]) {
+const scenarios = [
+  { chainId: 42161, bridged: false },
+  { chainId: 56, bridged: false },
+  { chainId: 4663, bridged: false },
+  { chainId: 42161, bridged: true },
+];
+for (const { chainId, bridged } of scenarios) {
   const setting = networks.find((network) => network.id === chainId)!;
   const upstream = process.env[setting.env]!;
   const fork = await controlledFork(chainId, upstream);
@@ -63,9 +69,11 @@ for (const chainId of [42161, 56, 4663]) {
       chainId === 42161
         ? [
             {
-              address: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              address: bridged
+                ? "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+                : "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
               decimals: 6,
-              symbol: "USDC",
+              symbol: bridged ? "USDC.e" : "USDC",
             },
             {
               address: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
@@ -207,7 +215,11 @@ for (const chainId of [42161, 56, 4663]) {
       expiresAt: Date.now() + 120000,
     };
     const deps = {
-      snapshot: readLifecycleSnapshot,
+      snapshot: async (request: LifecycleRequest) => {
+        // An idle fork does not receive the public chain's advancing block headers.
+        await fork.request("evm_mine", []);
+        return readLifecycleSnapshot(request);
+      },
       quote: quoteLifecycleRoute,
       simulate: simulateLifecyclePlan,
     };
@@ -499,6 +511,7 @@ for (const chainId of [42161, 56, 4663]) {
     results.push({
       chainId,
       evidence: "controlled EIP1193 provider on isolated fork",
+      bridgedUsdc: bridged,
       publicBroadcasts: 0,
       registrations: opened.plan.registrations.length,
       localSigner,

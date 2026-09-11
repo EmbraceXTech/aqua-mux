@@ -2,21 +2,22 @@
   {
     "chainId": 42161,
     "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x531ab724e0d939c749b931fe0f9fcaa60d0a5bdf4dfbcfa5b77b6648704a79ad",
+      "hash": "0xc1b3c2d3a9ac81b96fa9202cb1cf4157ed9186daeb371ec92d117eeb63741eb0",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0x93092829c3fbb63e477280dd7da8bd14b9667898a9d4e6860c6e1809f12269e3",
-    "closeHash": "0x4dacec01faeb3fc834720e57f6f30fb9ad9db9ee4a3a901f24f644104d46b053",
-    "callDigest": "0xeede510f700b70a545b8857ee6db35516cb54ffb046d62151cb704f83ca33a43",
+    "openHash": "0x60b5d7519a683027918593c7c44545c0004327e490953d0fd19e7549d80d0899",
+    "closeHash": "0x53c711d2d9000346f45eb7e9521de6eac932d2788375fb88170cb415531da18a",
+    "callDigest": "0xe5526d24576d2da0df5e92196a37fe615776194ee211d98c85a5fbfc8a72fd47",
     "residual": [
       {
         "symbol": "WETH",
-        "amount": "19979992896449"
+        "amount": "19979997917315"
       },
       {
         "symbol": "USDC",
@@ -33,22 +34,23 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
-    "atomicRollbackHash": "0xd9c2f8c3b4fffde91260985c602fa7b6d7f872d2338e3bd3a2ff7b1fcde4c5a8"
+    "atomicRollbackHash": "0x566df094be2605ada4e442bd025083b5256c730fd65400536f56f3a21cd31aa1"
   },
   {
     "chainId": 56,
     "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x463ba4bf0c1517f9fa86d6840b2483b558883bf73d16f25c2f0b11a0bfe40522",
+      "hash": "0x6ef01dd929eaf9a11a6d4fc6c80d2f6da0d3172b18fd2f522ec0dc9b2e8ee28f",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0x1a1df44478a9efbcff809f0e86982cb81f72977ee955482730b70e3deb531d7f",
-    "closeHash": "0x0ef41868ccabc39fe0a74170e3ae7e0c40e4846b06f9edcba74a67962475be49",
-    "callDigest": "0xcf7dc891cde1de24673053e37127e776bf9197f7432fcf7cf44da78ff8105ba9",
+    "openHash": "0xb2a9a480710516ed86e8ebeb0027345b599a9cd06bed47d2942ba75fc1276fa6",
+    "closeHash": "0xf325cbe6c92e84c90f6d53f119c2cf18e01d9179843b512f50042cd729bbdcb7",
+    "callDigest": "0x1995cdecf0ba87c7335d59cc0b82fe0a749fabe4aaeb6c1ec5fdd6ef1c123b55",
     "residual": [
       {
         "symbol": "WBNB",
@@ -74,17 +76,18 @@
   {
     "chainId": 4663,
     "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x51d1b78790d2a820e27eed5dfb2820e3a4694710b91179c99d0b0be8f834d132",
+      "hash": "0x8293f628cfd5ad388d4b8475fd60eb05fa4dccc49c00fba25ee63d2d013d8283",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0xaac9ac4751d112852a598c8ae4080e967ab42c1db715cf37e9c8eb278d48ef09",
-    "closeHash": "0x549d20059cbfcc077a5c8a155d076a354b57e4a183bc8ebe81c1d4851e1e7dbb",
-    "callDigest": "0xdfc2407b7ff3a433d51acc1316ebc4a1974e2bf77ef364bff401864c72ac576d",
+    "openHash": "0x86b0f393c1db4e9c356741e4ad937d4ad44f713e90264b919d752664d0aba00c",
+    "closeHash": "0xe0a83c2d965be5572dcb2d2c2a4e410e88188156b64ae7acce889cd4ab1a3183",
+    "callDigest": "0x9476bd3a4f141196e1bfff53a93abb7ea0cbcadf9f5a7822fcc3edaef4a3b9c2",
     "residual": [
       {
         "symbol": "WETH",
@@ -105,6 +108,43 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": true,
-    "atomicRollbackHash": "0x4a6143abeebd12d3239df46af56ed956094d9b7f45b8c5d46cd1e322b6d41d48"
+    "atomicRollbackHash": "0x667350c42f82d52ae0a478f2eb855cf1a576d9e8148da81a4d11263747da8bb7"
+  },
+  {
+    "chainId": 42161,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": true,
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "localSigner": {
+      "hash": "0x4a93a702ff15a61337615e339271a35b4ceea3ff311539418cb8259e5f64f26e",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0xc6a26688614e15f4236f92cfc97b3022cf338607eb3dee79901573d0e797b039",
+    "closeHash": "0xdc25145ada5d895393bb90002b7caf54f2595d90fe710ba69b43e5b318c6175a",
+    "callDigest": "0x0e94fe7ce8a3a5282783e38a2942ed64c9ad1fa1050620285fcbc7ff1a435531",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "19979993952016"
+      },
+      {
+        "symbol": "USDC.e",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDT",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
+    "atomicRollbackHash": "0x3402046c2d10dc65275188b0fe127dfd66c5dfcf12618cf80d5531f7b67ed2a0"
   }
 ]

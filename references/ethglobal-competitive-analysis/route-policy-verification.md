@@ -168,3 +168,15 @@ Robinhood close left zero WETH, USDG and PONS residuals.
 The controlled-provider flow refused manipulated direct output, receiver, source amount, callback bytes and an extra pool call before broadcasting.
 It also refused a signed transaction after plan expiry, recovered a deliberately lost RPC send response and proved whole-batch rollback after a failing nested call.
 All receipts in this artifact belong to isolated forks, and public broadcasts remain zero.
+
+
+## Arbitrum bridged USDC extension
+
+The separately identified bridged USDC at `0xff970a61a04b1ca14834a43f5de4533ebddb5cc8` is now supported through the pinned WETH/USDC.e 500-fee pool at `0xc31e54c7a869b9fcbecc14363cf510d1c41fa443`.
+It is not substituted for native USDC in token metadata or canonical requests.
+The [verified pool source](https://arbitrum.blockscout.com/api/v2/smart-contracts/0xc31e54c7a869b9fcbecc14363cf510d1c41fa443) uses Solidity 0.7.6 and optimizer 800.
+The complete deployed runtime, including metadata, exactly matches the already retained Uniswap pool compiler template after the independently read factory, token, fee, tick spacing, liquidity limit and pool-address immutable substitutions.
+The new twelfth deployment attestation retains the full code, block number and semantic values without duplicating the unchanged source/compiler input.
+The controlled-provider fork now includes a separate native-funded WETH/USDC.e and WETH/USDT entry and close-convert scenario, with zero USDC.e and USDT residuals.
+The same local-signer, refusal, recovery and receipt-proof checks passed for this scenario.
+Idle fork headers are advanced with a local mined block before snapshot reads; production staleness checks remain unchanged.
