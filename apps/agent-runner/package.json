@@ -1,0 +1,20 @@
+{
+  "name": "@aquamux/agent-runner-spike",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "spike:adapters": "node spike/adapters.mjs",
+    "test:docker": "RUN_DOCKER_TESTS=1 node --test test/docker-sandbox.test.mjs",
+    "image:build": "docker build -t aquamux-runtime-spike:local ."
+  },
+  "dependencies": {
+    "@ai-sdk/harness": "1.0.108",
+    "@ai-sdk/harness-codex": "1.0.110",
+    "@ai-sdk/harness-claude-code": "1.0.112",
+    "ai": "7.0.98"
+  }
+}
