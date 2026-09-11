@@ -4,11 +4,35 @@ import {
   chainIdSchema,
   hashSchema,
   integerAmountSchema,
+  quantityHexSchema,
   hexSchema,
   idSchema,
   timestampSchema,
   tokenAmountSchema,
 } from "./primitives";
+
+export const lifecycleRegistrationSchema = z
+  .strictObject({
+    hash: hashSchema,
+    app: addressSchema,
+    tokens: z.array(addressSchema).min(2).max(32),
+    amounts: z.array(integerAmountSchema).min(2).max(32),
+    program: hexSchema,
+    strategy: hexSchema,
+    replaces: hashSchema.optional(),
+  })
+  .superRefine((v, ctx) => {
+    if (v.tokens.length !== v.amounts.length)
+      ctx.addIssue({
+        code: "custom",
+        message: "Registration tokens and amounts must have equal lengths.",
+      });
+    if (new Set(v.tokens).size !== v.tokens.length)
+      ctx.addIssue({
+        code: "custom",
+        message: "Registration tokens must be unique.",
+      });
+  });
 
 export const lifecyclePlanSchema = z
   .strictObject({
@@ -28,7 +52,7 @@ export const lifecyclePlanSchema = z
         z.strictObject({
           to: addressSchema,
           data: hexSchema,
-          value: hexSchema,
+          value: quantityHexSchema,
           label: z.string().min(1).max(240),
         }),
       )
@@ -36,19 +60,7 @@ export const lifecyclePlanSchema = z
       .max(128),
     inventoryBefore: z.array(tokenAmountSchema).max(32),
     conservativeInventoryAfter: z.array(tokenAmountSchema).max(32),
-    registrations: z
-      .array(
-        z.strictObject({
-          hash: hashSchema,
-          app: addressSchema,
-          tokens: z.array(addressSchema).min(2),
-          amounts: z.array(integerAmountSchema).min(2),
-          program: hexSchema,
-          strategy: hexSchema,
-          replaces: hashSchema.optional(),
-        }),
-      )
-      .max(12),
+    registrations: z.array(lifecycleRegistrationSchema).max(12),
     retirements: z
       .array(
         z.strictObject({

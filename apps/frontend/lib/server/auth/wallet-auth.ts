@@ -75,13 +75,8 @@ export class WalletAuth {
       this.store.db
         .prepare("DELETE FROM sessions WHERE expires_at<=?")
         .run(now);
-      const count = this.store.db
-        .prepare(
-          "SELECT count(*) AS count FROM challenges WHERE owner=? AND used=0",
-        )
-        .get(owner) as { count: number };
-      if (count.count >= 10)
-        throw new AuthError(429, "Too many active wallet challenges.");
+      // A claimed wallet is unauthenticated input, never a victim-keyed quota.
+      // Local prototype ingress is private; hosted deployments need trusted ingress rate limits.
       this.store.db
         .prepare(
           "INSERT INTO challenges(id,owner,origin,message,expires_at) VALUES(?,?,?,?,?)",

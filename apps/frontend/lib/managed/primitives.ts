@@ -9,6 +9,11 @@ export const hexSchema = z
   .string()
   .regex(/^0x(?:[0-9a-fA-F]{2})*$/)
   .transform((v) => v as Hex);
+export const quantityHexSchema = z
+  .string()
+  .max(66)
+  .regex(/^0x(?:0|[1-9a-fA-F][0-9a-fA-F]*)$/)
+  .transform((v) => v as Hex);
 export const hashSchema = z
   .string()
   .regex(/^0x[0-9a-fA-F]{64}$/)

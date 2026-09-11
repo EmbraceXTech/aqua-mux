@@ -97,3 +97,21 @@ test("wrong wallet and expired proof/session are refused", async () => {
     store.close();
   }
 });
+
+test("unauthenticated challenges cannot exhaust another wallet login quota", async () => {
+  const store = new ManagedStore(":memory:");
+  try {
+    const owner = privateKeyToAccount(generatePrivateKey());
+    const auth = new WalletAuth(store, origin);
+    for (let i = 0; i < 20; i++) auth.challenge(owner.address, origin, 42161);
+    const legitimate = auth.challenge(owner.address, origin, 42161);
+    const session = await auth.verify(
+      legitimate.id,
+      await owner.signMessage({ message: legitimate.message }),
+      origin,
+    );
+    assert.equal(session.owner, owner.address.toLowerCase());
+  } finally {
+    store.close();
+  }
+});

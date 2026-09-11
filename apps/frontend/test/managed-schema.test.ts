@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {
   assertCapability,
+  lifecycleRegistrationSchema,
+  quantityHexSchema,
   integerAmountSchema,
   rawPriceRatio,
   strategyConfigSchema,
@@ -87,4 +89,49 @@ test("schema versions, invented actions and unproven delegated execution fail cl
     () => assertCapability(configFixture(), "delegated"),
     /authenticated/,
   );
+});
+
+test("shared token metadata cannot change decimals between pair claims", () => {
+  const config = configFixture();
+  if (config.family !== "lp") throw new Error("fixture");
+  const pair = structuredClone(config.pairs[0]);
+  pair.quoteToken.address = "0x0000000000000000000000000000000000000013";
+  pair.openingPrice.quoteToken = pair.quoteToken.address;
+  pair.baseToken.decimals = 6;
+  config.pairs.push(pair);
+  config.policy.allowedAssets.value.push(pair.quoteToken.address);
+  assert.equal(strategyConfigSchema.safeParse(config).success, false);
+});
+
+test("registration vectors agree and native values use RPC quantity encoding", () => {
+  const registration = {
+    hash: `0x${"11".repeat(32)}`,
+    app: baseToken.address,
+    tokens: [baseToken.address, quoteToken.address],
+    amounts: ["1", "2"],
+    program: "0x",
+    strategy: "0x",
+  };
+  assert.equal(
+    lifecycleRegistrationSchema.safeParse(registration).success,
+    true,
+  );
+  assert.equal(
+    lifecycleRegistrationSchema.safeParse({
+      ...registration,
+      amounts: ["1", "2", "3"],
+    }).success,
+    false,
+  );
+  assert.equal(
+    lifecycleRegistrationSchema.safeParse({
+      ...registration,
+      tokens: [baseToken.address, baseToken.address],
+    }).success,
+    false,
+  );
+  for (const value of ["0x0", "0x1", "0xff"])
+    assert.equal(quantityHexSchema.safeParse(value).success, true);
+  for (const value of ["0x", "0x00", "0x01"])
+    assert.equal(quantityHexSchema.safeParse(value).success, false);
 });

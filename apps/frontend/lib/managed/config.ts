@@ -127,6 +127,24 @@ export const strategyConfigSchema = z
     );
     if (new Set(keys).size !== keys.length)
       ctx.addIssue({ code: "custom", message: "Duplicate economic pair." });
+    const metadata = new Map<string, { decimals: number; symbol: string }>();
+    for (const token of [
+      ...v.pairs.flatMap((pair) => [pair.baseToken, pair.quoteToken]),
+      ...v.policy.spendBudgets.value.map((budget) => budget.token),
+    ]) {
+      const previous = metadata.get(token.address);
+      if (
+        previous &&
+        (previous.decimals !== token.decimals ||
+          previous.symbol !== token.symbol)
+      )
+        ctx.addIssue({
+          code: "custom",
+          message:
+            "Shared token metadata must agree across all pairs and budgets.",
+        });
+      metadata.set(token.address, token);
+    }
     const allowed = new Set(v.policy.allowedAssets.value);
     if (
       v.pairs.some(
