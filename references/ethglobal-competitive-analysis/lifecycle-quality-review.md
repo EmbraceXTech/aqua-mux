@@ -2,75 +2,94 @@
 
 Review date: September 12, 2026.
 Reviewer owns this report only and made no implementation changes.
-Scope includes `apps/frontend/lib/managed-compiler/`, `apps/frontend/lib/server/lifecycle/`, lifecycle tests, and the managed fork verifier.
+Scope includes `apps/frontend/lib/managed-compiler/`, `apps/frontend/lib/server/lifecycle/`, lifecycle tests, and both fork verification scripts.
 
 ## Verdict
 
-Must fix before acceptance.
-The implementation owner is addressing findings, and a final verdict requires inspection and tests on the exact final focused commit.
-Initial inspection covered the working tree while the owner prepared commit `0409fa6` and subsequent changes.
+The reviewed lifecycle corrections pass; final acceptance is pending the coordinator-requested dynamic token extension.
+No must-fix finding remains in the previously reviewed files.
+The reviewed implementation consists of base commit `0409fa6`, correction commit `131827d43738b9ef2b715f272c5e64be179ffb2b`, and fork verification commit `29b1f6562323f58a45885f23de0d45ee10258af3`.
+The owner froze these files for final verification, and a scoped diff against `29b1f65` was empty.
+This acceptance does not establish completion of the product UI, caller-side attribution, external-wallet compatibility, or delegated execution.
 
-## Findings
+## Corrected findings
 
-### P1: Bounded LP reserves do not encode the reviewed opening price
+### Bounded opening price
 
-`compileLP` checks the raw quote/base reserve ratio against the reviewed opening price for both full and bounded ranges.
-Concentrated liquidity adds virtual offsets, so this check does not establish the actual opening price.
-Using the lifecycle WETH/USDC fixture with 1 WETH, 2000 USDC, opening price 2000, and bounds 1000 to 3000 succeeds in the compiler.
-The installed SDK's `instructions.concentrate.computeLiquidityAndPrice` applied to the compiled sorted amounts and encoded bounds gives an implied price of 1792.859529899711 USDC per WETH.
-This changes the economic meaning of the reviewed position.
-Derive and verify concentrated reserves using the deployed instruction's math, or refuse unsupported configurations.
-Add a fork quote assertion for an asymmetric bounded range and reversed token order.
+The original compiler checked the raw quote/base reserve ratio against the reviewed opening price for both full and bounded ranges.
+Concentrated liquidity adds virtual offsets, so that check did not establish the actual opening price.
+The reviewer reproduced acceptance of 1 WETH and 2000 USDC with opening price 2000 and bounds 1000 to 3000, while the installed SDK implied an opening price of about 1792.85953 USDC per WETH.
+The owner separately reproduced the discrepancy against deployed SwapVM on the fork.
+The corrected `pricing.ts` derives the exact rational spot from encoded virtual reserves, and `compileLP` refuses a different reviewed opening price.
+The final fork checks an asymmetric concentrated position against the reviewed price within one raw output unit after fee and small-trade price impact.
+Bounded proposal producers must use `describeLPPrice` or construct reserves consistent with the reviewed price before confirmation.
+That integration requirement was sent to the coordinator.
 
-### P1: Sequential ERC20 purchases reuse consumed allowance
+### Consumed ERC20 allowance
 
-`approvalBuilder` caches the allowance it approved without subtracting amounts consumed by route calls.
-Two equal purchases from the same ERC20 funding asset therefore emit one approval, although the first swap consumes it.
-The second swap then fails in an atomic simulation or transaction.
-The original fork funding case uses native ETH and cannot catch this behavior.
-Track consumption or approve a correctly bounded aggregate amount, and test equal and unequal repeated purchases with an allowance-enforcing token.
+The original approval builder cached the approved allowance without subtracting route consumption.
+Two equal purchases from the same ERC20 funding asset therefore received only one approval.
+The owner reproduced an allowance failure on the fork before restoring the correction.
+The corrected builder exposes consumption tracking, and each ERC20 route consumes its planned allowance.
+Unit tests inspect exact approvals for equal and unequal purchases.
+The independent final fork successfully executes two equal WETH-funded purchases and reads back the retained WETH backing.
 
-### P2: Encoded lower-bound rounding needs verification
+### Bound rounding and per-pair fees
 
-The compiler rounds the raw lower price upward and describes this as rounding inward.
-The SDK's `ConcentrateGrowLiquidity2DArgs.fromRawPrices` then floors the square root.
-The final encoded lower square can fall below the raw lower bound supplied to the SDK.
-Use a ceiling square root for the lower bound and verify the final encoded interval against the reviewed rational prices.
+The original raw-price rounding passed through an SDK square-root floor, which could move the final lower bound outside the reviewed interval.
+The corrected compiler directly encodes a ceiling square root for the lower bound and a floor square root for the upper bound.
+Tests verify the resulting squared bounds and reciprocal token-order equivalence.
+Decoded instructions preserve distinct fees of 5 and 37 basis points.
+The final fork uses those different pair fees.
 
-### P2: Regression coverage and lint
+### Snapshot freshness
 
-The initial compiler test checks a deadline opcode prefix, fresh hashes, and a raw reserve mismatch.
-The initial managed fork uses full ranges and identical 5-basis-point fees for both pairs.
-Add assertions covering bounded economic price, reciprocal sorting, different pair fees, and repeated ERC20 allowance consumption.
-Focused ESLint initially failed because `wrapped` was imported but unused in `scripts/verify-managed-lifecycle.ts`.
+The reviewer reproduced a successful plan return after simulation advanced the clock beyond the initial snapshot's 30-second freshness limit.
+The corrected planner clamps expiry to the initial snapshot freshness deadline, reads and validates another snapshot after simulation, and rejects a final snapshot that predates the simulation block.
+It uses the final snapshot for gas sufficiency and the persisted snapshot digest.
+The snapshot reader also rejects a stale latest chain block.
+A slow-simulation regression now refuses the previously accepted plan.
 
-## Component boundaries
+### Module split and lint
 
-The initial lifecycle index mixed funding, conversion, registration, routing, and final simulation validation in one function of roughly 300 lines.
-The owner has since extracted funding and conversion, reducing the index to 191 lines at the next inspection checkpoint.
-The compiler, integer arithmetic, inventory accounting, route decoding, snapshot reader, and call encoding otherwise have distinct responsibilities.
-Final maintainability acceptance remains subject to the completed fixes.
+The original main planner combined funding, conversion, registration, route validation, and final simulation checks in roughly 300 lines.
+The final index is 205 lines, with funding in a 92-line module and conversion in a 42-line module.
+Price arithmetic and concentrated virtual-reserve calculations are isolated in a 74-line compiler module.
+Integer arithmetic, inventory accounting, route decoding, snapshots, and call encoding have separate responsibilities.
+The unused verifier import was removed, and scoped ESLint passes.
+The fork verifier remains a sequential integration scenario with a separate Solidity route fixture; its length reflects setup, execution, and chain assertions rather than product logic.
 
-## Evidence collected
+## Independent final verification
 
-`npx tsx --test test/lifecycle.test.ts` initially passed all 10 tests.
-The focused ESLint command covered both compiler files, all lifecycle files, lifecycle tests and fixtures, and both fork verification scripts.
-It failed on the unused import described above.
-The existing fork verifier passed independently on isolated Anvil port 19483.
-The verifier ran from a temporary working directory, so its generated report did not overwrite the shared workspace's verification artifact.
-It proved native funding, shared WETH inventory, fills in both directions, rollback after a failing final replacement call, successful replacement, exact program deadline behavior, close-only simulation during a route outage, and close-and-convert with paired balances read back as zero.
-That run used the existing full-range scenarios and does not establish the missing bounded-price or repeated ERC20-purchase properties.
-WETH, Aqua, and SwapVM were forked deployments; paired token code, resolver credentials, and the conversion router were local fixtures.
+All 15 tests passed with `npx tsx --test test/lifecycle.test.ts`.
+Scoped ESLint passed with `--max-warnings=0` across the compiler, lifecycle modules, lifecycle test and fixture, and both verification scripts.
+The final fork passed all 13 checks on isolated Anvil port 19484.
+The fork began at Arbitrum block `504163162` and completed at `2026-09-11T20:21:48.881Z`.
+The verifier ran from a temporary working directory, so it did not overwrite the shared workspace's generated verification report.
+
+The fork proves native and ERC20 shortage funding, conservative receipt accounting, shared WETH counted once, a bounded executable opening-price quote, two-way resolver fills, replacement rollback after a failing final call, successful replacement, deadline acceptance and refusal, route-independent close-only simulation, and atomic close-and-convert with paired balances read back as zero.
+WETH, Aqua, and SwapVM use forked deployments.
+The wallet, paired token code, resolver credentials, and conversion router are local fixtures.
 No real-chain transaction was sent.
+These results do not establish compatibility with an unmodified production aggregation route or an external wallet.
+
+Full frontend `npx tsc --noEmit` initially encountered syntax errors in the concurrently edited `test/managed-auth-next.test.ts`.
+The reviewer reported that separate failure to the coordinator.
+A subsequent independent run passed after the authentication worker's edits settled.
 
 ## Accounting and execution boundaries
 
-The planner counts each real token once and uses the maximum competing virtual claim as its backing requirement.
-Funding credits minimum receipts rather than expected receipts, and the gas check reserves native value plus estimated execution cost.
+The planner represents each selected real token once and backs competing virtual claims using their maximum requirement rather than their sum.
+Funding credits minimum receipts and keeps retained funding-token backing inside the funding budget.
+The gas check reserves native call value, estimated execution cost, and a positive recovery reserve.
 Retirements precede purchases and registrations in one atomic batch.
-Close-only planning does not request a swap route.
-Conversion operates on explicitly selected amounts and refuses amounts above selected inventory, rather than summing virtual allocations.
-The low-level planner receives the selected scope from its caller and does not independently establish managed-group ownership or resolve ambiguous transfer attribution.
-Fresh snapshot and whole-batch simulation checks bind calls and record configuration, policy, and snapshot digests.
-Submission-time configuration, lease, authorization, and expiry enforcement belongs to the execution layer and is outside this review's acceptance claim.
-Residual reporting must remain scoped to the balances actually observed and must not treat missing observations as zero.
+Close-only planning requests no conversion route.
+Conversion uses explicitly selected amounts and refuses amounts above selected inventory.
+It does not sum virtual allocations or default to selling the entire wallet.
+The caller must establish managed-group ownership and resolve ambiguous transfer attribution before providing that selection.
+
+Plans record configuration, policy, snapshot, and call digests, enforce freshness and expiry, and require successful atomic simulation.
+Submission-time configuration, lease, authorization, and expiry checks belong to the execution layer and require its separate review.
+The residual helper now refuses missing after-balances instead of turning unavailable observations into zero.
+Its inputs must share the same selected accounting scope; passing whole-wallet balances as group inventory would misattribute unrelated holdings.
+Fixed conversion amounts can still revert after intervening fills or leave excess receipts, so post-transaction observation remains required.
