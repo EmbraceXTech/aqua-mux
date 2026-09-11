@@ -1,5 +1,7 @@
 import { erc20Abi, type Address } from "viem";
-import { AQUA, NATIVE, token as catalogToken } from "../../config";
+import { AQUA, NATIVE } from "../../config";
+import { ensureManagedTokens, verifiedToken } from "./tokens";
+export { verifiedToken } from "./tokens";
 import type { StrategyConfig } from "../../managed/config";
 import type { Token, TokenAmount } from "../../managed/primitives";
 import type { ProposalIntent } from "./inputs";
@@ -17,16 +19,21 @@ export interface WalletSnapshot extends Record<string, unknown> {
   nativeBalanceWei: string;
   balances: TokenAmount[];
   allowances: { token: Token; spender: Address; amount: string }[];
+  routeQuotes?: {
+    source: string;
+    fromToken: Token;
+    toToken: Token;
+    amountIn: string;
+    amountOut: string;
+    observedAt: number;
+    expiresAt: number;
+  }[];
   coverage: {
     source: string;
     observedAt: number;
     status: "complete" | "partial" | "unavailable";
     detail?: string;
   }[];
-}
-export function verifiedToken(chainId: number, address: string): Token {
-  const t = catalogToken(chainId, address);
-  return { address: t.address, decimals: t.decimals, symbol: t.symbol };
 }
 export function validateConfigTokens(config: StrategyConfig) {
   for (const pair of config.pairs)
@@ -49,9 +56,17 @@ export async function walletSnapshot(input: {
   maker: Address;
   assets: Address[];
   maxAgeMs: number;
+  storedTokens?: Token[];
 }): Promise<WalletSnapshot> {
+  await ensureManagedTokens(input.chainId, input.assets, input.storedTokens);
   const c = client(input.chainId);
   const block = await c.getBlock();
+  if ((await c.getChainId()) !== input.chainId)
+    throw new ManagedError(
+      "wrong_chain",
+      "The RPC returned the wrong network.",
+      503,
+    );
   const observedAt = Date.now();
   const blockTimestamp = Number(block.timestamp) * 1000;
   if (

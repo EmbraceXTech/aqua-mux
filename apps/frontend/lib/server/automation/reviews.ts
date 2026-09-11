@@ -1,3 +1,4 @@
+import { assertReviewSnapshotFresh } from "../managed-service/freshness";
 import { normalizeProposalConfig } from "../managed-service/proposal-config";
 import { groupReviewSnapshot } from "../managed-service/review-snapshot";
 import { watchReviewLiveness } from "./liveness";
@@ -273,15 +274,11 @@ export async function runGroupReview(
           "The review deadline elapsed.",
           408,
         );
-      if (
-        now() - snapshot.blockTimestamp >
-          group.config.policy.maxReferenceAgeMs.value ||
-        snapshot.blockTimestamp > now() + 10_000
-      )
-        throw new ManagedError(
-          "stale_data",
-          "Wallet data became stale while the review ran. Refresh before continuing.",
-        );
+      assertReviewSnapshotFresh(
+        snapshot,
+        group.config.policy.maxReferenceAgeMs.value,
+        now(),
+      );
       const config = result.result.proposedConfig
         ? normalizeProposalConfig(result.result.proposedConfig)
         : undefined;

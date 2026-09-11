@@ -1,3 +1,4 @@
+import { ensureManagedTokens } from "./tokens";
 import { pairInventory, availableInventory, planFunding } from "./funding";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
@@ -10,7 +11,12 @@ import {
   type TokenAmount,
 } from "../../managed";
 import { openManagedStore } from "../store";
-import { buildLifecyclePlan, type LifecycleRequest } from "../lifecycle";
+import {
+  buildLifecyclePlan,
+  type LifecycleRequest,
+  type RouteRequest,
+  type LifecycleRoute,
+} from "../lifecycle";
 import { readLifecycleSnapshot } from "../lifecycle/snapshot";
 import { quoteLifecycleRoute } from "../lifecycle/routes";
 import { simulateLifecyclePlan } from "../dev-wallet/simulation";
@@ -94,7 +100,16 @@ export async function createManagedPlan(
         ...group.inventory.map((i) => i.token.address),
       ],
       maxAgeMs: group.config.policy.maxReferenceAgeMs.value,
+      storedTokens: [
+        ...group.config.pairs.flatMap((pair) => [
+          pair.baseToken,
+          pair.quoteToken,
+        ]),
+        ...group.inventory.map((i) => i.token),
+      ],
     });
+    if (input.targetToken)
+      await ensureManagedTokens(group.chainId, [input.targetToken]);
     let inventory: TokenAmount[] = input.inventory ?? group.inventory;
     if (!inventory.length) inventory = pairInventory(config);
     inventory = availableInventory(inventory, snapshot);
@@ -145,9 +160,14 @@ export async function createManagedPlan(
           }
         : {}),
     };
+    const routes: { request: RouteRequest; route: LifecycleRoute }[] = [];
     const plan = await buildLifecyclePlan(request, {
       snapshot: readLifecycleSnapshot,
-      quote: quoteLifecycleRoute,
+      quote: async (routeRequest) => {
+        const route = await quoteLifecycleRoute(routeRequest);
+        routes.push({ request: routeRequest, route });
+        return route;
+      },
       simulate: simulateLifecyclePlan,
     });
     return store.transaction(() => {
@@ -177,6 +197,10 @@ export async function createManagedPlan(
         reviewId: input.reviewId ?? null,
       };
       store.putDocument("plan-context", plan.id, owner, context);
+      store.putDocument("plan-routes", plan.id, owner, {
+        digest: planDigest(plan),
+        routes,
+      });
       return { plan, digest: planDigest(plan) };
     });
   } finally {

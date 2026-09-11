@@ -19,6 +19,10 @@ export async function groupReviewSnapshot(
     maker: group.maker,
     assets: group.config.policy.allowedAssets.value,
     maxAgeMs: group.config.policy.maxReferenceAgeMs.value,
+    storedTokens: group.config.pairs.flatMap((pair) => [
+      pair.baseToken,
+      pair.quoteToken,
+    ]),
   });
   const strategies = store.list("strategy", group.owner, group.id);
   snapshot.managedStrategies = strategies;

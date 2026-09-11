@@ -14,7 +14,7 @@ import {
   type ChainObservationConfig,
 } from "../positions";
 import { groupBot, ownedGroup } from "./groups";
-import { verifiedToken } from "./snapshot";
+
 import { pauseBot } from "../automation/lease";
 
 export async function reconcileManagedTransactions(
@@ -91,8 +91,11 @@ export async function reconcileManagedTransactions(
               maker: group.maker,
               app: registration.app,
               hash: registration.hash,
-              tokens: registration.tokens.map((t) =>
-                verifiedToken(group.chainId, t),
+              tokens: registration.tokens.map(
+                (t) =>
+                  group.config.pairs
+                    .flatMap((pair) => [pair.baseToken, pair.quoteToken])
+                    .find((token) => token.address === t)!,
               ),
               program: registration.program,
               registrationBlock: result.blockNumber,

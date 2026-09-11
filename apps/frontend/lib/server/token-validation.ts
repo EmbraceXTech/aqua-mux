@@ -1,6 +1,7 @@
 import { parseAbi, type Address, type PublicClient } from "viem";
 import {
   findRegistryToken,
+  isPositiveUint256Decimal,
   tokenRegistryChainId,
   type RegistryToken,
   type TokenMetadataCheck,
@@ -164,11 +165,18 @@ async function checkRoute(
         amountIn: amount,
       };
     }
-    const quote = (await response.json()) as { dstAmount?: unknown };
-    if (
-      !/^\d+$/.test(String(quote.dstAmount)) ||
-      BigInt(String(quote.dstAmount)) <= 0n
-    ) {
+    let quote: { dstAmount?: unknown };
+    try {
+      quote = (await response.json()) as { dstAmount?: unknown };
+    } catch {
+      return {
+        status: "unavailable",
+        reason: "invalid_response",
+        checkedAt,
+        amountIn: amount,
+      };
+    }
+    if (!isPositiveUint256Decimal(quote.dstAmount)) {
       return {
         status: "unavailable",
         reason: "invalid_response",
@@ -180,7 +188,7 @@ async function checkRoute(
       status: "available",
       checkedAt,
       amountIn: amount,
-      amountOut: String(quote.dstAmount),
+      amountOut: quote.dstAmount,
     };
   } catch {
     return {
@@ -197,7 +205,7 @@ export async function validateTokenPair(
   dependencies: TokenRegistryDependencies & MetadataDependencies = {},
 ): Promise<TokenPairValidation> {
   const chainId = tokenRegistryChainId(input.chainId);
-  if (!/^\d+$/.test(input.amount) || BigInt(input.amount) <= 0n) {
+  if (!isPositiveUint256Decimal(input.amount)) {
     throw new Error(
       "Route amount must be a positive integer in raw token units.",
     );

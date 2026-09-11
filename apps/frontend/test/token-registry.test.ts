@@ -46,15 +46,53 @@ test("registry parsing keeps address identity and rejects malformed records", ()
     malformed: { address: "nope" },
   });
 
-  assert.equal(parsed.tokens.length, 2);
-  assert.equal(parsed.rejected, 3);
+  assert.equal(parsed.tokens.length, 1);
+  assert.equal(parsed.rejected, 4);
   assert.deepEqual(
     parsed.tokens.map((token) => token.address),
-    [address("1"), address("2")],
+    [address("2")],
   );
-  assert.equal(parsed.tokens[1].risk, "unverified");
-  assert.equal(parsed.tokens[1].selectable, true);
-  assert.equal(parsed.tokens[0].risk, "unknown");
+  assert.equal(parsed.tokens[0].risk, "unverified");
+  assert.equal(parsed.tokens[0].selectable, true);
+});
+
+test("conflicting duplicate addresses are quarantined in both input orders", () => {
+  const safe = {
+    address: address("c"),
+    symbol: "SAFE",
+    name: "Safe Token",
+    decimals: 6,
+  };
+  const malicious = {
+    ...safe,
+    decimals: 18,
+    tags: ["RISK:malicious"],
+  };
+  for (const entries of [
+    [safe, malicious],
+    [malicious, safe],
+  ]) {
+    const parsed = parseTokenRegistry(1, entries);
+    assert.equal(parsed.tokens.length, 0);
+    assert.equal(parsed.rejected, 2);
+  }
+});
+
+test("identical duplicate identities merge the strongest risk", () => {
+  const identity = {
+    address: address("d"),
+    symbol: "DUP",
+    name: "Duplicate",
+    decimals: 18,
+  };
+  const parsed = parseTokenRegistry(1, [
+    { ...identity, tags: ["bluechip"] },
+    { ...identity, tags: ["RISK:malicious"], providers: ["1inch"] },
+  ]);
+  assert.equal(parsed.tokens.length, 1);
+  assert.equal(parsed.tokens[0].risk, "malicious");
+  assert.equal(parsed.tokens[0].selectable, false);
+  assert.equal(parsed.rejected, 1);
 });
 
 test("registry search prioritizes an exact address and preserves duplicate symbols", () => {

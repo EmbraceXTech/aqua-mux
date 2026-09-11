@@ -86,7 +86,8 @@ The proposal flow must request a fresh quote for the actual amount and enforce i
 ## Implemented design
 
 `lib/token-registry.ts` owns client-safe registry types, input normalization, risk classification, exact-address lookup, and deterministic search ranking.
-It rejects malformed addresses, mismatched chain IDs, invalid decimals, duplicate addresses, and oversized metadata fields.
+It rejects malformed addresses, mismatched chain IDs, invalid decimals, and oversized metadata fields.
+Identical duplicate address records merge their tags and strongest risk state, while conflicting identity or decimals records are quarantined regardless of input order.
 Search ranks exact addresses before exact symbols and prefixes, but it keeps duplicate-symbol records as separate results.
 Records tagged malicious or suspicious remain visible for provenance but are not selectable.
 An entry without a 1inch risk tag reports `unknown` rather than implying that somebody reviewed it.
@@ -95,6 +96,7 @@ An entry without a 1inch risk tag reports `unknown` rather than implying that so
 Concurrent refreshes for the same chain share one request.
 A failed refresh may use a validated in-memory snapshot for up to 24 hours and marks the response stale and degraded.
 After a failed refresh, a 30-second retry delay prevents token-search keystrokes from repeatedly calling an unavailable provider.
+The same retry delay now applies when a cold refresh or expired stale snapshot falls back to the committed catalog.
 If no usable runtime snapshot exists, the server returns the committed fallback and marks it degraded.
 Unavailable data remains unavailable instead of becoming an empty token list.
 
@@ -106,6 +108,11 @@ Each token has `registryStatus: listed` and `routeStatus: not_checked` until a p
 The endpoint caps results at 100 records and rejects searches longer than 80 characters.
 
 `POST /api/tokens/validate` accepts a chain ID, source address, destination address, and positive integer amount in raw token units.
+It authenticates the wallet owner and validates the request origin before reading a body capped at 1,024 bytes.
+Input amounts and successful quote outputs must be decimal strings between one and the uint256 maximum, so numeric JSON outputs and rounded JavaScript numbers are rejected.
+An in-process admission controller allows one active validation per owner, four active validations in the process, 12 owner requests per minute, and 48 process requests per minute.
+Those limits match a proposal-review interaction instead of a search-as-you-type interaction, and the process allowance is four times the owner allowance because the product supports four chains.
+This admission state is local to one Node.js process and is not a substitute for shared ingress or distributed limits in a hosted deployment.
 It looks up both tokens by chain and address, rejects blocked risk states, reads on-chain bytecode and decimals, compares optional symbol and name responses, and requests one 1inch quote.
 Its response keeps source metadata, destination metadata, and route status in separate fields.
 Provider errors and invalid quote responses cannot become an available route.
@@ -117,22 +124,26 @@ Its console output reports the full registry count, fallback count, and duplicat
 
 ## Test evidence
 
-The focused token registry suite passed 11 tests.
-Those tests cover malformed data, wrong-chain records, duplicate addresses and symbols, risk states, search ordering and limits, cache reuse, no-key fallback, decimals mismatch, successful route checks, failed route checks, and API input bounds.
+The focused corrective token registry suite passed 22 tests after the review fixes.
+Those tests cover malformed data, wrong-chain records, order-independent duplicate conflict quarantine, strongest-risk merging, duplicate symbols, search ordering and limits, cache reuse, cold and warm outage backoff, outage recovery, decimals mismatch, successful route checks, failed route checks, uint256 boundaries, numeric quote rejection, authentication sequencing, bounded bodies, per-owner limits, and process limits.
 Focused ESLint completed with zero warnings.
 The generator completed for all four chains and produced fallback counts of 11, 8, 10, and 6.
 The read-only live verification script confirmed contract decimals and one positive quote per supported chain.
 An end-to-end request against the existing Next.js development server returned both Robinhood `HOOD` addresses as separate exact-symbol results, and the validation endpoint independently returned verified USDG metadata and an available point-in-time route.
+Before the correction, a direct request without authorization or an origin header reproduced the review defect with HTTP 200 and invoked validation work.
+After the correction, unit-level route tests prove that authentication failures, oversized bodies, uint256 overflow, concurrent overload, and rate overload do not invoke the injected upstream validator.
+The same direct server request then returned HTTP 403 without an origin, and a matching-origin request without a bearer session returned HTTP 401.
 The full frontend test command passed 99 tests, skipped one environment-dependent test, and reported no failures.
 The full frontend lint command completed with zero warnings.
 
 The repository-wide TypeScript check was also attempted while other Orca workers were editing shared files.
-The latest run failed in `test/managed-auth-next.test.ts` because an in-progress header fixture did not satisfy `HeadersInit`.
+The latest run failed because an in-progress `lib/server/route-policy/index.ts` import could not find its separately owned `quote` module.
 No token registry file appeared in the TypeScript error output, and an isolated strict TypeScript check for the registry modules and tests passed.
 
 ## Ownership and integration boundary
 
-This worker owns the new registry modules, registry tests, token API routes, verification script, fallback generator change, generated fallback catalog, three new fallback images, and this report.
+This worker owns the registry modules, registry tests, token API routes, verification script, fallback generator change, generated fallback catalog, three new fallback images, and this report.
+The corrective review scope adds `lib/server/token-validation-http.ts` and `lib/server/token-validation-limit.ts`, plus focused changes to parsing, source caching, validation, and tests.
 The UI worker owns token selector and managed proposal integration.
 The existing dirty changes in `lib/config.ts`, `components/aquamux.tsx`, and other shared product files were preserved.
 

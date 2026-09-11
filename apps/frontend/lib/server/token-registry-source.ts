@@ -78,6 +78,17 @@ function fallbackSnapshot(
   };
 }
 
+function fallbackCacheEntry(
+  chainId: TokenRegistryChainId,
+  nowMs: number,
+): RegistryCacheEntry {
+  return {
+    ...fallbackSnapshot(chainId, nowMs),
+    expiresAtMs: nowMs + REGISTRY_RETRY_MS,
+    staleUntilMs: nowMs + REGISTRY_RETRY_MS,
+  };
+}
+
 async function refreshTokenRegistry(
   chainId: TokenRegistryChainId,
   dependencies: TokenRegistryDependencies,
@@ -126,7 +137,9 @@ async function refreshTokenRegistry(
       registryCache.set(chainId, staleEntry);
       return snapshotWithoutExpiry(staleEntry);
     }
-    return fallbackSnapshot(chainId, nowMs);
+    const fallback = fallbackCacheEntry(chainId, nowMs);
+    registryCache.set(chainId, fallback);
+    return snapshotWithoutExpiry(fallback);
   }
 }
 

@@ -75,6 +75,16 @@ export type TokenPairValidation = {
   route: TokenRouteCheck;
 };
 
+export const UINT256_MAX = (1n << 256n) - 1n;
+
+export function isPositiveUint256Decimal(value: unknown): value is string {
+  return (
+    typeof value === "string" &&
+    /^[1-9]\d{0,77}$/.test(value) &&
+    BigInt(value) <= UINT256_MAX
+  );
+}
+
 const rawTokenSchema = z
   .object({
     address: z.string(),
@@ -126,6 +136,7 @@ export function parseTokenRegistry(
       ? Object.values(container)
       : [];
   const byAddress = new Map<Address, RegistryToken>();
+  const conflictedAddresses = new Set<Address>();
   let rejected = 0;
 
   for (const entry of entries) {
@@ -140,13 +151,13 @@ export function parseTokenRegistry(
     }
 
     const address = getAddress(parsed.data.address).toLowerCase() as Address;
-    if (byAddress.has(address)) {
+    if (conflictedAddresses.has(address)) {
       rejected++;
       continue;
     }
     const tags = [...new Set(parsed.data.tags ?? [])].sort();
     const risk = tokenRisk(tags);
-    byAddress.set(address, {
+    const token: RegistryToken = {
       chainId,
       address,
       symbol: parsed.data.symbol,
@@ -159,7 +170,39 @@ export function parseTokenRegistry(
       routeStatus: "not_checked",
       risk,
       selectable: risk !== "malicious" && risk !== "suspicious",
-    });
+    };
+    const existing = byAddress.get(address);
+    if (existing) {
+      if (
+        existing.symbol !== token.symbol ||
+        existing.name !== token.name ||
+        existing.decimals !== token.decimals
+      ) {
+        byAddress.delete(address);
+        conflictedAddresses.add(address);
+        rejected += 2;
+        continue;
+      }
+      const mergedTags = [...new Set([...existing.tags, ...token.tags])].sort();
+      const mergedRisk = tokenRisk(mergedTags);
+      byAddress.set(address, {
+        ...existing,
+        ...(existing.logoURI
+          ? {}
+          : token.logoURI
+            ? { logoURI: token.logoURI }
+            : {}),
+        tags: mergedTags,
+        providers: [
+          ...new Set([...existing.providers, ...token.providers]),
+        ].sort(),
+        risk: mergedRisk,
+        selectable: mergedRisk !== "malicious" && mergedRisk !== "suspicious",
+      });
+      rejected++;
+      continue;
+    }
+    byAddress.set(address, token);
   }
 
   return { tokens: [...byAddress.values()], rejected };

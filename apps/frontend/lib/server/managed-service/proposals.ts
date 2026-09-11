@@ -1,3 +1,4 @@
+import { assertReviewSnapshotFresh } from "./freshness";
 import { normalizeProposalConfig } from "./proposal-config";
 import { randomUUID } from "node:crypto";
 import type { Address } from "viem";
@@ -26,6 +27,7 @@ type ProposalResponse = {
   bot?: BotRun;
 };
 type ProposalDocument = {
+  intent: ProposalIntent;
   digest: string;
   deadline: number;
   response: ProposalResponse;
@@ -89,6 +91,7 @@ export async function proposeIntent(
       usage: { cost: null },
     };
     const document = {
+      intent,
       digest,
       deadline: Date.now() + 120_000,
       response: { review },
@@ -130,6 +133,7 @@ export async function proposeIntent(
       `policy:${review.id}`,
       Date.now(),
     );
+    store.putDocument("proposal-intents", id, owner, document);
     const result = await configuredRunner().review(
       {
         requestId: review.id,
@@ -150,14 +154,16 @@ export async function proposeIntent(
         "review_timeout",
         "The proposal deadline elapsed.",
       );
-    if (
-      Date.now() - snapshot.blockTimestamp >
-        policyTemplate.maxReferenceAgeMs.value ||
-      snapshot.blockTimestamp > Date.now() + 10_000
-    )
+    assertReviewSnapshotFresh(
+      snapshot,
+      policyTemplate.maxReferenceAgeMs.value,
+      Date.now(),
+    );
+    if (!policyTemplate.allowedActions.value.includes(result.result.decision))
       throw new ManagedError(
-        "stale_data",
-        "Wallet data became stale while the proposal ran. Request a fresh proposal.",
+        "invalid_review",
+        "The agent proposed an action outside the selected policy.",
+        502,
       );
     const config = result.result.proposedConfig
       ? normalizeProposalConfig(result.result.proposedConfig)

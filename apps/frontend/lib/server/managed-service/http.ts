@@ -1,3 +1,4 @@
+import { ensureManagedTokens } from "./tokens";
 import {
   recordWalletStatus,
   rejectPreparedAttempt,
@@ -111,6 +112,10 @@ export async function managedApi(
         });
       if (method === "POST") {
         const input = groupInputSchema.parse(await body(request));
+        await ensureManagedTokens(
+          input.config.chainId,
+          input.config.policy.allowedAssets.value,
+        );
         return ok(createGroup(owner, input.config, input.mode));
       }
     }
@@ -136,6 +141,14 @@ export async function managedApi(
         const input = z
           .strictObject({ config: strategyConfigSchema })
           .parse(await body(request));
+        await ensureManagedTokens(
+          input.config.chainId,
+          input.config.policy.allowedAssets.value,
+          group.config.pairs.flatMap((pair) => [
+            pair.baseToken,
+            pair.quoteToken,
+          ]),
+        );
         const result = editGroup(owner, id, input.config);
         cancelGroupReview(id);
         return ok(result);

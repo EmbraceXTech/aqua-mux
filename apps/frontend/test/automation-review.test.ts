@@ -283,3 +283,24 @@ test("same-key retry after SQLite restart terminalizes expired pending review wi
     rmSync(directory, { recursive: true, force: true });
   }
 });
+
+test("API timeout cancels the pending review and pauses recurring management", async () => {
+  const f = fixture();
+  f.deps.timeoutMs = 10;
+  f.deps.runner.review = async (_request, signal) =>
+    new Promise((_resolve, reject) =>
+      signal.addEventListener(
+        "abort",
+        () => reject(new Error("fixture timeout")),
+        { once: true },
+      ),
+    );
+  try {
+    const result = await runGroupReview(ownerA, f.group.id, f.input, f.deps);
+    assert.equal(result.status, "cancelled");
+    assert.equal(f.store.get("bot", f.bot.id, ownerA)?.state, "paused");
+    assert.equal(result.result, undefined);
+  } finally {
+    f.store.close();
+  }
+});
