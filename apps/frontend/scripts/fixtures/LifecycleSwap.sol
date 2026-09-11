@@ -25,3 +25,18 @@ contract LifecycleSwap {
         return (returnAmount, desc.amount);
     }
 }
+
+// Same balance and allowance storage layout as TestToken, with explicit metadata reads.
+contract LifecycleToken {
+    mapping(address => uint256) public balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
+    function decimals() external view returns (uint8) {
+        return address(this) == address(0xaf88d065e77c8cC2239327C5EDb3A432268e5831) ? 6 : 8;
+    }
+    function mint(address to, uint256 amount) external { balanceOf[to] += amount; }
+    function approve(address spender, uint256 amount) external returns (bool) { allowance[msg.sender][spender] = amount; return true; }
+    function transfer(address to, uint256 amount) external returns (bool) { balanceOf[msg.sender] -= amount; balanceOf[to] += amount; return true; }
+    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
+        allowance[from][msg.sender] -= amount; balanceOf[from] -= amount; balanceOf[to] += amount; return true;
+    }
+}

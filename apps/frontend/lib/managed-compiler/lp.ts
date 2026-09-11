@@ -7,7 +7,7 @@ import {
 } from "@1inch/swap-vm-sdk";
 import { AquaProtocolContract } from "@1inch/aqua-sdk";
 import { keccak256, toHex, type Hex } from "viem";
-import { AQUA, KYC, NATIVE, SWAP_VM, token } from "../config";
+import { AQUA, KYC, NATIVE, SWAP_VM } from "../config";
 import { strategyConfigSchema, type StrategyConfig } from "../managed/config";
 import type { Call } from "../model";
 import { uint } from "./arithmetic";
@@ -24,12 +24,9 @@ export function compileLP(input: StrategyConfig, nonce: Hex, now: number) {
     throw new Error("A fresh 32-byte plan nonce is required.");
   return config.pairs.map((pair, index) => {
     for (const t of [pair.baseToken, pair.quoteToken]) {
-      if (
-        t.address === NATIVE ||
-        token(config.chainId, t.address).decimals !== t.decimals
-      )
+      if (t.address === NATIVE)
         throw new Error(
-          "LP token metadata does not match the verified catalog.",
+          "LP registration requires wrapped native or ERC20 tokens.",
         );
     }
     const base = uint(pair.baseAmount, 248),

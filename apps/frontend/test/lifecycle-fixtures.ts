@@ -12,6 +12,7 @@ import { configFixture } from "./managed-fixtures";
 import type { LPStrategyConfig } from "../lib/managed/config";
 import { digest } from "../lib/server/lifecycle/digest";
 import { aggregationSwapAbi } from "../lib/server/lifecycle/routes";
+import { requestTokens } from "../lib/server/lifecycle/metadata";
 import type {
   LifecycleDependencies,
   LifecycleRequest,
@@ -115,7 +116,12 @@ export function dependenciesFixture(): LifecycleDependencies {
       blockNumber: "100",
       blockHash: hash,
       nativeBalance: "10000000000000000000",
-      balances: request.inventory,
+      balances: requestTokens(request).map((token) => ({
+        token,
+        amount:
+          request.inventory.find((i) => i.token.address === token.address)
+            ?.amount ?? "0",
+      })),
       allowances: [],
       contracts: [AQUA, SWAP_VM, classicRouter(42161)].map((address) => ({
         address,

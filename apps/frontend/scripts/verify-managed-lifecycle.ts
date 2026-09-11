@@ -85,6 +85,11 @@ export async function verifyManagedLifecycle(context: {
     router,
     `0x${compiled.contracts["LifecycleSwap.sol"].LifecycleSwap.evm.deployedBytecode.object}`,
   ]);
+  for (const t of [usdc, btc])
+    await rpc("anvil_setCode", [
+      t.address,
+      `0x${compiled.contracts["LifecycleSwap.sol"].LifecycleToken.evm.deployedBytecode.object}`,
+    ]);
   const setup: Call[] = [
     wrapCall(base.address, parseEther("3")),
     {

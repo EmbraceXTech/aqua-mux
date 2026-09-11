@@ -1,14 +1,8 @@
 import { erc20Abi, keccak256, type Address } from "viem";
-import {
-  AQUA,
-  SWAP_VM,
-  NATIVE,
-  classicRouter,
-  token,
-  wrapped,
-} from "../../config";
+import { AQUA, SWAP_VM, NATIVE, classicRouter } from "../../config";
 import { client } from "../rpc";
 import { aquaLifecycleAbi } from "./calls";
+import { requestTokens, verifyLifecycleToken } from "./metadata";
 import type { LifecycleRequest, LifecycleSnapshot } from "./types";
 
 const aquaCodeHash =
@@ -35,23 +29,11 @@ export async function readLifecycleSnapshot(
   )
     throw new Error("Latest chain block is stale.");
   const blockNumber = block.number;
-  const addresses = new Set<Address>([
-    NATIVE,
-    wrapped(chainId).address,
-    ...request.inventory.map((i) => i.token.address),
-  ]);
-  for (const pair of request.config.pairs) {
-    addresses.add(pair.baseToken.address);
-    addresses.add(pair.quoteToken.address);
-  }
-  if (request.funding) {
-    addresses.add(request.funding.token.address);
-    for (const p of request.funding.purchases) addresses.add(p.token.address);
-  }
-  if (request.conversion) {
-    addresses.add(request.conversion.targetToken.address);
-    for (const p of request.conversion.amounts) addresses.add(p.token.address);
-  }
+  const selectedTokens = requestTokens(request);
+  const addresses = new Set<Address>(selectedTokens.map((t) => t.address));
+  await Promise.all(
+    selectedTokens.map((t) => verifyLifecycleToken(t, rpc, blockNumber)),
+  );
   const router = classicRouter(chainId),
     needsRoute =
       !!request.funding?.purchases.length ||
@@ -75,11 +57,7 @@ export async function readLifecycleSnapshot(
   const nativeBalance = await rpc.getBalance({ address: maker, blockNumber });
   const balances = await Promise.all(
     [...addresses].map(async (address) => ({
-      token: {
-        address,
-        decimals: token(chainId, address).decimals,
-        symbol: token(chainId, address).symbol,
-      },
+      token: selectedTokens.find((t) => t.address === address)!,
       amount: String(
         address === NATIVE
           ? nativeBalance

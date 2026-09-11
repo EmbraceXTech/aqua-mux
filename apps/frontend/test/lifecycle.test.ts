@@ -4,6 +4,7 @@ import { decodeFunctionData, erc20Abi } from "viem";
 import { NATIVE, SWAP_VM, classicRouter, tokens } from "../lib/config";
 import { allocate, minimumOutput } from "../lib/managed-compiler/arithmetic";
 import { compileLP, describeLPPrice } from "../lib/managed-compiler/lp";
+import { verifyLifecycleToken } from "../lib/server/lifecycle/metadata";
 import {
   AquaProgramBuilder,
   SwapVmProgram,
@@ -310,6 +311,45 @@ test("compiler preserves distinct per-pair fees and inward square-root bounds", 
     assert.ok(BigInt(range.sqrtPriceMin) ** 2n >= 1001n * 10n ** 24n);
     assert.ok(BigInt(range.sqrtPriceMax) ** 2n <= 2999n * 10n ** 24n);
   }
+});
+
+test("dynamic registry tokens compile after matching snapshot metadata without static catalog membership", async () => {
+  const request = lifecycleFixture();
+  if (request.config.family !== "lp") throw new Error("Expected LP fixture.");
+  const dynamic = {
+    address: "0x0000000000000000000000000000000000000123" as const,
+    decimals: 6,
+    symbol: "DYNAMIC",
+  };
+  request.config.pairs[0].quoteToken = dynamic;
+  request.config.pairs[0].openingPrice.quoteToken = dynamic.address;
+  request.config.policy.allowedAssets.value.push(dynamic.address);
+  request.inventory[1].token = dynamic;
+  const plan = await buildLifecyclePlan(request, dependenciesFixture());
+  assert.ok(plan.registrations[0].tokens.includes(dynamic.address));
+});
+
+test("token metadata verification pins chain reads and rejects decimals or missing code", async () => {
+  let decimals = 6,
+    code = "0x1234";
+  const rpc = {
+    getCode: async (args: { blockNumber: bigint }) => {
+      assert.equal(args.blockNumber, 12n);
+      return code;
+    },
+    readContract: async (args: { blockNumber: bigint }) => {
+      assert.equal(args.blockNumber, 12n);
+      return decimals;
+    },
+  } as unknown as Parameters<typeof verifyLifecycleToken>[1];
+  await verifyLifecycleToken(quote, rpc, 12n);
+  decimals = 18;
+  await assert.rejects(verifyLifecycleToken(quote, rpc, 12n), /decimals/);
+  code = "0x";
+  await assert.rejects(
+    verifyLifecycleToken(quote, rpc, 12n),
+    /no contract code/,
+  );
 });
 
 test("repeated ERC20 purchases replenish consumed allowances for equal and unequal spends", async () => {

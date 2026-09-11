@@ -1,4 +1,4 @@
-import { AQUA, NATIVE, SWAP_VM, token } from "../../config";
+import { AQUA, NATIVE, SWAP_VM } from "../../config";
 import { uint } from "../../managed-compiler/arithmetic";
 import type { Token } from "../../managed/primitives";
 import { Inventory } from "./inventory";
@@ -31,7 +31,10 @@ export function validateSnapshot(
   )
     throw new Error("Management policy has expired.");
   const validateToken = (t: Token) => {
-    if (token(request.config.chainId, t.address).decimals !== t.decimals)
+    const observed = snapshot.balances.find(
+      (b) => b.token.address === t.address,
+    )?.token;
+    if (!observed || observed.decimals !== t.decimals)
       throw new Error("Token metadata mismatch.");
     if (!request.config.policy.allowedAssets.value.includes(t.address))
       throw new Error("Token is outside the reviewed permitted assets.");
@@ -55,8 +58,11 @@ export function validateSnapshot(
     selected = new Inventory(request.inventory);
   for (const item of selected.values()) {
     if (
-      token(request.config.chainId, item.token.address).decimals !==
-      item.token.decimals
+      !snapshot.balances.some(
+        (b) =>
+          b.token.address === item.token.address &&
+          b.token.decimals === item.token.decimals,
+      )
     )
       throw new Error("Selected inventory metadata mismatch.");
     const balance =
@@ -67,6 +73,10 @@ export function validateSnapshot(
       throw new Error(
         "Selected inventory exceeds current real wallet balance.",
       );
+  }
+  for (const pair of request.config.pairs) {
+    validateToken(pair.baseToken);
+    validateToken(pair.quoteToken);
   }
   const previous = request.previous ?? [];
   if (new Set(previous.map((s) => s.hash)).size !== previous.length)
