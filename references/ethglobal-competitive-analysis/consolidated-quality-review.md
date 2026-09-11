@@ -280,3 +280,29 @@ The returned decision is fund-and-open with one bounded WETH/USDC pair and a pro
 No container resource remains associated with that completed request.
 These persisted facts corroborate the owner's real-run report and the reviewed runtime integration at `01c7511`.
 They do not establish the separate two-pair lifecycle, current market prices, complete app planning or execution, or a repeated independent model invocation.
+
+
+## Fill, replacement and production receipt evidence accepted
+
+The reviewer independently reran all four scenarios at exact commit `a770ab269f6f404765188148442cd343b5878e4c`.
+The fixture now calls reconcileManagedTransactions for submitted and deliberately unknown attempts, instead of confirming records itself.
+All scenarios finish with confirmed attempts, docked strategy records and a closed group.
+Subsequent preparation succeeds through the same production execution-lock path.
+This closes the earlier manual-finalization limitation for the tested production reconciler and in-memory store scope.
+Persistent restart recovery and authenticated app HTTP behavior remain separate gates.
+
+Forward and reverse SwapVM fills execute against the registered fork strategies.
+The reverse fill reduces the maker base reserve shared with a sibling registration.
+A deliberately failed replacement preserves the exact previous and proposed registration states and actual token balances.
+A valid replacement then succeeds, followed by close-convert and observed residual balances.
+All scenarios have zero public broadcasts.
+
+The resolver credential contract is temporarily replaced only on the isolated fork and restored in a finally block.
+The evidence must not imply possession of a real resolver credential or public-chain fills.
+The initial quote-rejection assertion currently accepts any failure, so the reviewer requested a decoded credential-specific revert assertion or a narrower result label.
+The claimed exact cause of that rejection is not accepted yet; the successful credential-fixtured fill and lifecycle evidence is accepted.
+
+The new configuration, execution, resolver-fill and rollback helpers have focused responsibilities.
+Scoped ESLint passes for the script and all four helpers.
+No further module split is required.
+The app owner has separately reproduced a post-close conversion guard failure through authenticated HTTP, and the chain owner is preparing a focused correction.
