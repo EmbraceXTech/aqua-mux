@@ -158,6 +158,16 @@ export function updateBot(
     }
     const next = transitionBot(bot, command, sessionId, Date.now(), generation);
     store.put("bot", next, owner);
-    return { group, bot: next, serverTime: Date.now(), leaseTimeoutMs: 45_000 };
+    return {
+      group,
+      bot: next,
+      serverTime: Date.now(),
+      leaseTimeoutMs: 45_000,
+      attempts: store
+        .list("transaction", owner, id)
+        .filter((attempt) =>
+          ["prepared", "submitted", "unknown"].includes(attempt.status),
+        ),
+    };
   });
 }

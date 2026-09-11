@@ -1,3 +1,4 @@
+import { normalizeProposalConfig } from "./proposal-config";
 import { randomUUID } from "node:crypto";
 import type { Address } from "viem";
 import {
@@ -158,7 +159,10 @@ export async function proposeIntent(
         "stale_data",
         "Wallet data became stale while the proposal ran. Request a fresh proposal.",
       );
-    const config = result.result.proposedConfig;
+    const config = result.result.proposedConfig
+      ? normalizeProposalConfig(result.result.proposedConfig)
+      : undefined;
+    if (config) result.result.proposedConfig = config;
     if (config) {
       validateConfigTokens(config);
       if (

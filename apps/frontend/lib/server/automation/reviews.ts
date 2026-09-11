@@ -1,3 +1,4 @@
+import { normalizeProposalConfig } from "../managed-service/proposal-config";
 import { groupReviewSnapshot } from "../managed-service/review-snapshot";
 import { watchReviewLiveness } from "./liveness";
 import { randomUUID } from "node:crypto";
@@ -7,7 +8,11 @@ import {
   type Records,
   type StrategyGroup,
 } from "../../managed";
-import { openManagedStore, type ManagedStore } from "../store";
+import {
+  openManagedStore,
+  type ManagedStore,
+  type ExecutionLock,
+} from "../store";
 import {
   DevelopmentReviewEntitlement,
   type ReviewEntitlement,
@@ -94,7 +99,42 @@ export async function runGroupReview(
           "idempotency_conflict",
           "This request key belongs to another review.",
         );
-      const review = store.get("review", prior.data.reviewId, owner)!;
+      let review = store.get("review", prior.data.reviewId, owner)!;
+      if (
+        review.status === "pending" &&
+        review.createdAt + deps.timeoutMs <= now()
+      ) {
+        review = store.put(
+          "review",
+          {
+            ...review,
+            status: "cancelled",
+            errors: ["The previous review did not finish before its deadline."],
+          },
+          owner,
+        );
+        const oldLock = store.getDocument<ExecutionLock>(
+          "review-lock",
+          review.id,
+          owner,
+        )?.data;
+        if (oldLock) {
+          try {
+            store.releaseExecutionLock(oldLock);
+          } catch {
+            /* A newer fence owns recovery. */
+          }
+        }
+        if (bot.runGeneration === review.runGeneration)
+          store.put(
+            "bot",
+            pauseBot(
+              bot,
+              "The previous review timed out. Resume from a fresh snapshot.",
+            ),
+            owner,
+          );
+      }
       return { existing: review };
     }
     if (input.purpose === "interval") {
@@ -147,6 +187,7 @@ export async function runGroupReview(
       usage: { cost: null },
     };
     store.put("review", record, owner);
+    store.putDocument("review-lock", record.id, owner, lock);
     store.putDocument("review-keys", key, owner, { reviewId: id, digest });
     if (input.purpose === "interval")
       store.put("bot", { ...bot, nextDueAt: now() + bot.intervalMs }, owner);
@@ -241,7 +282,10 @@ export async function runGroupReview(
           "stale_data",
           "Wallet data became stale while the review ran. Refresh before continuing.",
         );
-      const config = result.result.proposedConfig;
+      const config = result.result.proposedConfig
+        ? normalizeProposalConfig(result.result.proposedConfig)
+        : undefined;
+      if (config) result.result.proposedConfig = config;
       if (config) {
         validateConfigTokens(config);
         if (

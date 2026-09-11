@@ -207,3 +207,79 @@ test("stale data and quota failures persist visible failures and pause the bot",
     }
   }
 });
+
+test("same-key retry after SQLite restart terminalizes expired pending review without inference", async () => {
+  const { mkdtempSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { canonicalDigest } = await import("../lib/managed");
+  const directory = mkdtempSync(join(tmpdir(), "aquamux-review-restart-"));
+  const path = join(directory, "store.sqlite");
+  const f = fixture();
+  let persistent = new ManagedStore(path);
+  try {
+    const createdAt = Date.now() - 10_000;
+    persistent.put("group", f.group, ownerA);
+    persistent.put("bot", f.bot, ownerA);
+    const review = {
+      id: "crashed-review",
+      owner: ownerA,
+      groupId: f.group.id,
+      botId: f.bot.id,
+      createdAt,
+      runGeneration: f.bot.runGeneration,
+      snapshot: {},
+      coverage: [],
+      provider: "unavailable",
+      model: "unavailable",
+      runtimeVersion: "unavailable",
+      status: "pending" as const,
+      errors: [],
+      usage: { cost: null },
+    };
+    persistent.put("review", review, ownerA);
+    persistent.putDocument(
+      "review-keys",
+      canonicalDigest({ groupId: f.group.id, key: f.input.idempotencyKey }),
+      ownerA,
+      {
+        reviewId: review.id,
+        digest: canonicalDigest({
+          groupId: f.group.id,
+          purpose: "interval",
+          sessionId: "tab-a",
+          generation: f.bot.runGeneration,
+        }),
+      },
+    );
+    const lock = persistent.acquireExecutionLock(
+      42161,
+      ownerA,
+      ownerA,
+      review.id,
+      1000,
+    );
+    persistent.putDocument("review-lock", review.id, ownerA, lock);
+    persistent.close();
+    persistent = new ManagedStore(path);
+    const result = await runGroupReview(ownerA, f.group.id, f.input, {
+      ...f.deps,
+      store: persistent,
+    });
+    assert.equal(result.status, "cancelled");
+    assert.equal(f.calls(), 0);
+    assert.equal(persistent.get("bot", f.bot.id, ownerA)?.state, "paused");
+    const next = persistent.acquireExecutionLock(
+      42161,
+      ownerA,
+      ownerA,
+      "new-run",
+      1000,
+    );
+    persistent.releaseExecutionLock(next);
+  } finally {
+    persistent.close();
+    f.store.close();
+    rmSync(directory, { recursive: true, force: true });
+  }
+});

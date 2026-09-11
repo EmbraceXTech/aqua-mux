@@ -76,6 +76,10 @@ test("authenticated managed HTTP creates a group, fences two tabs, stops and iso
     config.maker = session.owner;
     const response = await send("groups", "POST", { config }, session.token);
     assert.equal(response.status, 200);
+    assert.equal(
+      (await send("groups", "POST", { config }, session.token)).status,
+      409,
+    );
     const created = await response.json();
     const path = `groups/${created.group.id}`;
     const firstResponse = await send(
