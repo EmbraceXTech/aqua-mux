@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type {
   LifecyclePlan,
+  TokenAmount,
   LPStrategyConfig,
   ReviewRecord,
 } from "@/lib/managed";
@@ -86,7 +87,11 @@ export function useManagedActions(
       await refresh();
     });
   }
-  async function plan(action: LifecyclePlan["kind"], targetToken?: string) {
+  async function plan(
+    action: LifecyclePlan["kind"],
+    targetToken?: string,
+    inventory?: TokenAmount[],
+  ) {
     if (!session || !detail) return;
     const revision = scope.current.revision;
     await perform(async () => {
@@ -100,6 +105,7 @@ export function useManagedActions(
         action,
         ...(review ? { reviewId: review.id } : {}),
         ...(targetToken ? { targetToken } : {}),
+        ...(inventory ? { inventory } : {}),
         sessionId: tabSession,
         generation: detail.bot.runGeneration,
       });
@@ -156,7 +162,7 @@ export function useManagedActions(
           `Development signer returned ${outcome.state}. Reconcile to verify the position and remaining inventory.`,
         );
       } else {
-        const walletBatchId = await submitExternalManaged(
+        const attempt = await submitExternalManaged(
           session,
           reviewed.plan,
           tabSession,
@@ -164,7 +170,7 @@ export function useManagedActions(
         );
         setPendingPlan(undefined);
         setNotice(
-          `Wallet batch submitted: ${walletBatchId}. Reconcile before taking another action.`,
+          `Wallet transaction ${attempt.status}: ${attempt.transactionHash ?? "hash unavailable"}. Reconcile before taking another action.`,
         );
       }
       const current = await managedRequest<GroupDetail>(
@@ -181,6 +187,15 @@ export function useManagedActions(
     });
   }
   return {
+    readInventory: async () => {
+      if (!session || !detail)
+        throw new Error("Authenticate the selected group first.");
+      const snapshot = await managedRequest<{ balances: TokenAmount[] }>(
+        `/groups/${detail.group.id}/inventory`,
+        session,
+      );
+      return snapshot.balances;
+    },
     pendingPlan,
     busy,
     error,

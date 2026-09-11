@@ -65,11 +65,13 @@ export function GroupController({
             if (kind === "stop") actions.dismissPlan();
             await group.action(kind);
           }}
-          onClose={(token) =>
+          onReadInventory={actions.readInventory}
+          onClose={(token, inventory) =>
             catchAction(
               actions.plan(
                 token ? "close-and-convert" : "close",
                 token?.address,
+                inventory,
               ),
             )
           }

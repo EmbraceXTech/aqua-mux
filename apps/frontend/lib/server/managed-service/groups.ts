@@ -13,6 +13,7 @@ import { transitionBot, pauseBot, type BotCommand } from "../automation/lease";
 import { ManagedError } from "./errors";
 import { validateConfigTokens } from "./snapshot";
 import type { ManagedTokenSnapshot } from "./tokens";
+import { requiresPolicyAuthorization } from "../../managed/policy";
 
 export function ownedGroup(
   store: ManagedStore,
@@ -92,6 +93,7 @@ export function editGroup(
   input: StrategyConfig,
   store: ManagedStore = openManagedStore(),
   tokens?: ManagedTokenSnapshot,
+  authorizePolicy = false,
 ) {
   const config = strategyConfigSchema.parse(input);
   validateConfigTokens(config, tokens);
@@ -99,11 +101,25 @@ export function editGroup(
     const group = ownedGroup(store, owner, id);
     const bot = groupBot(store, owner, id);
     assertCapability(config, bot.mode);
-    if (group.maker !== config.maker || group.chainId !== config.chainId)
+    if (
+      group.maker !== config.maker ||
+      group.chainId !== config.chainId ||
+      group.config.recipeId !== config.recipeId ||
+      group.config.recipeVersion !== config.recipeVersion
+    )
       throw new ManagedError(
         "immutable_identity",
-        "Group wallet and chain cannot change.",
+        "Group wallet, chain and recipe cannot change.",
         400,
+      );
+    if (
+      !authorizePolicy &&
+      requiresPolicyAuthorization(group.config.policy, config.policy)
+    )
+      throw new ManagedError(
+        "policy_authorization_required",
+        "Changed management permissions require explicit owner authorization.",
+        403,
       );
     if (
       store

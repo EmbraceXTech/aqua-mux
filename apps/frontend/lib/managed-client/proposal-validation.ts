@@ -1,4 +1,8 @@
-import type { RegistryToken, TokenPairValidation } from "@/lib/token-registry";
+import type {
+  RegistryToken,
+  TokenPairValidation,
+  TokenRouteCheck,
+} from "@/lib/token-registry";
 import { managedRequest, type ManagedSession } from "./api";
 import { exactAmount } from "./numeric-input";
 import { hasVerifiedDecimals } from "../token-metadata";
@@ -38,7 +42,17 @@ export async function validateProposalFunding({
       { chainId, src: funding.address, dst: asset.address, amount },
     );
     assertCurrent();
+    check.route = await managedRequest<TokenRouteCheck>(
+      "/funding-route",
+      session,
+      { chainId, src: funding.address, dst: asset.address, amount },
+    );
+    assertCurrent();
     onCheck(check);
+    if (check.route.status !== "available")
+      throw new Error(
+        "No verified execution route is available for this pair and amount. Select a supported paired asset or reduce the funding amount.",
+      );
     if (
       check.chainId !== chainId ||
       check.source.address.toLowerCase() !== funding.address.toLowerCase() ||

@@ -1,0 +1,724 @@
+{
+  "environment": "real app and HarnessAgent; no public transactions",
+  "browser": {
+    "page": "c95d3318-bbd2-4be3-90d6-fad9f99dd580",
+    "url": "http://127.0.0.1:33127/"
+  },
+  "records": [
+    {
+      "requestId": "84237790-366b-4d3b-bccf-91ad67538e31",
+      "status": "succeeded",
+      "durationMs": 29670,
+      "createdAt": "2026-09-11T23:14:21.879Z",
+      "identity": {
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "groupId": "b01ce8ed-bc55-4ad8-9a24-4f67813c8f30"
+      },
+      "intent": {
+        "recipeId": "managed-concentrated-lp",
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "fundingToken": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "budget": "100000000000000",
+        "gasReserveWei": "500000000000000",
+        "permittedAssets": [
+          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+        ],
+        "holdingPeriodMs": 604800000,
+        "intervalMs": 900000
+      },
+      "snapshot": {
+        "tokenMetadata": {
+          "chainId": 42161,
+          "tokens": [
+            {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            }
+          ]
+        },
+        "observedAt": 1789168461448,
+        "blockNumber": "504204470",
+        "blockHash": "0xca9fa87de1062893980348e371ad2c6e52db276f360ebb411c18644f5f4f0307",
+        "blockTimestamp": 1789168461000,
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "nativeBalanceWei": "1500000000000000",
+        "balances": [
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "amount": "0"
+          }
+        ],
+        "allowances": [
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          }
+        ],
+        "coverage": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789168461000,
+            "status": "complete"
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789168461849,
+            "status": "partial",
+            "detail": "Known application groups are included. Strategies registered outside this application and unindexed fills remain unknown; an empty known list does not establish zero external exposure."
+          }
+        ],
+        "managedStrategies": [],
+        "routeQuotes": [
+          {
+            "source": "1inch-route-quote",
+            "fromToken": {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            "toToken": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amountIn": "33333333333333",
+            "amountOut": "83580",
+            "observedAt": 1789168461598,
+            "expiresAt": 1789168491598
+          }
+        ]
+      },
+      "result": {
+        "version": 1,
+        "decision": "fund-and-open",
+        "rationale": "The available preview provides a compiled, editable WETH/USDC LP candidate within the 0.0001 ETH funding budget while preserving the 0.0005 ETH gas reserve. Suitable for owner review, not execution authorization; the starting 5 bps fee and 20% bounds are not claimed to be optimal.",
+        "evidence": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789168461000,
+            "status": "complete",
+            "detail": "Preview confirms 0.0015 ETH native balance at block 504204470; WETH and USDC balances are zero."
+          },
+          {
+            "source": "proposal_preview",
+            "observedAt": 1789168461448,
+            "status": "complete",
+            "detail": "Using the supplied snapshot, preview reports integer funding allocation, exact rational opening price and compiled bounds for 33333333333333 base units of WETH and 83162 base units of USDC."
+          },
+          {
+            "source": "1inch-route-quote",
+            "observedAt": 1789168461598,
+            "status": "complete",
+            "detail": "Amount-specific observation quotes 83580 USDC base units for 33333333333333 wei ETH; preview uses conservative receipts of 83162."
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789168461849,
+            "status": "partial",
+            "detail": "No known application strategies are listed; external strategies and unindexed fills remain unknown."
+          }
+        ],
+        "proposedConfig": {
+          "version": 1,
+          "recipeVersion": 1,
+          "chainId": 42161,
+          "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+          "policy": {
+            "id": "policy:84237790-366b-4d3b-bccf-91ad67538e31",
+            "version": 1,
+            "intervalMs": {
+              "value": 900000,
+              "enforcedBy": "execution-broker"
+            },
+            "cooldownMs": {
+              "value": 900000,
+              "enforcedBy": "execution-broker"
+            },
+            "maxActions": {
+              "value": 1,
+              "enforcedBy": "advisory-display"
+            },
+            "spendBudgets": {
+              "value": [
+                {
+                  "token": {
+                    "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                    "decimals": 18,
+                    "symbol": "ETH"
+                  },
+                  "amount": "100000000000000"
+                }
+              ],
+              "enforcedBy": "advisory-display"
+            },
+            "gasBudgetWei": {
+              "value": "500000000000000",
+              "enforcedBy": "advisory-display"
+            },
+            "allowedAssets": {
+              "value": [
+                "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "allowedRoutes": {
+              "value": [
+                "0x111111125421ca6dc452d289314280a0f8842a65"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "maxSlippageBps": {
+              "value": 50,
+              "enforcedBy": "execution-broker"
+            },
+            "maxReferenceAgeMs": {
+              "value": 60000,
+              "enforcedBy": "execution-broker"
+            },
+            "expiresAt": {
+              "value": 1789773261849,
+              "enforcedBy": "execution-broker"
+            },
+            "allowedActions": {
+              "value": [
+                "hold",
+                "fund-and-open",
+                "replace",
+                "close",
+                "propose-conversion"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "triggers": {
+              "value": {
+                "rangeExit": true,
+                "inventoryDriftBps": 10000,
+                "upwardOnly": false
+              },
+              "enforcedBy": "execution-broker"
+            }
+          },
+          "family": "lp",
+          "recipeId": "managed-concentrated-lp",
+          "pairs": [
+            {
+              "baseToken": {
+                "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "decimals": 18,
+                "symbol": "WETH"
+              },
+              "quoteToken": {
+                "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "decimals": 6,
+                "symbol": "USDC"
+              },
+              "baseAmount": "33333333333333",
+              "quoteAmount": "83162",
+              "feeBps": 5,
+              "openingPrice": {
+                "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "numerator": "854815000000000000",
+                "denominator": "349008596121659"
+              },
+              "range": {
+                "kind": "bounded",
+                "lower": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                  "numerator": "665296000000000000000",
+                  "denominator": "333333333333330000"
+                },
+                "upper": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                  "numerator": "997944000000000000000",
+                  "denominator": "333333333333330000"
+                }
+              },
+              "programExpiresAt": 1789773261000
+            }
+          ]
+        },
+        "expectedEffects": [
+          "Present the exact tool-bound managed-concentrated-lp candidate for owner review without changing the supplied policy.",
+          "If subsequently approved and successfully executed, fund a bounded WETH/USDC position while retaining the specified gas reserve."
+        ],
+        "uncertainties": [
+          "Fresh routes, gas estimates and whole-batch simulation are required before signing; simulation has not been performed.",
+          "Quote observations do not guarantee opening prices or future receipts.",
+          "External exposure, future fills and returns remain unknown."
+        ]
+      },
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "runtimeVersion": "harness@1.0.108/codex@1.0.110/claude-code@1.0.112",
+      "tools": [
+        "running",
+        "tool:proposal_preview",
+        "succeeded"
+      ]
+    },
+    {
+      "requestId": "244405e1-ffc8-4a56-9029-4b90a8cbe0db",
+      "status": "succeeded",
+      "durationMs": 27407,
+      "createdAt": "2026-09-11T23:19:51.846Z",
+      "identity": {
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "groupId": "5ad10409-d5fb-4541-891f-c18148bf5754"
+      },
+      "intent": {
+        "recipeId": "managed-concentrated-lp",
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "fundingToken": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+        "budget": "100000000000000",
+        "gasReserveWei": "500000000000000",
+        "permittedAssets": [
+          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+        ],
+        "holdingPeriodMs": 604800000,
+        "intervalMs": 900000
+      },
+      "config": {
+        "version": 1,
+        "recipeVersion": 1,
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "policy": {
+          "id": "policy:84237790-366b-4d3b-bccf-91ad67538e31",
+          "version": 1,
+          "intervalMs": {
+            "value": 900000,
+            "enforcedBy": "execution-broker"
+          },
+          "cooldownMs": {
+            "value": 900000,
+            "enforcedBy": "execution-broker"
+          },
+          "maxActions": {
+            "value": 1,
+            "enforcedBy": "advisory-display"
+          },
+          "spendBudgets": {
+            "value": [
+              {
+                "token": {
+                  "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                  "decimals": 18,
+                  "symbol": "ETH"
+                },
+                "amount": "100000000000000"
+              }
+            ],
+            "enforcedBy": "advisory-display"
+          },
+          "gasBudgetWei": {
+            "value": "500000000000000",
+            "enforcedBy": "advisory-display"
+          },
+          "allowedAssets": {
+            "value": [
+              "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+            ],
+            "enforcedBy": "execution-broker"
+          },
+          "allowedRoutes": {
+            "value": [
+              "0x111111125421ca6dc452d289314280a0f8842a65"
+            ],
+            "enforcedBy": "execution-broker"
+          },
+          "maxSlippageBps": {
+            "value": 50,
+            "enforcedBy": "execution-broker"
+          },
+          "maxReferenceAgeMs": {
+            "value": 60000,
+            "enforcedBy": "execution-broker"
+          },
+          "expiresAt": {
+            "value": 1789773261849,
+            "enforcedBy": "execution-broker"
+          },
+          "allowedActions": {
+            "value": [
+              "hold",
+              "fund-and-open",
+              "replace",
+              "close",
+              "propose-conversion"
+            ],
+            "enforcedBy": "execution-broker"
+          },
+          "triggers": {
+            "value": {
+              "rangeExit": true,
+              "inventoryDriftBps": 10000,
+              "upwardOnly": false
+            },
+            "enforcedBy": "execution-broker"
+          }
+        },
+        "family": "lp",
+        "recipeId": "managed-concentrated-lp",
+        "pairs": [
+          {
+            "baseToken": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "quoteToken": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "baseAmount": "33333333333333",
+            "quoteAmount": "83162",
+            "feeBps": 6,
+            "openingPrice": {
+              "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "numerator": "854815000000000000",
+              "denominator": "349008596121659"
+            },
+            "range": {
+              "kind": "bounded",
+              "lower": {
+                "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "numerator": "665296000000000000000",
+                "denominator": "333333333333330000"
+              },
+              "upper": {
+                "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "numerator": "997944000000000000000",
+                "denominator": "333333333333330000"
+              }
+            },
+            "programExpiresAt": 1789773261000
+          }
+        ]
+      },
+      "snapshot": {
+        "tokenMetadata": {
+          "chainId": 42161,
+          "tokens": [
+            {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            }
+          ]
+        },
+        "observedAt": 1789168791358,
+        "blockNumber": "504205784",
+        "blockHash": "0xb5c06f5afc63a499adef82cdc7724e97f9ed28eebe54557460cd46c386dd44b3",
+        "blockTimestamp": 1789168791000,
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "nativeBalanceWei": "1500000000000000",
+        "balances": [
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "amount": "0"
+          }
+        ],
+        "allowances": [
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          }
+        ],
+        "coverage": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789168791000,
+            "status": "complete"
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789168791830,
+            "status": "partial",
+            "detail": "Known application groups are included. Strategies registered outside this application and unindexed fills remain unknown; an empty known list does not establish zero external exposure."
+          }
+        ],
+        "managedStrategies": [],
+        "routeQuotes": [
+          {
+            "source": "1inch-route-quote",
+            "fromToken": {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            "toToken": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amountIn": "33333333333333",
+            "amountOut": "83580",
+            "observedAt": 1789168791486,
+            "expiresAt": 1789168821486
+          }
+        ]
+      },
+      "result": {
+        "version": 1,
+        "decision": "fund-and-open",
+        "rationale": "The available preview provides a compiled WETH/USDC owner-review candidate within the 0.0001 ETH funding budget while preserving the 0.0005 ETH gas reserve. Its exact reserve price and bounded range are suitable for an editable proposal, not an execution authorization.",
+        "evidence": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789168791000,
+            "status": "complete",
+            "detail": "Preview confirms 0.0015 ETH native balance at block 504205784; existing WETH and USDC balances are zero."
+          },
+          {
+            "source": "1inch-route-quote",
+            "observedAt": 1789168791486,
+            "status": "complete",
+            "detail": "Observed 33333333333333 wei ETH input for 83580 USDC atomic units. Preview budgets 83162 USDC atomic units conservatively and supplies compiled bounds."
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789168791830,
+            "status": "partial",
+            "detail": "No known application strategies were returned; external strategies and unindexed fills remain unknown."
+          }
+        ],
+        "proposedConfig": {
+          "version": 1,
+          "recipeVersion": 1,
+          "chainId": 42161,
+          "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+          "policy": {
+            "id": "policy:84237790-366b-4d3b-bccf-91ad67538e31",
+            "version": 1,
+            "intervalMs": {
+              "value": 900000,
+              "enforcedBy": "execution-broker"
+            },
+            "cooldownMs": {
+              "value": 900000,
+              "enforcedBy": "execution-broker"
+            },
+            "maxActions": {
+              "value": 1,
+              "enforcedBy": "advisory-display"
+            },
+            "spendBudgets": {
+              "value": [
+                {
+                  "token": {
+                    "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                    "decimals": 18,
+                    "symbol": "ETH"
+                  },
+                  "amount": "100000000000000"
+                }
+              ],
+              "enforcedBy": "advisory-display"
+            },
+            "gasBudgetWei": {
+              "value": "500000000000000",
+              "enforcedBy": "advisory-display"
+            },
+            "allowedAssets": {
+              "value": [
+                "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "allowedRoutes": {
+              "value": [
+                "0x111111125421ca6dc452d289314280a0f8842a65"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "maxSlippageBps": {
+              "value": 50,
+              "enforcedBy": "execution-broker"
+            },
+            "maxReferenceAgeMs": {
+              "value": 60000,
+              "enforcedBy": "execution-broker"
+            },
+            "expiresAt": {
+              "value": 1789773261849,
+              "enforcedBy": "execution-broker"
+            },
+            "allowedActions": {
+              "value": [
+                "hold",
+                "fund-and-open",
+                "replace",
+                "close",
+                "propose-conversion"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "triggers": {
+              "value": {
+                "rangeExit": true,
+                "inventoryDriftBps": 10000,
+                "upwardOnly": false
+              },
+              "enforcedBy": "execution-broker"
+            }
+          },
+          "family": "lp",
+          "recipeId": "managed-concentrated-lp",
+          "pairs": [
+            {
+              "baseToken": {
+                "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "decimals": 18,
+                "symbol": "WETH"
+              },
+              "quoteToken": {
+                "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "decimals": 6,
+                "symbol": "USDC"
+              },
+              "baseAmount": "33333333333333",
+              "quoteAmount": "83162",
+              "feeBps": 6,
+              "openingPrice": {
+                "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "numerator": "854815000000000000",
+                "denominator": "349008596121659"
+              },
+              "range": {
+                "kind": "bounded",
+                "lower": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                  "numerator": "665296000000000000000",
+                  "denominator": "333333333333330000"
+                },
+                "upper": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                  "numerator": "997944000000000000000",
+                  "denominator": "333333333333330000"
+                }
+              },
+              "programExpiresAt": 1789773261000
+            }
+          ]
+        },
+        "expectedEffects": [
+          "Present the exact server-bound managed-concentrated-lp candidate with unchanged policy for owner review.",
+          "Candidate allocates 33333333333333 WETH atomic units and 83162 USDC atomic units to the bounded LP, with a compiled fee of 6 bps.",
+          "No signing or submission occurs; fresh routes, estimates and whole-batch simulation precede signing."
+        ],
+        "uncertainties": [
+          "Discovery is partial and direct exposure reconciliation is unavailable.",
+          "Quotes are amount-specific observations, not guaranteed future receipts; gas costs, fills and returns remain unknown.",
+          "Preview limitation text mentions a 5 bps starting fee, whereas its compiled candidate specifies 6 bps; the server-bound candidate uses the compiled value."
+        ]
+      },
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "runtimeVersion": "harness@1.0.108/codex@1.0.110/claude-code@1.0.112",
+      "tools": [
+        "running",
+        "tool:proposal_preview",
+        "succeeded"
+      ]
+    }
+  ]
+}

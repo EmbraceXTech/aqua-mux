@@ -30,6 +30,9 @@ export function ConfigEditor({
         pair.range.kind === "bounded" ? exactPriceInput(pair.range.lower) : "",
       upper:
         pair.range.kind === "bounded" ? exactPriceInput(pair.range.upper) : "",
+      expiry: pair.programExpiresAt
+        ? new Date(pair.programExpiresAt).toISOString().slice(0, 19)
+        : "",
     })),
   );
   const [error, setError] = useState("");
@@ -52,6 +55,9 @@ export function ConfigEditor({
           });
           return {
             ...pair,
+            programExpiresAt: draft.expiry
+              ? Date.parse(`${draft.expiry}Z`)
+              : undefined,
             baseAmount: exactAmount(
               draft.base,
               pair.baseToken.decimals,
@@ -137,6 +143,18 @@ export function ConfigEditor({
               </label>
             ))}
           </div>
+          <label className="managed-field">
+            <span>
+              Program expiry, UTC. Leave empty for no on-chain deadline.
+            </span>
+            <input
+              aria-label={`Program expiry UTC pair ${index + 1}`}
+              type="datetime-local"
+              step="1"
+              value={pairs[index].expiry}
+              onChange={(event) => update(index, "expiry", event.target.value)}
+            />
+          </label>
           <label className="managed-consent">
             <input
               type="checkbox"

@@ -13,8 +13,8 @@ export function RouteChecks({ checks }: { checks: TokenPairValidation[] }) {
           </h3>
           <p>
             Source metadata: {check.metadata.source.status}. Destination
-            metadata: {check.metadata.destination.status}. Route:{" "}
-            {check.route.status}.
+            metadata: {check.metadata.destination.status}. Verified execution
+            route: {check.route.status}.
           </p>
           <p>
             {check.route.amountOut

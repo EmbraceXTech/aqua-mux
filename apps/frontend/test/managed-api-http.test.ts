@@ -137,7 +137,7 @@ test("authenticated managed HTTP creates a group, fences two tabs, stops and iso
     assert.equal(attemptResponse.status, 409);
     assert.equal(
       (await attemptResponse.json()).code,
-      "external_execution_unverified",
+      "external_preflight_unavailable",
     );
     assert.equal(store.list("transaction", session.owner).length, 0);
     const forged = await send(
@@ -152,7 +152,7 @@ test("authenticated managed HTTP creates a group, fences two tabs, stops and iso
       },
       session.token,
     );
-    assert.equal((await forged.json()).code, "external_execution_unverified");
+    assert.equal((await forged.json()).code, "invalid_request");
     const lock = store.acquireExecutionLock(
       42161,
       session.owner,
@@ -163,15 +163,21 @@ test("authenticated managed HTTP creates a group, fences two tabs, stops and iso
     store.releaseExecutionLock(lock);
     const catalog = await (await send("catalog")).json();
     assert.equal(catalog.executionCapabilities.external.verified, false);
-    assert.equal(catalog.executionCapabilities.external.adapter, "none");
-    assert.equal(catalog.capabilities.manualExternal.enabled, false);
+    assert.equal(
+      catalog.executionCapabilities.external.adapter,
+      "simple7702-self-signed-v1",
+    );
+    assert.equal(catalog.capabilities.manualExternal.enabled, true);
     const initialDetail = await (
       await send(path, "GET", undefined, session.token)
     ).json();
-    assert.deepEqual(
-      initialDetail.executionCapabilities,
-      catalog.executionCapabilities,
-    );
+    assert.deepEqual(initialDetail.executionCapabilities, {
+      external: {
+        ...catalog.executionCapabilities.external,
+        reason:
+          "This account or chain does not have the verified atomic execution implementation.",
+      },
+    });
     const firstResponse = await send(
       `${path}/bot`,
       "POST",

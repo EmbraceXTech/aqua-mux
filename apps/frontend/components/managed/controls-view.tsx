@@ -3,6 +3,8 @@ import type { GroupDetail } from "@/lib/managed-client/api";
 import { Button } from "../ui/button";
 import { TokenSelect, type SelectedToken } from "./token-select";
 import { dateLabel } from "./format";
+import type { TokenAmount } from "@/lib/managed";
+import { ConversionInventory } from "./conversion-inventory";
 
 export function ControlsView({
   detail,
@@ -10,6 +12,7 @@ export function ControlsView({
   stopBusy,
   onAction,
   onClose,
+  onReadInventory,
 }: {
   detail: GroupDetail;
   busy: boolean;
@@ -17,8 +20,10 @@ export function ControlsView({
   onAction: (
     kind: "start" | "resume" | "stop" | "takeover" | "reconcile",
   ) => Promise<void>;
-  onClose: (target?: SelectedToken) => Promise<void>;
+  onClose: (target?: SelectedToken, inventory?: TokenAmount[]) => Promise<void>;
+  onReadInventory: () => Promise<TokenAmount[]>;
 }) {
+  const [inventory, setInventory] = useState<TokenAmount[]>();
   const [target, setTarget] = useState<SelectedToken>();
   const [consent, setConsent] = useState(false);
   const running = detail.bot.state === "running";
@@ -51,7 +56,9 @@ export function ControlsView({
         </label>
         <div className="managed-actions">
           <Button
-            disabled={busy || running || !consent}
+            disabled={
+              busy || running || !consent || detail.group.state === "closed"
+            }
             onClick={() =>
               void onAction(detail.bot.state === "idle" ? "start" : "resume")
             }
@@ -115,9 +122,8 @@ export function ControlsView({
         <hr />
         <h3>Close and convert</h3>
         <p>
-          Convert only the selected group&apos;s attributable inventory to one
-          token. Review amounts, minimum receipts, gas reserve, and residuals
-          before confirming.
+          Choose exact quantities from the latest wallet balances. Review
+          minimum receipts, gas reserve, and residuals before confirming.
         </p>
         <TokenSelect
           chainId={detail.group.chainId}
@@ -125,11 +131,18 @@ export function ControlsView({
           value={target}
           onChange={setTarget}
         />
+        <ConversionInventory
+          busy={busy}
+          onRead={onReadInventory}
+          onChange={setInventory}
+        />
         <Button
-          disabled={busy || !target || detail.group.state === "closed"}
-          onClick={() => void onClose(target)}
+          disabled={busy || !target || !inventory?.length}
+          onClick={() => void onClose(target, inventory)}
         >
-          Review close and convert
+          {detail.group.state === "closed"
+            ? "Review remaining asset conversion"
+            : "Review close and convert"}
         </Button>
         <p className="managed-footnote">
           If conversion is unavailable, close-only remains a separate choice. A

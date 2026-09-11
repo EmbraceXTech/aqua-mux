@@ -1,3 +1,4 @@
+import type { ProposalIntent } from "../managed-service/inputs";
 import { assertReviewSnapshotFresh } from "../managed-service/freshness";
 import { normalizeProposalConfig } from "../managed-service/proposal-config";
 import { groupReviewSnapshot } from "../managed-service/review-snapshot";
@@ -261,6 +262,16 @@ export async function runGroupReview(
         runGeneration: bot.runGeneration,
         purpose: input.purpose,
         config: group.config,
+        ...(group.state === "draft"
+          ? {
+              intent: store.getDocument<{ intent: ProposalIntent }>(
+                "group-intent",
+                group.id,
+                owner,
+              )?.data.intent,
+              policyTemplate: group.config.policy,
+            }
+          : {}),
         snapshot,
         deadline: record.createdAt + deps.timeoutMs,
       },

@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { canonicalDigest, type LPStrategyConfig } from "@/lib/managed";
+import {
+  canonicalDigest,
+  type TokenAmount,
+  type LPStrategyConfig,
+} from "@/lib/managed";
 import type { GroupDetail } from "@/lib/managed-client/api";
 import { Button } from "../ui/button";
 import { StrategyView } from "./strategy-view";
@@ -16,6 +20,7 @@ export function BotWorkspace({
   stopBusy,
   onAction,
   onClose,
+  onReadInventory,
   onSave,
   onReview,
   onPlan,
@@ -27,7 +32,8 @@ export function BotWorkspace({
   onAction: (
     kind: "start" | "resume" | "stop" | "takeover" | "reconcile",
   ) => Promise<void>;
-  onClose: (token?: SelectedToken) => Promise<void>;
+  onClose: (token?: SelectedToken, inventory?: TokenAmount[]) => Promise<void>;
+  onReadInventory: () => Promise<TokenAmount[]>;
   onSave: (config: LPStrategyConfig) => Promise<void>;
   onReview: () => Promise<void>;
   onPlan: () => Promise<void>;
@@ -177,6 +183,7 @@ export function BotWorkspace({
             stopBusy={stopBusy}
             onAction={onAction}
             onClose={onClose}
+            onReadInventory={onReadInventory}
           />
         )}
       </div>

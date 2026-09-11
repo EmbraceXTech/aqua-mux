@@ -1,0 +1,27 @@
+{
+  "environment": "isolated real-code fork with controlled provider",
+  "chainId": 42161,
+  "publicTransactions": 0,
+  "open": {
+    "hash": "0xbaa70d076794081bf90756b127b3b7d1be5790cec8cd6a6e031acbbfe17dba0f",
+    "attemptId": "4d45223c-76dc-4065-997d-806d293ec84e"
+  },
+  "cooldownRefused": "cooldown_active",
+  "unreviewedInventoryRefused": "inventory_review_required",
+  "closeOnly": {
+    "hash": "0xfa26c626cca04b47d80e00f76f8cb59540c8a212734d6187fd151945af292ead",
+    "attemptId": "e4301e3d-f259-4149-a8ac-f867f47c5e0b"
+  },
+  "closedGroupConversion": {
+    "hash": "0xf39ddb267901d6d34ecaa2adc521ab205e6fb45ad5e7e3e3376202bc396efbb6",
+    "attemptId": "cc2e8076-f3d7-47ab-9a8f-59da250faf8b"
+  },
+  "providerMethods": [
+    "eth_accounts",
+    "eth_chainId",
+    "eth_signTransaction"
+  ],
+  "inventoryAttribution": "explicit quantities, no estimated attribution",
+  "productionReceiptRecovery": true,
+  "generatedAt": "2026-09-11T23:32:17.782Z"
+}

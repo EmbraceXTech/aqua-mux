@@ -214,9 +214,17 @@ export async function createManagedPlan(
     const plan = await buildLifecyclePlan(request, {
       snapshot: readLifecycleSnapshot,
       quote: async (routeRequest) => {
-        const route = await quoteLifecycleRoute(routeRequest);
-        routes.push({ request: routeRequest, route });
-        return route;
+        try {
+          const route = await quoteLifecycleRoute(routeRequest);
+          routes.push({ request: routeRequest, route });
+          return route;
+        } catch {
+          throw new ManagedError(
+            "route_unavailable",
+            "The verified execution route is unavailable for this pair or amount. Choose a supported pair or reduce the amount; close-only remains available.",
+            503,
+          );
+        }
       },
       simulate: simulateLifecyclePlan,
     });

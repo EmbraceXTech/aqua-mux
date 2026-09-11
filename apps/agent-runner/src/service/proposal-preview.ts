@@ -100,7 +100,7 @@ export function proposalPreview(request: ReviewRequest) {
       available: false,
       reason: "Funding would consume the shared base reserve.",
     };
-  const config = strategyConfigSchema.parse({
+  const config = strategyConfigSchema.parse(request.config ?? {
     version: 1,
     recipeVersion: 1,
     family: "lp",
@@ -110,6 +110,11 @@ export function proposalPreview(request: ReviewRequest) {
     policy: policyTemplate,
     pairs,
   });
+  if (config.family !== "lp") return {available:false,reason:"Only LP previews are supported."};
+  if (config.pairs.some((pair) => {
+    const observed = pairs.find((candidate) => candidate.baseToken.address === pair.baseToken.address && candidate.quoteToken.address === pair.quoteToken.address);
+    return !observed || BigInt(pair.baseAmount) > retained || BigInt(pair.quoteAmount) > BigInt(observed.quoteAmount);
+  })) return {available:false,reason:"The edited reserves exceed this fresh conservative funding preview. Reduce the amounts or obtain a new allocation."};
   const registrations = compileLP(config, `0x${"00".repeat(32)}`, Date.now());
   return {
     available: true,

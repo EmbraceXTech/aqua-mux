@@ -1,9 +1,8 @@
+import { checkManagedFundingRoute } from "./funding-route";
+import { attemptApi } from "./attempt-http";
+import { body, ok } from "./http-body";
+import { walletSnapshot } from "./snapshot";
 import { ensureManagedTokens } from "./tokens";
-import {
-  recordWalletStatus,
-  rejectPreparedAttempt,
-  walletStatusSchema,
-} from "./wallet-status";
 import { z, ZodError } from "zod";
 import { AuthError, requireOwner } from "../auth";
 import { StoreError, openManagedStore } from "../store";
@@ -30,7 +29,7 @@ import {
 import { cancelGroupReview, runGroupReview } from "../automation/reviews";
 import { ManagedError, managedFailure } from "./errors";
 import { createManagedPlan, planInputSchema } from "./plans";
-import { confirmManagedPlan, recordManagedSubmission } from "./execution";
+import { confirmManagedPlan } from "./execution";
 import {
   observeManagedGroup,
   reconcileManagedTransactions,
@@ -38,45 +37,11 @@ import {
 import { proposeIntent } from "./proposals";
 import { BROWSER_LEASE_MS } from "../automation/lease";
 import {
-  assertExternalExecutionAvailable,
+  externalExecutionCapabilities,
   executionCapabilities,
   manualExternal,
 } from "./external-capability";
 
-async function body(request: Request): Promise<unknown> {
-  if (!request.headers.get("content-type")?.startsWith("application/json"))
-    throw new ManagedError("invalid_request", "Send a JSON request.", 400);
-  const reader = request.body?.getReader();
-  if (!reader)
-    throw new ManagedError("invalid_request", "A JSON body is required.", 400);
-  let size = 0;
-  const chunks: Uint8Array[] = [];
-  for (;;) {
-    const item = await reader.read();
-    if (item.done) break;
-    size += item.value.byteLength;
-    if (size > 128_000) {
-      await reader.cancel();
-      throw new ManagedError(
-        "request_too_large",
-        "The request body is too large.",
-        413,
-      );
-    }
-    chunks.push(item.value);
-  }
-  try {
-    return JSON.parse(Buffer.concat(chunks).toString("utf8"));
-  } catch {
-    throw new ManagedError(
-      "invalid_request",
-      "The request body is not valid JSON.",
-      400,
-    );
-  }
-}
-const ok = (value: unknown) =>
-  Response.json(value, { headers: { "Cache-Control": "no-store" } });
 export async function managedApi(
   request: Request,
   segments: string[],
@@ -104,6 +69,12 @@ export async function managedApi(
         .parse(await body(request));
       return ok(await proposeIntent(owner, input.idempotencyKey, input.intent));
     }
+    if (
+      segments.length === 1 &&
+      segments[0] === "funding-route" &&
+      method === "POST"
+    )
+      return ok(await checkManagedFundingRoute(owner, await body(request)));
     if (segments[0] !== "groups")
       throw new ManagedError("not_found", "Managed endpoint not found.", 404);
     if (segments.length === 1) {
@@ -128,7 +99,11 @@ export async function managedApi(
       if (method === "GET")
         return ok({
           group,
-          executionCapabilities,
+          executionCapabilities: await externalExecutionCapabilities(
+            owner,
+            group.chainId,
+            group.maker,
+          ),
           bot: groupBot(store, owner, id),
           reviews: store.list("review", owner, id),
           plans: store.list("plan", owner, id),
@@ -143,7 +118,10 @@ export async function managedApi(
         });
       if (method === "PATCH") {
         const input = z
-          .strictObject({ config: strategyConfigSchema })
+          .strictObject({
+            config: strategyConfigSchema,
+            authorizePolicy: z.literal(true).optional(),
+          })
           .parse(await body(request));
         const tokens = await (dependencies.ensureTokens ?? ensureManagedTokens)(
           input.config.chainId,
@@ -153,10 +131,40 @@ export async function managedApi(
             pair.quoteToken,
           ]),
         );
-        const result = editGroup(owner, id, input.config, store, tokens);
+        const result = editGroup(
+          owner,
+          id,
+          input.config,
+          store,
+          tokens,
+          input.authorizePolicy,
+        );
         cancelGroupReview(id);
         return ok(result);
       }
+    }
+    if (
+      method === "GET" &&
+      segments.length === 3 &&
+      segments[2] === "inventory"
+    ) {
+      const tokens = group.config.pairs.flatMap((pair) => [
+        pair.baseToken,
+        pair.quoteToken,
+      ]);
+      const snapshot = await walletSnapshot({
+        chainId: group.chainId,
+        maker: group.maker,
+        assets: [...new Set(tokens.map((token) => token.address))],
+        storedTokens: tokens,
+        maxAgeMs: 60000,
+      });
+      return ok({
+        balances: snapshot.balances,
+        blockNumber: snapshot.blockNumber,
+        observedAt: snapshot.observedAt,
+        attribution: "user-quantity-review-required",
+      });
     }
     if (method !== "POST")
       throw new ManagedError(
@@ -167,6 +175,19 @@ export async function managedApi(
     const action = segments[2];
     if (action === "bot" && segments.length === 3) {
       const input = botInputSchema.parse(await body(request));
+      if (["start", "resume", "takeover"].includes(input.action)) {
+        const hasTransactions = store.list("transaction", owner, id).length > 0;
+        const hasStrategies = store.list("strategy", owner, id).length > 0;
+        if (hasTransactions) await reconcileManagedTransactions(owner, id);
+        const observed = hasStrategies
+          ? await observeManagedGroup(owner, id)
+          : null;
+        if (observed && observed.positions.health !== "current")
+          throw new ManagedError(
+            "reconciliation_required",
+            "Fresh position and fill reconciliation is required before resuming.",
+          );
+      }
       const result = updateBot(
         owner,
         id,
@@ -198,14 +219,14 @@ export async function managedApi(
         }),
       });
     }
-    if (action === "plans" && segments.length === 3)
-      return ok(
-        await createManagedPlan(
-          owner,
-          id,
-          planInputSchema.parse(await body(request)),
-        ),
-      );
+    if (action === "plans" && segments.length === 3) {
+      const input = planInputSchema.parse(await body(request));
+      if (input.action === "close" || input.action === "close-and-convert") {
+        updateBot(owner, id, "stop", input.sessionId ?? "owner-close");
+        cancelGroupReview(id);
+      }
+      return ok(await createManagedPlan(owner, id, input));
+    }
     if (
       action === "plans" &&
       segments.length === 5 &&
@@ -227,81 +248,8 @@ export async function managedApi(
         }),
       });
     }
-    if (action === "attempts" && segments.length === 3)
-      assertExternalExecutionAvailable();
-    if (
-      action === "attempts" &&
-      segments.length === 5 &&
-      segments[4] === "submitted"
-    ) {
-      const input = z
-        .strictObject({
-          transactionHash: hashSchema.optional(),
-          walletBatchId: z.string().min(1).max(240).optional(),
-        })
-        .refine((v) => v.transactionHash || v.walletBatchId)
-        .parse(await body(request));
-      const attempt = store.get(
-        "transaction",
-        idSchema.parse(segments[3]),
-        owner,
-      );
-      if (!attempt || attempt.groupId !== id)
-        throw new ManagedError(
-          "not_found",
-          "Transaction attempt not found.",
-          404,
-        );
-      return ok({
-        attempt: recordManagedSubmission({
-          owner,
-          attemptId: attempt.id,
-          ...input,
-        }),
-      });
-    }
-    if (
-      action === "attempts" &&
-      segments.length === 5 &&
-      segments[4] === "wallet-status"
-    )
-      return ok({
-        attempt: recordWalletStatus(
-          owner,
-          id,
-          idSchema.parse(segments[3]),
-          walletStatusSchema.parse(await body(request)),
-        ),
-      });
-    if (
-      action === "attempts" &&
-      segments.length === 5 &&
-      segments[4] === "rejected"
-    ) {
-      z.strictObject({ code: z.literal(4001) }).parse(await body(request));
-      return ok({
-        attempt: rejectPreparedAttempt(owner, id, idSchema.parse(segments[3])),
-      });
-    }
-    if (
-      action === "attempts" &&
-      segments.length === 5 &&
-      segments[4] === "not-sent"
-    ) {
-      const input = z
-        .strictObject({
-          reason: z.enum(["workspace_changed", "preflight_refused"]),
-        })
-        .parse(await body(request));
-      return ok({
-        attempt: rejectPreparedAttempt(
-          owner,
-          id,
-          idSchema.parse(segments[3]),
-          input.reason,
-        ),
-      });
-    }
+    if (action === "attempts")
+      return await attemptApi(request, segments, owner, id, store);
     if (action === "reconcile" && segments.length === 3) {
       const attempts = await reconcileManagedTransactions(owner, id);
       const observation = await observeManagedGroup(owner, id);
