@@ -1,0 +1,58 @@
+[
+  {
+    "chainId": 42161,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "openHash": "0xb7ca4f7f05f37c56aee668d34277a75b28592cfb6842ddd4c97c4eb2618a9fea",
+    "closeHash": "0xdc1a62f1163cd2518eb44fd284134f2fce7027c0dca84cbdb12bab0cb6a48118",
+    "callDigest": "0x8c04b7291d0af6f44b89d1d07135c438285e234d5c3aa2067f287e90eab6132e",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "19979998648309"
+      },
+      {
+        "symbol": "USDC",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDT",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "atomicRollbackHash": "0x825f0319df85b5117ff4d6fb8caa94a071c574fd738fbc7f1cb759f121a4800c"
+  },
+  {
+    "chainId": 56,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "openHash": "0xaffbe84335d4aafce62ddadac67bc0645c757ef92225f3cd1ff6a9a5e314231a",
+    "closeHash": "0x5430ecec6483834abda7778e7dd2f37cf42bb9cf921ea940eedd4aea5611027a",
+    "callDigest": "0x97e560d0a1da4b41b9e3bfc444f1f5aa966a68fe58cedccd8f2d227aac8a2e90",
+    "residual": [
+      {
+        "symbol": "WBNB",
+        "amount": "19980031430133"
+      },
+      {
+        "symbol": "USDC",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDT",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "atomicRollbackHash": "0xd8f6a7f5cbf9e5a786342cdc09a9d7d88cbf72b656acff3b4103f557912e34b1"
+  }
+]

@@ -231,6 +231,11 @@ test("RPC execution trace proves exact external account calls and rejects partia
     const account = {
       type: "CALL",
       to: ownerA,
+      from: ownerA,
+      input: (await import("../lib/server/dev-wallet/batch")).encodeDevBatch(
+        f.plan.calls,
+      ),
+      value: "0x0",
       calls: f.plan.calls.map((call) => ({
         type: "CALL",
         from: ownerA,
@@ -248,8 +253,9 @@ test("RPC execution trace proves exact external account calls and rejects partia
         },
         f.plan,
       ),
-      true,
+      false,
     );
+    assert.equal(traceProvesPlan(account, f.plan), true);
     assert.equal(
       traceProvesPlan({ ...account, calls: account.calls.slice(1) }, f.plan),
       false,

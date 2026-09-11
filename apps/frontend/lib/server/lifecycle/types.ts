@@ -33,7 +33,7 @@ export type LifecycleSnapshot = {
   nativeBalance: string;
   balances: TokenAmount[];
   allowances: { token: Address; spender: Address; amount: string }[];
-  contracts: { address: Address; codeHash: Hex }[];
+  contracts: { address: Address; codeHash: Hex; implementation?: Address }[];
   strategies: PreviousStrategy[];
 };
 export type RouteRequest = {

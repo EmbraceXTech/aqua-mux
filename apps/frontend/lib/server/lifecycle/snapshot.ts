@@ -1,6 +1,7 @@
 import { erc20Abi, keccak256, type Address } from "viem";
 import { AQUA, SWAP_VM, NATIVE, classicRouter } from "../../config";
 import { client } from "../rpc";
+import { implementationSlot } from "../route-policy/provenance";
 import { aquaLifecycleAbi } from "./calls";
 import { requestTokens, verifyLifecycleToken } from "./metadata";
 import type { LifecycleRequest, LifecycleSnapshot } from "./types";
@@ -39,7 +40,16 @@ export async function readLifecycleSnapshot(
       !!request.funding?.purchases.length ||
       request.kind === "close-and-convert";
   const contracts = await Promise.all(
-    [AQUA, SWAP_VM, ...(needsRoute ? [router] : [])].map(async (address) => {
+    [
+      ...new Set([
+        AQUA,
+        SWAP_VM,
+        ...(needsRoute ? [router] : []),
+        ...selectedTokens
+          .map((token) => token.address)
+          .filter((address) => address !== NATIVE),
+      ]),
+    ].map(async (address) => {
       const code = await rpc.getCode({ address, blockNumber });
       if (!code || code === "0x")
         throw new Error("Required contract is unavailable.");
@@ -54,6 +64,24 @@ export async function readLifecycleSnapshot(
       return { address, codeHash };
     }),
   );
+  for (const contract of [...contracts]) {
+    const value = await rpc.getStorageAt({
+      address: contract.address,
+      slot: implementationSlot,
+      blockNumber,
+    });
+    if (value && BigInt(value) !== 0n) {
+      if (BigInt(value) >= 1n << 160n)
+        throw new Error("Invalid proxy implementation slot.");
+      const implementation = `0x${value.slice(-40)}` as Address;
+      const code = await rpc.getCode({ address: implementation, blockNumber });
+      if (!code || code === "0x")
+        throw new Error("Proxy implementation is unavailable.");
+      Object.assign(contract, { implementation });
+      if (!contracts.some((entry) => entry.address === implementation))
+        contracts.push({ address: implementation, codeHash: keccak256(code) });
+    }
+  }
   const nativeBalance = await rpc.getBalance({ address: maker, blockNumber });
   const balances = await Promise.all(
     [...addresses].map(async (address) => ({

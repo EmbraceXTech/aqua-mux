@@ -46,6 +46,16 @@ export const lifecyclePlanSchema = z
     configDigest: hashSchema,
     snapshotDigest: hashSchema,
     routesDigest: hashSchema.optional(),
+    deploymentEvidence: z
+      .array(
+        z.strictObject({
+          address: addressSchema,
+          codeHash: hashSchema,
+          implementation: addressSchema.optional(),
+        }),
+      )
+      .max(64)
+      .optional(),
     policyDigest: hashSchema,
     runGeneration: z.number().int().nonnegative(),
     calls: z

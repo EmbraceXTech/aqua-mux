@@ -1,8 +1,9 @@
-import { erc20Abi, type PublicClient } from "viem";
+import { keccak256, erc20Abi, type PublicClient } from "viem";
 import { NATIVE, tokens } from "../../config";
 import { tokenSchema, type Token } from "../../managed";
 import type { DevBatchPlan } from "./batch";
 import { DevWalletError } from "./config";
+import { implementationSlot } from "../route-policy/provenance";
 
 // Extra metadata comes only from authoritative stored plans or registry resolution.
 // The browser cannot supply a DevBatchPlan to the execution endpoint.
@@ -30,8 +31,29 @@ export function devPlanAssets(plan: DevBatchPlan): Token[] {
 
 export async function verifyDevAssets(
   plan: DevBatchPlan,
-  rpc: Pick<PublicClient, "getCode" | "readContract">,
+  rpc: Pick<PublicClient, "getCode" | "readContract"> &
+    Partial<Pick<PublicClient, "getStorageAt">>,
 ) {
+  for (const deployment of plan.deploymentEvidence ?? []) {
+    if (deployment.implementation) {
+      const slot = await rpc.getStorageAt?.({
+        address: deployment.address,
+        slot: implementationSlot,
+      });
+      if (
+        slot?.toLowerCase() !==
+        `0x${deployment.implementation.slice(2).padStart(64, "0")}`
+      )
+        throw new DevWalletError(
+          "A reviewed proxy implementation changed. Prepare a fresh plan.",
+        );
+    }
+    const code = await rpc.getCode({ address: deployment.address });
+    if (!code || keccak256(code) !== deployment.codeHash)
+      throw new DevWalletError(
+        "A reviewed deployment runtime changed. Prepare a fresh plan.",
+      );
+  }
   const approved = devPlanAssets(plan);
   const selected = new Set(
     [...(plan.verifiedTokens ?? []), ...(plan.assetMetadata ?? [])].map(

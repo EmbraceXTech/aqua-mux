@@ -26,6 +26,7 @@ export function encodeDevBatch(calls: Plan["calls"]) {
 
 export type DevBatchPlan = Plan & {
   gasReserveWei?: string;
+  deploymentEvidence?: LifecyclePlan["deploymentEvidence"];
   assetMetadata?: Token[];
   minimumReceipts?: TokenAmount[];
   verifiedRoutes?: { request: RoutePolicyRequest; route: VerifiedRoute }[];
@@ -42,6 +43,7 @@ export function lifecycleBatch(plan: LifecyclePlan): DevBatchPlan {
     strategies: [],
     summary: plan.expectedEffects,
     gasReserveWei: plan.gasReserveWei,
+    deploymentEvidence: plan.deploymentEvidence,
     minimumReceipts: plan.minimumReceipts,
     assetMetadata: [
       ...plan.inventoryBefore,

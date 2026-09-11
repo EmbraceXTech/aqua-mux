@@ -231,6 +231,7 @@ export async function buildLifecyclePlanWithRoutes(
   plan = lifecyclePlanSchema.parse({
     ...plan,
     snapshotDigest: digest(finalSnapshot),
+    deploymentEvidence: finalSnapshot.contracts,
     estimatedGasWei: simulation.estimatedGasWei,
     simulation: {
       blockNumber: simulation.blockNumber,

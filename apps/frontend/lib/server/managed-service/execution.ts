@@ -14,6 +14,7 @@ import {
 import { assertLiveRun } from "../automation/lease";
 import { ownedGroup, groupBot } from "./groups";
 import { ManagedError } from "./errors";
+import { assertManagementAction } from "./management-rules";
 
 export type ExecutionInput = {
   owner: string;
@@ -33,7 +34,7 @@ export type PlanContext = {
   generation: number;
   reviewId: string | null;
 };
-function currentPlan(
+export function currentPlan(
   store: ManagedStore,
   input: Omit<ExecutionInput, "idempotencyKey">,
 ): LifecyclePlan {
@@ -42,6 +43,7 @@ function currentPlan(
   const plan = store.get("plan", input.planId, input.owner);
   if (!plan || plan.groupId !== group.id)
     throw new ManagedError("not_found", "Managed plan not found.", 404);
+  assertManagementAction(store, group, plan.kind);
   if (plan.expiresAt <= Date.now())
     throw new ManagedError(
       "plan_expired",
