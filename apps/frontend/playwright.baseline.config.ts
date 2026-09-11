@@ -1,6 +1,6 @@
 import { defineConfig } from "@playwright/test";
 
-const port = Number(process.env.AQUAMUX_DEV_PORT ?? 33127);
+const port = Number(process.env.AQUAMUX_DEV_PORT ?? 33128);
 if (!Number.isInteger(port) || port < 1024 || port > 65535) {
   throw new Error("AQUAMUX_DEV_PORT must be an integer from 1024 to 65535.");
 }
@@ -10,7 +10,7 @@ export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
   reporter: "list",
-  outputDir: "test-results/baseline",
+  outputDir: `test-results/baseline-${port}`,
   use: {
     baseURL,
     headless: true,
@@ -18,7 +18,9 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `npx next dev --webpack --hostname 127.0.0.1 --port ${port}`,
+    command: "node scripts/baseline-dev.mjs",
+    env: { AQUAMUX_DEV_PORT: String(port) },
+    gracefulShutdown: { signal: "SIGTERM", timeout: 10000 },
     url: baseURL,
     reuseExistingServer: false,
     timeout: 120000,
