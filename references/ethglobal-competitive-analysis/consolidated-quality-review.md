@@ -257,3 +257,14 @@ Scoped frontend lint and the corrected full frontend typecheck also pass.
 The owner reports real request `84237790-366b-4d3b-bccf-91ad67538e31` with a persisted proposal_preview tool event and a successful editable native-funded LP proposal.
 That real-model result is owner-reported pending durable redacted evidence and independent inspection.
 The owner also reproduced a generic initial-plan error and is correcting it, so the complete proposal-to-execution journey is not accepted.
+
+
+## Arbitrum USDC.e route accepted
+
+Milestone `e123941b757deadd938209c0530579e321cfbffe` adds one pinned Arbitrum WETH/USDC.e pool using the already accepted router compiler and validation path.
+The exact five-file change was overlaid on the isolated accepted `41ae2f7` snapshot.
+Both existing provenance regressions pass, including semantic reconstruction of all twelve retained deployment records.
+The updated controlled-provider script passes all four scenarios, including native-funded Arbitrum USDC.e entry and close-convert with two registrations.
+Transaction and prestate proof, expiry refusal, ambiguous relay recovery and zero public broadcasts remain explicit in the results.
+The new runtime change is a deployment-manifest entry and needs no new component split.
+This acceptance does not close the separately pending observed-fill, replacement or production receipt-reconciliation gates.
