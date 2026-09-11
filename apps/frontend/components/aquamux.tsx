@@ -26,6 +26,11 @@ import { formatUnits, type Address } from "viem";
 import { Button } from "./ui/button";
 import { Modal } from "./ui/modal";
 import { ManagedWorkspace } from "./managed/managed-workspace";
+import { useManagedSession } from "@/lib/managed-client/use-managed-session";
+import { managedRequest } from "@/lib/managed-client/api";
+import { useLegacyQuote } from "@/lib/managed-client/use-legacy-quote";
+import { catalogTokenResolver } from "@/lib/managed-client/catalog-token";
+import { useTokenSearch } from "@/lib/managed-client/use-token-search";
 import {
   networks,
   network,
@@ -42,7 +47,6 @@ import {
   type Plan,
 } from "@/lib/model";
 import {
-  connectWallet,
   submitPlan,
   batchStatus,
   type BatchStatus,
@@ -56,11 +60,6 @@ type TransactionRecord = {
   submittedAt: number;
   read: boolean;
   status?: BatchStatus;
-};
-type Quote = {
-  legs: { address: string; amountOut: string; minAmountOut: string }[];
-  quotedAt: number;
-  expiresAt: number;
 };
 type Health = {
   networks: {
@@ -81,6 +80,7 @@ const palette = [
   "#69a8d9",
 ];
 function TokenIcon({ token, size = 36 }: { token: Token; size?: number }) {
+  if (!token.logo) return <span className="token-initial" style={{ width: size, height: size }} aria-label={`${token.symbol} icon`}>{token.symbol.slice(0, 2)}</span>;
   return (
     <Image
       className="token-icon"
@@ -177,12 +177,11 @@ export function AquaMux() {
     [source, setSource] = useState<Address>(NATIVE),
     [amount, setAmount] = useState("1"),
     [legs, setLegs] = useState<Leg[]>(() => initialLegs(42161));
-  const [account, setAccount] = useState<Address>(),
-    [balances, setBalances] = useState<Record<string, string | null>>({}),
-    [health, setHealth] = useState<Health>(),
-    [quote, setQuote] = useState<Quote>(),
-    [quoteBusy, setQuoteBusy] = useState(false),
-    [quoteError, setQuoteError] = useState("");
+  const wallet = useManagedSession(chainId);
+  const session = wallet.session?.mode === "external" ? wallet.session : undefined;
+  const account = session?.owner;
+  const [balances, setBalances] = useState<Record<string, string | null>>({}),
+    [health, setHealth] = useState<Health>();
   const [picker, setPicker] = useState<"source" | number | null>(null),
     [search, setSearch] = useState(""),
     [chainPicker, setChainPicker] = useState(false),
@@ -210,10 +209,12 @@ export function AquaMux() {
     [copied, setCopied] = useState(false),
     [now, setNow] = useState(0),
     [revision, setRevision] = useState(0);
+  const [selectedRegistryTokens, setSelectedRegistryTokens] = useState<Record<number, Token[]>>({});
+  const registrySearch = useTokenSearch(chainId, search, picker !== null);
   const requestId = useRef(0),
     healthRequested = useRef(false);
   const n = network(chainId),
-    catalog = tokens(chainId),
+    catalog = [...tokens(chainId), ...(selectedRegistryTokens[chainId] ?? []).filter((item) => !tokens(chainId).some((known) => known.address === item.address))],
     src = catalog.find((t) => t.address === source)!,
     base = source === NATIVE ? wrapped(chainId) : src;
   const total = legs.reduce((s, l) => s + l.bps, 0),
@@ -231,7 +232,12 @@ export function AquaMux() {
       range,
     };
   const serialized = JSON.stringify(basket);
+  const serializedCatalog = JSON.stringify(catalog);
   const [managedOpen, setManagedOpen] = useState(false);
+  const { quote, busy: quoteBusy, error: quoteError } = useLegacyQuote({
+    enabled: !managedOpen && mode === "swap" && !!health?.swapApiConfigured,
+    chainId, basket: serialized, catalog: serializedCatalog, session,
+  });
   useEffect(() => {
     if (healthRequested.current) return;
     healthRequested.current = true;
@@ -249,16 +255,18 @@ export function AquaMux() {
   useEffect(() => {
     const p = window.ethereum;
     if (!p) return;
-    const changed = (value: unknown) => {
-      const a = value as Address[];
-      setAccount(a[0]);
+    const changed = () => {
+      requestId.current += 1;
       setReview(false);
       setPlan(undefined);
       setBalances({});
+      setBusy(false);
     };
     const chainChanged = () => {
+      requestId.current += 1;
       setPlan(undefined);
       setReview(false);
+      setBusy(false);
     };
     p.on?.("accountsChanged", changed);
     p.on?.("chainChanged", chainChanged);
@@ -267,6 +275,15 @@ export function AquaMux() {
       p.removeListener?.("chainChanged", chainChanged);
     };
   }, []);
+  useEffect(() => {
+    requestId.current += 1;
+    const timer = setTimeout(() => {
+      setPlan(undefined);
+      setReview(false);
+      setBalances({});
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [session]);
   useEffect(() => {
     if (!account) return;
     let alive = true;
@@ -283,26 +300,6 @@ export function AquaMux() {
       alive = false;
     };
   }, [account, chainId, revision]);
-  useEffect(() => {
-    let alive = true;
-    if (mode !== "swap" || !health?.swapApiConfigured) return;
-    const timer = setTimeout(async () => {
-      try {
-        const b = validateBasket(JSON.parse(serialized));
-        setQuoteBusy(true);
-        const q = await api<Quote>("/api/quote", b);
-        if (alive) setQuote(q);
-      } catch (e) {
-        if (alive) setQuoteError(errorMessage(e));
-      } finally {
-        if (alive) setQuoteBusy(false);
-      }
-    }, 600);
-    return () => {
-      alive = false;
-      clearTimeout(timer);
-    };
-  }, [serialized, health?.swapApiConfigured, mode]);
   useEffect(() => {
     const timer = setTimeout(() => {
       try {
@@ -409,9 +406,6 @@ export function AquaMux() {
   }, [batch]);
   function change() {
     requestId.current++;
-    setQuoteBusy(false);
-    setQuoteError("");
-    setQuote(undefined);
     setPlan(undefined);
     setError("");
     setReview(false);
@@ -445,6 +439,7 @@ export function AquaMux() {
     setChainPicker(false);
   }
   function choose(t: Token) {
+    setSelectedRegistryTokens((old) => ({ ...old, [chainId]: [...(old[chainId] ?? []).filter((item) => item.address !== t.address), t] }));
     change();
     if (picker === "source") {
       setSource(t.address);
@@ -492,8 +487,8 @@ export function AquaMux() {
     try {
       setError("");
       setBusy(true);
-      setAccount(await connectWallet());
-      setWalletOpen(false);
+      const connected = await wallet.connect("external");
+      if (connected) setWalletOpen(false);
     } catch (e) {
       setError(errorMessage(e));
     } finally {
@@ -501,7 +496,7 @@ export function AquaMux() {
     }
   }
   async function reviewPlan() {
-    if (!account) {
+    if (!account || !session) {
       setWalletOpen(true);
       return;
     }
@@ -509,8 +504,8 @@ export function AquaMux() {
     try {
       setError("");
       setBusy(true);
-      validateBasket(basket);
-      const p = await api<Plan>("/api/plan", { basket, account });
+      validateBasket(basket, catalogTokenResolver(chainId, catalog));
+      const p = await managedRequest<Plan>("/api/plan", session, { basket, account });
       if (id === requestId.current) {
         setPlan(p);
         setReview(true);
@@ -518,11 +513,11 @@ export function AquaMux() {
     } catch (e) {
       if (id === requestId.current) setError(errorMessage(e));
     } finally {
-      setBusy(false);
+      if (id === requestId.current) setBusy(false);
     }
   }
   async function execute() {
-    if (!plan) return;
+    if (!plan || !session || plan.account.toLowerCase() !== session.owner.toLowerCase() || session.expiresAt <= Date.now()) return;
     try {
       setError("");
       setBusy(true);
@@ -551,7 +546,9 @@ export function AquaMux() {
   }
   const selectedPicker =
     typeof picker === "number" ? legs[picker]?.address : undefined;
-  const available = catalog.filter(
+  const registryCandidates: Token[] = registrySearch.result ? registrySearch.result.items.map((item) => ({ address: item.address, symbol: item.symbol, name: item.name, decimals: item.decimals, logo: tokens(chainId).find((known) => known.address === item.address)?.logo ?? "", source: "1inch registry" })) : catalog;
+  if (!registryCandidates.some((item) => item.address === NATIVE)) registryCandidates.unshift(tokens(chainId).find((item) => item.address === NATIVE)!);
+  const available = registryCandidates.filter(
     (t) =>
       (picker === "source" ||
         (t.address !== source &&
@@ -688,7 +685,7 @@ export function AquaMux() {
           </Button>
         </div>
       </header>
-      {managedOpen ? <ManagedWorkspace /> : <main className="app-main">
+      {managedOpen ? <ManagedWorkspace wallet={wallet} /> : <main className="app-main">
         <div className="intro">
           <h1>
             One token.
@@ -1239,7 +1236,7 @@ export function AquaMux() {
             ? "Choose your input token"
             : "Choose a paired token"
         }
-        description={`Verified 1inch token list for ${n.name}.`}
+        description={`1inch registry metadata for ${n.name}. Listing does not guarantee a usable route.`}
       >
         <input
           autoFocus
@@ -1249,13 +1246,16 @@ export function AquaMux() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
+        {registrySearch.error && <p role="alert">Registry unavailable. Showing bundled tokens. {registrySearch.error}</p>}
         <div className="picker-list token-picker">
           {available.map((t) => (
-            <button key={t.address} onClick={() => choose(t)}>
+            <button key={t.address} disabled={registrySearch.result?.items.find((item) => item.address === t.address)?.selectable === false} onClick={() => choose(t)}>
               <TokenIcon token={t} />
               <span>
                 <strong>{t.symbol}</strong>
                 <small>{t.name}</small>
+                <small className="managed-address">{t.address}</small>
+                <small>{registrySearch.result?.items.find((item) => item.address === t.address)?.risk.replaceAll("_", " ") ?? "Bundled metadata"} / route not checked</small>
               </span>
               <small>
                 {account
@@ -1316,7 +1316,7 @@ export function AquaMux() {
         open={walletOpen}
         onOpenChange={setWalletOpen}
         title={account ? "Your wallet" : "Connect your wallet"}
-        description="Use an Ethereum browser wallet. One-transaction execution requires atomic batch support."
+        description="Connect your Ethereum browser wallet and sign an authentication message to request quotes and plans. Transactions require a separate confirmation and atomic batch support."
       >
         {account ? (
           <>
@@ -1325,7 +1325,8 @@ export function AquaMux() {
             <Button
               variant="outline"
               onClick={() => {
-                setAccount(undefined);
+                void wallet.disconnect();
+                requestId.current += 1;
                 setBalances({});
                 setPlan(undefined);
                 setWalletOpen(false);
@@ -1337,12 +1338,12 @@ export function AquaMux() {
         ) : (
           <Button className="main-action" onClick={connect} disabled={busy}>
             <Wallet size={18} />
-            {busy ? "Waiting for wallet" : "Connect browser wallet"}
+            {busy || wallet.busy ? "Waiting for wallet" : "Connect browser wallet"}
           </Button>
         )}
-        {error && (
+        {(error || wallet.error) && (
           <p role="alert" className="error-box">
-            {error}
+            {error || wallet.error}
           </p>
         )}
       </Modal>

@@ -5,6 +5,7 @@ export default defineConfig({
     "managed.spec.ts",
     "managed-races.spec.ts",
     "managed-proposal.spec.ts",
+    "managed-legacy-auth.spec.ts",
   ],
   workers: 1,
   outputDir: "/tmp/aquamux-managed-e2e-results",

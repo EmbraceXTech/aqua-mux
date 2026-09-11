@@ -57,6 +57,7 @@ export async function authenticateFixture(page: Page) {
     },
     { id: challenge.id, signature },
   );
+  await page.reload();
   await page.getByRole("button", { name: "Strategies", exact: true }).click();
   await expect(
     page.getByText("Authenticated wallet", { exact: true }),

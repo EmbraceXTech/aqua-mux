@@ -3,7 +3,7 @@ import { authenticateWallet, managedRequest, type ManagedSession } from "./api";
 import { connectDevWallet, disconnectDevWallet } from "@/lib/dev-wallet";
 
 const sessionKey = "aquamux-managed-session-v1";
-export function useManagedSession() {
+export function useManagedSession(chainId = 42161) {
   const [session, setSession] = useState<ManagedSession>();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -43,11 +43,15 @@ export function useManagedSession() {
     });
     const changed = () =>
       clear("Wallet account changed. Authenticate the selected wallet again.");
+    const chainChanged = () =>
+      clear("Wallet network changed. Authenticate the selected wallet again.");
     window.ethereum?.on?.("accountsChanged", changed);
+    window.ethereum?.on?.("chainChanged", chainChanged);
     return () => {
       active = false;
       generation.current += 1;
       window.ethereum?.removeListener?.("accountsChanged", changed);
+      window.ethereum?.removeListener?.("chainChanged", chainChanged);
     };
   }, [clear]);
   useEffect(() => {
@@ -84,7 +88,7 @@ export function useManagedSession() {
           mode,
           maxFeeWei: result.maxFeeWei,
         };
-      } else value = await authenticateWallet(42161);
+      } else value = await authenticateWallet(chainId);
       if (requestGeneration !== generation.current) return;
       setSession(value);
       try {
@@ -92,6 +96,7 @@ export function useManagedSession() {
       } catch {
         /* Authentication remains valid in memory. */
       }
+      return value;
     } catch (cause) {
       if (requestGeneration === generation.current)
         setError(
@@ -106,14 +111,16 @@ export function useManagedSession() {
   async function disconnect() {
     const previous = session;
     clear();
+    const disconnectGeneration = generation.current;
     try {
       if (previous?.mode === "local-development")
         await disconnectDevWallet(previous.token);
       else if (previous) await managedRequest("/api/auth/logout", previous, {});
     } catch {
-      setError(
-        "Disconnected locally. Server session revocation could not be confirmed.",
-      );
+      if (disconnectGeneration === generation.current)
+        setError(
+          "Disconnected locally. Server session revocation could not be confirmed.",
+        );
     }
   }
   return { session, error, busy, connect, disconnect };

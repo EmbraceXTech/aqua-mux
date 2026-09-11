@@ -7,7 +7,7 @@ import {
   requestKey,
   type ManagedSession,
 } from "@/lib/managed-client/api";
-import { useManagedSession } from "@/lib/managed-client/use-managed-session";
+import type { useManagedSession } from "@/lib/managed-client/use-managed-session";
 import { StrategyCatalog, type RecipeId } from "./strategy-catalog";
 import { ProposalForm, type ProposalIntent } from "./proposal-form";
 import { WalletBar } from "./wallet-bar";
@@ -15,14 +15,17 @@ import { GroupController } from "./group-controller";
 import { ReviewResultCard } from "./review-result";
 import { titleLabel } from "./format";
 
-export function ManagedWorkspace() {
-  const wallet = useManagedSession();
+export function ManagedWorkspace({
+  wallet,
+}: {
+  wallet: ReturnType<typeof useManagedSession>;
+}) {
   return (
     <main className="managed-main">
       <WalletBar
         session={wallet.session}
         busy={wallet.busy}
-        onConnect={wallet.connect}
+        onConnect={async (mode) => { await wallet.connect(mode); }}
         onDisconnect={wallet.disconnect}
       />
       {wallet.error && (
