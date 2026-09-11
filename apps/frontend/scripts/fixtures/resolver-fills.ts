@@ -3,9 +3,11 @@ import { Address as SdkAddress, HexString } from "@1inch/sdk-core";
 import { Order, SwapVMContract, TakerTraits } from "@1inch/swap-vm-sdk";
 import {
   createWalletClient,
+  encodeErrorResult,
   encodeFunctionData,
   erc20Abi,
   http,
+  parseAbi,
   parseEther,
   toHex,
   type Hex,
@@ -101,6 +103,13 @@ export async function verifyResolverFills(
     return hash;
   };
   try {
+    const expectedRevert = encodeErrorResult({
+      abi: parseAbi([
+        "error TxOriginTokenBalanceIsZero(address txOrigin, address token)",
+      ]),
+      errorName: "TxOriginTokenBalanceIsZero",
+      args: [account.address, KYC],
+    });
     await assert.rejects(
       fork.rpc.call({
         account: account.address,
@@ -109,6 +118,24 @@ export async function verifyResolverFills(
           swap(base, quote, amount),
         ).toString() as Hex,
       }),
+      (error: unknown) => {
+        let cause = error;
+        while (cause && typeof cause === "object") {
+          const item = cause as { data?: unknown; cause?: unknown };
+          const data =
+            typeof item.data === "object" && item.data
+              ? (item.data as { data?: unknown }).data
+              : item.data;
+          if (
+            typeof data === "string" &&
+            data.toLowerCase() === expectedRevert.toLowerCase()
+          )
+            return true;
+          cause = item.cause;
+        }
+        return false;
+      },
+      "Uncredentialed origin must revert with the exact credential error, origin and credential token",
     );
     // Test-only credential contract returns one for balanceOf. No production gate is changed.
     await fork.request("anvil_setCode", [KYC, "0x600160005260206000f3"]);
@@ -126,6 +153,7 @@ export async function verifyResolverFills(
       forward,
       reverse,
       uncredentialedOriginRejected: true,
+      credentialRevert: "TxOriginTokenBalanceIsZero(address,address)",
       credentialFixtureOnly: true,
       sharedBaseBefore: String(before),
       sharedBaseAfter: String(after),

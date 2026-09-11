@@ -133,3 +133,9 @@ The guard now permits zero retirements only for close-and-convert with a positiv
 Close-only and replacement still require active prior strategies, and every conversion amount remains bounded by current balances, selected inventory, allowed assets and reviewed routes.
 The bridged-USDC fork scenario now closes positions first and then signs a separate zero-retirement inventory conversion through the production adapter and receipt reconciler.
 The same scenario refuses an empty selection before preparing a transaction.
+
+
+Independent review requested precise proof of the resolver credential rejection rather than accepting any failed RPC call.
+The fixture now matches the complete ABI-encoded `TxOriginTokenBalanceIsZero(address,address)` revert with the exact synthetic taker origin and credential-token address.
+Transport errors, unrelated reverts and incorrect error arguments cannot satisfy that assertion.
+All four scenarios passed again with this stricter evidence, including the separate conversion after close-only.

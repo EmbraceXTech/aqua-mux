@@ -6,33 +6,34 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x29ec179bae775face49bfdce081e0237d5ef53405ffea6360bed44c648840a60",
+      "hash": "0x37e2a25a78a19fb1b0c1861021e51ae2d2bbc8f048788cde6f72f4fe14540d6a",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0xa4a815328e067e7ec7d07ac92d7b848c59b608c5b46a02cf8c3627fdd78626ec",
+    "openHash": "0x357b6a530c0d10e6d1f842cf1038630bbbca78d0d0d3429ca27f82f97634a512",
     "fills": {
-      "forward": "0xe3bbcaa8cbf2ad907857cc1babec517c6eea9ccc15fea08b9016529ab00cb5b6",
-      "reverse": "0x4639a618e20008a4b5d53acce900dcfce39239f00635e1f74ad64d9a28f23f7b",
+      "forward": "0x4ce7ae3b9567c40af39c02547c0d7771aa68118bdb645f3e15077496b3d34590",
+      "reverse": "0x6eb3d3c9bc8bf420b9887472b8da22037b423f99c7324eeabf6a77e4737d8527",
       "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "1050000000000000",
-      "sharedBaseAfter": "1024415682813721"
+      "sharedBaseAfter": "1024415612456771"
     },
-    "replacementHash": "0xef88a0a83afab1dc7594cf0a43a2ccb7041fb36d9944e626a7870e70bc8f3229",
+    "replacementHash": "0x31b5db62df74efcd74476513b32ee02bd7653244bf8acdb394574b0d19bfc054",
     "replacementRollback": {
-      "hash": "0xff46d8d1a63492b854b68c2f6e63d9c9ddfc2b652d9af47387cf9cfbb7791b1c",
+      "hash": "0x58656ddc7c5c2854c2b8a1a7a881ac126f9505a015b64b90c6c099809b4774df",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0x83442884c4b449806f59c3f3d8c6db27725b18e797412c7a14394c4a107db89c",
+    "closeHash": "0x86cfbde0f477af7f6f7e7d395ad2a4e9490c5f90887db1f9db7c50b613946900",
     "separateConversionHash": null,
-    "callDigest": "0x53d132c03072be4108b793d1749b86d8b591994482a9828f842700606ba545c7",
+    "callDigest": "0x1bdb606bc113d90f72c9275b2e84a3b0c25018b3c33e1c1723c0ee693e2755ee",
     "residual": [
       {
         "symbol": "WETH",
-        "amount": "19744628699473"
+        "amount": "19744637131554"
       },
       {
         "symbol": "USDC",
@@ -58,33 +59,34 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x2bfab2c01e154125e0072cafba9f88ecfd830bdd545db966d314d554862128e5",
+      "hash": "0xf9ac547ae7607de1b6c296014f341c64df6a427d419e1a50ee4935575318aa71",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0x90e86eefbcb330b090ead2fa6f14aff4f47515359ccefae67d77f80094810101",
+    "openHash": "0x272158f127396226d54a969dc5a609fce156899ca84c40beac8e3fac69879acc",
     "fills": {
-      "forward": "0xfdce00bd258f9baa90f9c70f0bedd9ef7c60465ccf2dc43f5ce5a8bff1f526cd",
-      "reverse": "0x41a39a8a940ed424421eb1a724f9af1f7aac9c05092080c71d71cb9c5abb99ad",
+      "forward": "0xafedf4b0426a54c1f2f2e3f31935f6ec24f6fa66deb659901f02ed0a9c2a2c80",
+      "reverse": "0x1fa2a29f539ecbbf4e99817f155df7308af60ff84f56956ad3218ce08fc3d301",
       "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "1050000000000000",
       "sharedBaseAfter": "1024415223393161"
     },
-    "replacementHash": "0x63599b5bf9575540ac46e047291aa2eb4a4600656311ae79a903b34928d2cb3b",
+    "replacementHash": "0x2d27b558fce7072a88c32da9f3f78bdb662aa5ec932ccd5cd5d542956d557479",
     "replacementRollback": {
-      "hash": "0x37e65e600df4564881d0f43d958836b78108ca6dd39940489b9977245d81e5da",
+      "hash": "0x1f4aa3ca647e4c6cfbc042f45353995cd33415c75bc40d39efec8f0ae3db53c7",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0x0fc8060b9889da25e1528ac64f78bd273d5e3b8da75f7a73672a6622ec5b1206",
+    "closeHash": "0xa4f5ef885724b8f1fca02dc0623d129c9d93e6c1284a24b97608a4109eb40056",
     "separateConversionHash": null,
-    "callDigest": "0x02d61bdc8f6f4620a13cca33fd59a6ecaf7f8dcd3f35f04765df9ce1b2ec5d91",
+    "callDigest": "0x34ae0822908646b60f1e495c2f53032f0a243b605b741e26af99f9cb5d26eca7",
     "residual": [
       {
         "symbol": "WBNB",
-        "amount": "19745880837481"
+        "amount": "19745880837472"
       },
       {
         "symbol": "USDC",
@@ -110,29 +112,30 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x067998bba6b88c4188adb1b3c81408c95a6d09deec99c6ec1ea9426b48e5a823",
+      "hash": "0x4d2873781332d75f7f99addd565ef5560ad2fab832ea4b2b00976c410477e700",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0x32305dee8a737bc873e08f89c2fadaad6f21dfd26d3fac26e9edd075f9bb7a45",
+    "openHash": "0x4e9545a0d434f54721becd28f2e71c5c9c9a59b28e1496ace1f6c2b3f65b29be",
     "fills": {
-      "forward": "0x9d2f05701e2ff23a863031b61218274d3373d4c0caef0d889c342d25baef8d0a",
-      "reverse": "0xf3759ac27fae19859962d69450ff3261302dcbae3b00f7fdf6bf850928ee70b9",
+      "forward": "0x61ceb830052f9f82b15e5532989d645539fc3a0d3b93d737778bbccb6ed83ace",
+      "reverse": "0x7d5b6aaa588225e4fb3272ba4f35505ce369ef3b178b0d06c80a2f2eb1486350",
       "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "52500000000000",
-      "sharedBaseAfter": "51221101629170"
+      "sharedBaseAfter": "51221007127287"
     },
-    "replacementHash": "0x32505b90aead9abca528fefe36374868e6caf14eec97e87776cb7d296873119a",
+    "replacementHash": "0x95348ce5a6abd69039fbc811af7f65cc532712d68fd0fdb5a1e4ff0cea6acbc3",
     "replacementRollback": {
-      "hash": "0x466b779e47ed0828adaaf0621b613e9b2299783418ad2c125af1bb7f91e15221",
+      "hash": "0xdf1a973f9560a3f2939f61dbc9d8122ba116aad768bb458ff155dde4b6b02671",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0xb35832537bfe6f25eed01f2526aa869267292a20b3987e8c0ae6f1ee82e7030e",
+    "closeHash": "0x9e7eb5197cd6121f7ac8f65613d5f0519fd03296da9bfd80e8414e9d78fb4e3f",
     "separateConversionHash": null,
-    "callDigest": "0xaee458531eb724655fe9e1ff6ff3595264c3c7f8326996ff8b563f840a7c4dd3",
+    "callDigest": "0x108ac9dd0fdd42c722e5c6bd6df975a4ac6764ed53efe53b9cf511c3d6108f83",
     "residual": [
       {
         "symbol": "WETH",
@@ -153,7 +156,7 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": true,
-    "atomicRollbackHash": "0x06fa548d49c8e8e145d10f61d59d930d76fe91df92ce46b4f02cab7f125f17d5"
+    "atomicRollbackHash": "0x8b4369ec2d7da66b39c1dc6a23c35cdd73d6d1b0ca620268db94a19347fae231"
   },
   {
     "chainId": 42161,
@@ -162,33 +165,34 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x076e6561c7153c2e7725a02bd646a660812bdb5924ec0c67d35f85cb4b58501c",
+      "hash": "0xbe0cb546c32647ade0af07865e1a9b5c616ef107809f279847902bc571e0cc26",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0x4d66f5164875bfe41b8bd26a210249a7bace7bca82334754aa236e4b9405343f",
+    "openHash": "0xfdf8480931c2218e2029a0d567f34ae0f848573419e2ed82bd878b8c3af1a4bf",
     "fills": {
-      "forward": "0xabd0a86fb336c30a58425f220a3318eed7d9c05a692654453804be18f6afa16e",
-      "reverse": "0xac13fed745630e5a6d1d584f5936e9a359a5fd1871cfa896405935a69c0881e8",
+      "forward": "0x8e5c262e1e3dca2ab4b395a1391705bfd75860fade183bb20513b9a1b5918e99",
+      "reverse": "0xdbf8335b3c9e6e4f24bd448bb90065e7d0acc78443fd86d493f3f9143cc30138",
       "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "1050000000000000",
-      "sharedBaseAfter": "1024415453471143"
+      "sharedBaseAfter": "1024415570287941"
     },
-    "replacementHash": "0xc914bf7aef76db83f005ebbf1bc1f2e1323c24689b54a64daac3ad1e8af50284",
+    "replacementHash": "0x79d87ab4f4e2cf4fc0b9c2c9e0bcf9f690b94bdeb5b9928c60389a6a0db1c0a2",
     "replacementRollback": {
-      "hash": "0x06255b6ff4dccb56067b9f6c70a85ab152df4dc90c228c196208782bc968e44a",
+      "hash": "0x8486e8bf9e654260135244b748411c6e2d2b2b3d40614a237cf0fb9b7c552419",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0xcbb0eedd26f4bbe7a729682f5ce528ea93021b3e3b4c0dc6acd0e71a297503b6",
-    "separateConversionHash": "0xe3c1bd8bc06a7a7d90c4b84a19490d0a446cc2f579b61740454e82bcc4928157",
-    "callDigest": "0x11ee1cdc6ec7da3e8cbfdd690764758336686f744936aea0a29a51c1b0c60e57",
+    "closeHash": "0x9d5d539511e1fc30f614057873e7de8c606c837ebae4d5dd9540dedd71d6ac1b",
+    "separateConversionHash": "0x1c8bb0324a85d7a6196f7c5fb372a27ae06515b6def4afa82f5f95a10ab2699d",
+    "callDigest": "0xda92ad3c6d818d48d6a1a17f3627f74f5bb2c66ecd8a9400af9c6b5e465533b2",
     "residual": [
       {
         "symbol": "WETH",
-        "amount": "19744632034020"
+        "amount": "19744637871196"
       },
       {
         "symbol": "USDC.e",
@@ -205,6 +209,6 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
-    "atomicRollbackHash": "0x6f9f1e8209d5f89273e37552bec0ccce0f9dfad9e3e56be2111d6b239a1f2b47"
+    "atomicRollbackHash": "0x64f923bebc5393205348a9ac8dbbf56ce5070e3131023a950a424a80c068a1ac"
   }
 ]
