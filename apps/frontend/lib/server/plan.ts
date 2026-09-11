@@ -7,25 +7,22 @@ import {
   toHex,
   type Address,
 } from "viem";
-import {
-  AQUA,
-  SWAP_VM,
-  NATIVE,
-  classicRouter,
-  token,
-  wrapped,
-} from "../config";
-import { units, validateBasket, type Call, type Plan } from "../model";
+import { AQUA, SWAP_VM, NATIVE, classicRouter, wrapped } from "../config";
+import { units, type Call, type Plan } from "../model";
 import { makeStrategy } from "../strategy";
+import { resolveLegacyBasket } from "./legacy-token-resolution";
 import { client } from "./rpc";
 import { quoteBasket } from "./swap";
 export async function buildPlan(
   input: unknown,
   account: Address,
 ): Promise<Plan> {
-  const b = validateBasket(input),
+  const resolved = await resolveLegacyBasket(input),
+    b = resolved.basket,
+    verifiedTokens = resolved.tokens,
+    resolveToken = resolved.resolveToken,
     c = client(b.chainId),
-    source = token(b.chainId, b.source),
+    source = resolveToken(b.chainId, b.source),
     total = units(b.amount, source.decimals);
   if ((await c.getChainId()) !== b.chainId)
     throw new Error("Configured RPC returned the wrong chain.");
@@ -50,7 +47,7 @@ export async function buildPlan(
           });
     if (available < amount)
       throw new Error(
-        `Insufficient ${token(b.chainId, address).symbol} balance.`,
+        `Insufficient ${resolveToken(b.chainId, address).symbol} balance.`,
       );
   }
   async function approve(address: Address, spender: Address, amount: bigint) {
@@ -70,19 +67,19 @@ export async function buildPlan(
           args: [spender, n],
         }),
         value: "0x0",
-        label: `Approve ${token(b.chainId, address).symbol} for ${spender === AQUA ? "Aqua" : "1inch"}`,
+        label: `Approve ${resolveToken(b.chainId, address).symbol} for ${spender === AQUA ? "Aqua" : "1inch"}`,
       });
     if (current > 0n) push(0n);
     push(amount);
   }
   await requireBalance(b.source, total);
   if (b.mode === "swap") {
-    const quote = await quoteBasket(b, account);
+    const quote = await quoteBasket(b, account, resolveToken);
     expiresAt = quote.expiresAt;
     summary.push(`Pay ${b.amount} ${source.symbol}.`);
     if (b.source !== NATIVE) await approve(b.source, router, total);
     for (const l of quote.legs) {
-      const output = token(b.chainId, l.address);
+      const output = resolveToken(b.chainId, l.address);
       summary.push(
         `Receive at least ${formatUnits(BigInt(l.minAmountOut), output.decimals)} ${output.symbol}.`,
       );
@@ -93,7 +90,7 @@ export async function buildPlan(
         to: router,
         data: l.tx.data,
         value: toHex(value),
-        label: `Swap to ${token(b.chainId, l.address).symbol}`,
+        label: `Swap to ${resolveToken(b.chainId, l.address).symbol}`,
       });
     }
     summary.push(
@@ -101,7 +98,10 @@ export async function buildPlan(
       "Output minimums are encoded by the 1inch Swap API.",
     );
   } else {
-    const base = b.source === NATIVE ? wrapped(b.chainId) : source;
+    const base =
+      b.source === NATIVE
+        ? resolveToken(b.chainId, wrapped(b.chainId).address)
+        : source;
     if (b.legs.some((l) => l.address === base.address))
       throw new Error(
         "The paired token must differ from the wrapped base token.",
@@ -118,7 +118,7 @@ export async function buildPlan(
       });
     await approve(base.address, AQUA, total);
     for (const leg of b.legs) {
-      const t = token(b.chainId, leg.address);
+      const t = resolveToken(b.chainId, leg.address);
       if (t.address === NATIVE)
         throw new Error("Choose a wrapped or ERC-20 token on the paired side.");
       const n = units(leg.amount, t.decimals);
@@ -159,6 +159,7 @@ export async function buildPlan(
     calls,
     strategies,
     summary,
+    verifiedTokens,
     createdAt: Date.now(),
     expiresAt,
   };

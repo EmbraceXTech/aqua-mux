@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { parseUnits, type Address, type Hex } from "viem";
-import { token } from "./config";
+import { token, type Token } from "./config";
 export const amountSchema = z
   .string()
   .regex(/^(0|[1-9]\d*)(\.\d+)?$/, "Enter a positive decimal amount.")
@@ -62,7 +62,9 @@ export type Plan = {
   expiresAt: number;
   strategies: { hash: Hex; pair: string; tokens: Address[] }[];
   summary: string[];
+  verifiedTokens?: readonly Token[];
 };
+export type TokenResolver = (chainId: number, address: string) => Token;
 export function units(amount: string, decimals: number): bigint {
   amountSchema.parse(amount);
   if ((amount.split(".")[1]?.length ?? 0) > decimals)
@@ -88,12 +90,15 @@ export function splitAmount(total: bigint, weights: number[]) {
     return n;
   });
 }
-export function validateBasket(input: unknown) {
+export function validateBasket(
+  input: unknown,
+  resolveToken: TokenResolver = token,
+) {
   const b = basketSchema.parse(input);
-  const src = token(b.chainId, b.source);
+  const src = resolveToken(b.chainId, b.source);
   units(b.amount, src.decimals);
   b.legs.forEach((l) => {
-    const t = token(b.chainId, l.address);
+    const t = resolveToken(b.chainId, l.address);
     if (b.mode === "liquidity") units(l.amount, t.decimals);
   });
   return b;

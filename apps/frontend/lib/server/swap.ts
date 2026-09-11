@@ -1,5 +1,5 @@
 import { type Address } from "viem";
-import { type Basket, splitAmount, units } from "../model";
+import { type Basket, splitAmount, units, type TokenResolver } from "../model";
 import { token, classicRouter } from "../config";
 export async function swapApi(
   path: string,
@@ -25,9 +25,13 @@ export async function swapApi(
     );
   return r.json();
 }
-export async function quoteBasket(b: Basket, account?: Address) {
+export async function quoteBasket(
+  b: Basket,
+  account?: Address,
+  resolveToken: TokenResolver = token,
+) {
   const amounts = splitAmount(
-    units(b.amount, token(b.chainId, b.source).decimals),
+    units(b.amount, resolveToken(b.chainId, b.source).decimals),
     b.legs.map((l) => l.bps),
   );
   const startedAt = Date.now();
