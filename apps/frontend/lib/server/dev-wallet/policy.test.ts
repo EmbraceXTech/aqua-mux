@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { encodeFunctionData, erc20Abi } from "viem";
-import { AQUA, tokens } from "../../config";
+import { encodeFunctionData, erc20Abi, parseAbi } from "viem";
+import { AQUA, SWAP_VM, tokens } from "../../config";
 import type { Plan } from "../../model";
 import { assertDevChain, assertLocalRequest, devAccount } from "./config";
 import { planDigest, validateDevPlan } from "./policy";
@@ -17,7 +17,13 @@ function plan(): Plan {
     calls: [
       {
         to: AQUA,
-        data: "0x12345678",
+        data: encodeFunctionData({
+          abi: parseAbi([
+            "function dock(address app,bytes32 strategyHash,address[] tokens)",
+          ]),
+          functionName: "dock",
+          args: [SWAP_VM, `0x${"00".repeat(32)}`, []],
+        }),
         value: "0x0",
         label: "Trusted compiler fixture",
       },
@@ -124,7 +130,7 @@ test("only compiler targets, wrapping and allowed token approvals pass", () => {
 test("local mode is opt-in, development-only, origin scoped and rejects proxies", () => {
   const original = { ...process.env };
   try {
-    process.env.NODE_ENV = "development";
+    Object.assign(process.env, { NODE_ENV: "development" });
     process.env.AQUAMUX_DEV_WALLET = "true";
     process.env.AQUAMUX_DEV_WALLET_ORIGIN = "http://127.0.0.1:3100";
     const request = (headers = {}) =>
@@ -140,6 +146,29 @@ test("local mode is opt-in, development-only, origin scoped and rejects proxies"
       });
     assertLocalRequest(request());
     assertLocalRequest(
+      new Request("http://localhost:3100/api/dev-wallet/connect", request()),
+    );
+    assert.throws(
+      () =>
+        assertLocalRequest(
+          new Request(
+            "http://localhost:3101/api/dev-wallet/connect",
+            request(),
+          ),
+        ),
+      /loopback/,
+    );
+    assert.throws(
+      () =>
+        assertLocalRequest(
+          new Request(
+            "http://remote.example:3100/api/dev-wallet/connect",
+            request(),
+          ),
+        ),
+      /loopback/,
+    );
+    assertLocalRequest(
       request({
         "x-forwarded-host": "127.0.0.1:3100",
         "x-forwarded-for": "::ffff:127.0.0.1",
@@ -154,10 +183,10 @@ test("local mode is opt-in, development-only, origin scoped and rejects proxies"
       { "x-aquamux-dev-wallet": "" },
     ])
       assert.throws(() => assertLocalRequest(request(headers)), /loopback/);
-    process.env.NODE_ENV = "production";
+    Object.assign(process.env, { NODE_ENV: "production" });
     assert.throws(() => assertLocalRequest(request()), /disabled/);
     assert.throws(() => devAccount(), /disabled/);
-    process.env.NODE_ENV = "development";
+    Object.assign(process.env, { NODE_ENV: "development" });
     process.env.AQUAMUX_DEV_WALLET = "false";
     assert.throws(() => assertLocalRequest(request()), /disabled/);
   } finally {

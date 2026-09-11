@@ -1,16 +1,25 @@
 import { createHash } from "node:crypto";
-import { decodeFunctionData, erc20Abi, type Address } from "viem";
-import { AQUA, classicRouter, tokens, wrapped } from "../../config";
+import { decodeFunctionData, erc20Abi, parseAbi, type Address } from "viem";
+import { AQUA, SWAP_VM, classicRouter, tokens, wrapped } from "../../config";
 import type { Plan } from "../../model";
+import { canonicalJson } from "../../managed";
 import { assertDevChain, DevWalletError } from "./config";
 
+const aquaAbi = parseAbi([
+  "function ship(address app,bytes strategy,address[] tokens,uint256[] amounts) returns(bytes32)",
+  "function dock(address app,bytes32 strategyHash,address[] tokens)",
+]);
+const wrapAbi = parseAbi(["function withdraw(uint256 amount)"]);
+
 export function planDigest(plan: Plan) {
-  return createHash("sha256").update(JSON.stringify(plan)).digest("hex");
+  return createHash("sha256").update(canonicalJson(plan)).digest("hex");
 }
 
-// Only server compiler output can reach this check. It is defense in depth,
-// not an API for authorizing client-supplied calls or arbitrary router programs.
-export function validateDevPlan(plan: Plan, maker: Address, now = Date.now()) {
+export function validateBatchEnvelope(
+  plan: Plan,
+  maker: Address,
+  now = Date.now(),
+) {
   assertDevChain(plan.chainId);
   if (plan.account.toLowerCase() !== maker.toLowerCase())
     throw new DevWalletError(
@@ -27,10 +36,6 @@ export function validateDevPlan(plan: Plan, maker: Address, now = Date.now()) {
     );
   if (!plan.calls.length || plan.calls.length > 64)
     throw new DevWalletError("Invalid atomic batch size.");
-  const router = classicRouter(plan.chainId).toLowerCase();
-  const assets = new Set(
-    tokens(plan.chainId).map((asset) => asset.address.toLowerCase()),
-  );
   for (const call of plan.calls) {
     const target = call.to.toLowerCase();
     if (
@@ -40,7 +45,38 @@ export function validateDevPlan(plan: Plan, maker: Address, now = Date.now()) {
       target === maker.toLowerCase()
     )
       throw new DevWalletError("Invalid call in the reviewed batch.");
-    if (target === AQUA || target === router) continue;
+  }
+}
+
+// Only trusted server compiler output can reach this authority check.
+export function validateDevPlan(plan: Plan, maker: Address, now = Date.now()) {
+  validateBatchEnvelope(plan, maker, now);
+  const router = classicRouter(plan.chainId).toLowerCase();
+  const assets = new Set(
+    tokens(plan.chainId).map((asset) => asset.address.toLowerCase()),
+  );
+  for (const call of plan.calls) {
+    const target = call.to.toLowerCase();
+    if (target === AQUA) {
+      try {
+        const decoded = decodeFunctionData({ abi: aquaAbi, data: call.data });
+        if (
+          decoded.args[0].toLowerCase() !== SWAP_VM ||
+          BigInt(call.value) !== 0n
+        )
+          throw new Error();
+      } catch {
+        throw new DevWalletError("Unapproved Aqua call.");
+      }
+      continue;
+    }
+    if (target === router) {
+      // An approved router address does not constrain its nested executor program.
+      // Keep swaps unavailable until a decoder and authority policy are verified.
+      throw new DevWalletError(
+        "Local wallet swaps require a verified executor policy. Use an already-funded LP plan or close-only action.",
+      );
+    }
     if (!assets.has(target))
       throw new DevWalletError("Unapproved call target.");
     if (
@@ -48,6 +84,18 @@ export function validateDevPlan(plan: Plan, maker: Address, now = Date.now()) {
       call.data === "0xd0e30db0"
     )
       continue;
+    if (
+      target === wrapped(plan.chainId).address.toLowerCase() &&
+      call.data.startsWith("0x2e1a7d4d")
+    ) {
+      try {
+        const { args } = decodeFunctionData({ abi: wrapAbi, data: call.data });
+        if (BigInt(call.value) !== 0n || args[0] <= 0n) throw new Error();
+      } catch {
+        throw new DevWalletError("Invalid unwrap call.");
+      }
+      continue;
+    }
     try {
       const decoded = decodeFunctionData({ abi: erc20Abi, data: call.data });
       if (

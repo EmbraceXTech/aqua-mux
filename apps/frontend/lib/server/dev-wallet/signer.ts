@@ -1,28 +1,26 @@
 import {
   createWalletClient,
-  encodeFunctionData,
   http,
   keccak256,
-  parseAbi,
   TransactionReceiptNotFoundError,
   type Hex,
 } from "viem";
-import type { Plan } from "../../model";
 import { client } from "../rpc";
 import { devAccount, assertDevChain, DevWalletError } from "./config";
 import { validateDevPlan } from "./policy";
 
-export const implementation = "0xe6Cae83BdE06E4c305530e199D7217f42808555B";
-export const implementationHash =
-  "0xcc7b633aef4b2543cb8f37522adf1a401f910f0f6b2430c1eecc11f401ccfcf3";
-const batchAbi = parseAbi([
-  "function executeBatch((address target,uint256 value,bytes data)[] calls)",
-]);
+import {
+  encodeDevBatch,
+  implementation,
+  implementationHash,
+  type DevBatchPlan,
+} from "./batch";
+export { implementation, implementationHash } from "./batch";
 
 export type SignedDevBatch = {
   hash: Hex;
   nonce: number;
-  broadcast: () => Promise<Hex>;
+  broadcast: (beforeSend?: () => void) => Promise<Hex>;
 };
 
 export function maxFeeBudget() {
@@ -35,8 +33,9 @@ export function maxFeeBudget() {
 }
 
 export async function signDevBatch(
-  plan: Plan,
+  plan: DevBatchPlan,
   assertCurrent: () => void | Promise<void>,
+  reviewedFeeLimit?: bigint,
 ): Promise<SignedDevBatch> {
   const account = devAccount();
   validateDevPlan(plan, account.address);
@@ -78,17 +77,7 @@ export async function signDevBatch(
           }),
         ]
       : undefined;
-  const data = encodeFunctionData({
-    abi: batchAbi,
-    functionName: "executeBatch",
-    args: [
-      plan.calls.map((call) => ({
-        target: call.to,
-        value: BigInt(call.value),
-        data: call.data,
-      })),
-    ],
-  });
+  const data = encodeDevBatch(plan.calls);
   const transaction = {
     account: account.address,
     to: account.address,
@@ -116,20 +105,33 @@ export async function signDevBatch(
     100n;
   const gasPrice = await rpc.getGasPrice();
   const maxFeePerGas = gasPrice * 2n;
-  if (gas * maxFeePerGas > maxFeeBudget())
+  const configuredLimit = maxFeeBudget();
+  const feeLimit =
+    reviewedFeeLimit !== undefined && reviewedFeeLimit < configuredLimit
+      ? reviewedFeeLimit
+      : configuredLimit;
+  if (gas * maxFeePerGas > feeLimit)
     throw new DevWalletError(
       "Estimated maximum fee exceeds the configured local wallet limit.",
     );
   const value = plan.calls.reduce((sum, call) => sum + BigInt(call.value), 0n);
-  if (
-    (await rpc.getBalance({ address: account.address })) <=
-    value + gas * maxFeePerGas
-  )
-    throw new DevWalletError(
-      "Insufficient native funds after reserving the maximum transaction fee.",
-    );
-  await assertCurrent();
-  validateDevPlan(plan, account.address);
+  const reserve = BigInt(plan.gasReserveWei ?? "0");
+  if (reserve < 0n) throw new DevWalletError("Invalid native gas reserve.");
+  const assertReady = async () => {
+    const balance = await rpc.getBalance({ address: account.address });
+    const freshPrice = await rpc.getGasPrice();
+    if (balance < value + gas * maxFeePerGas + reserve)
+      throw new DevWalletError(
+        "Insufficient native funds after retaining the reviewed gas reserve and maximum fee.",
+      );
+    if (freshPrice > maxFeePerGas || gas * maxFeePerGas > maxFeeBudget())
+      throw new DevWalletError(
+        "Transaction fees changed. Review a fresh plan.",
+      );
+    await assertCurrent();
+    validateDevPlan(plan, account.address);
+  };
+  await assertReady();
   const serialized = await wallet.signTransaction({
     ...transaction,
     account,
@@ -140,10 +142,11 @@ export async function signDevBatch(
   return {
     hash: keccak256(serialized),
     nonce,
-    // The service must persist the hash and nonce before calling this closure.
-    broadcast: async () => {
-      await assertCurrent();
-      validateDevPlan(plan, account.address);
+    broadcast: async (beforeSend) => {
+      await assertReady();
+      // Persist the known hash and nonce after guards, immediately before the RPC.
+      // No async work or fallible policy check may intervene after this callback.
+      beforeSend?.();
       return rpc.sendRawTransaction({ serializedTransaction: serialized });
     },
   };

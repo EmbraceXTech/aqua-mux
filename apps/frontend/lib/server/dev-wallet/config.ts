@@ -46,32 +46,46 @@ export function assertLocalRequest(request: Request) {
     );
   }
   const url = new URL(request.url);
-  if (
-    !["127.0.0.1", "[::1]", "localhost"].includes(origin.hostname) ||
-    !["http:", "https:"].includes(origin.protocol) ||
-    origin.username ||
-    origin.password ||
-    origin.pathname !== "/" ||
-    origin.search ||
-    origin.hash ||
-    url.origin !== origin.origin ||
-    request.headers.get("origin") !== origin.origin ||
-    request.headers.get("host") !== origin.host ||
-    request.headers.has("forwarded") ||
-    (request.headers.has("x-forwarded-host") &&
-      request.headers.get("x-forwarded-host") !== origin.host) ||
-    (request.headers.get("x-forwarded-for") ?? "")
+  const checks = {
+    configuration:
+      ["127.0.0.1", "[::1]", "localhost"].includes(origin.hostname) &&
+      ["http:", "https:"].includes(origin.protocol) &&
+      !origin.username &&
+      !origin.password &&
+      origin.pathname === "/" &&
+      !origin.search &&
+      !origin.hash,
+    // Next reconstructs internal URLs with its bind hostname. Host and Origin
+    // below must still exactly match the configured browser origin.
+    url:
+      url.origin === origin.origin ||
+      (["127.0.0.1", "[::1]", "localhost"].includes(url.hostname) &&
+        url.protocol === origin.protocol &&
+        url.port === origin.port &&
+        !url.username &&
+        !url.password),
+    origin: request.headers.get("origin") === origin.origin,
+    host: request.headers.get("host") === origin.host,
+    forwarded:
+      !request.headers.has("forwarded") &&
+      (!request.headers.has("x-forwarded-host") ||
+        request.headers.get("x-forwarded-host") === origin.host),
+    peer: !(request.headers.get("x-forwarded-for") ?? "")
       .split(",")
       .some(
         (ip) =>
           ip.trim() &&
           !["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(ip.trim()),
-      ) ||
-    ![null, "same-origin"].includes(request.headers.get("sec-fetch-site")) ||
-    request.headers.get("x-aquamux-dev-wallet") !== "manual" ||
-    !request.headers.get("content-type")?.startsWith("application/json")
-  )
+      ),
+    site: [null, "same-origin"].includes(request.headers.get("sec-fetch-site")),
+    intent: request.headers.get("x-aquamux-dev-wallet") === "manual",
+    json: !!request.headers.get("content-type")?.startsWith("application/json"),
+  };
+  const failed = Object.entries(checks)
+    .filter(([, passed]) => !passed)
+    .map(([name]) => name);
+  if (failed.length)
     throw new DevWalletError(
-      "Local development wallet requires a same-origin loopback request.",
+      `Local development wallet requires a same-origin loopback request (${failed.join(", ")}).`,
     );
 }

@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start --hostname 127.0.0.1 --port 3100",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test test/*.test.ts",
+    "test": "tsx --test test/*.test.ts lib/server/dev-wallet/*.test.ts",
     "test:e2e": "playwright test",
     "lint": "eslint app components lib test e2e --max-warnings=0",
     "verify:fork": "tsx scripts/verify-fork.ts",

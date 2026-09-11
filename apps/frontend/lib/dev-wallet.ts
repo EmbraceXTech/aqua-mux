@@ -10,7 +10,12 @@ export type DevWalletConnection = {
   maxFeeWei: string;
   networks: { chainId: number; name: string; testnet: boolean }[];
 };
-export type DevWalletReview = { id: string; digest: string; plan: Plan };
+export type DevWalletReview = {
+  id: string;
+  digest: string;
+  plan: Plan;
+  maxFeeWei?: string;
+};
 export type DevWalletOutcome = {
   id: string;
   state: "pending" | "confirmed" | "reverted" | "unknown";
@@ -46,6 +51,14 @@ export function connectDevWallet() {
 
 export function prepareDevWalletPlan(token: string, basket: Basket) {
   return request<DevWalletReview>("plan", { basket }, token);
+}
+
+export function prepareDevWalletLifecyclePlan(
+  token: string,
+  planId: string,
+  context?: { sessionId: string; generation: number },
+) {
+  return request<DevWalletReview>("lifecycle-plan", { planId, context }, token);
 }
 
 export function submitDevWalletPlan(
