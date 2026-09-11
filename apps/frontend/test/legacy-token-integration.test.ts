@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { toHex, type Address } from "viem";
+import { basketSchema } from "../lib/model";
 import { NATIVE, tokens } from "../lib/config";
 import { AuthError, type OwnerSession } from "../lib/server/auth";
 import { createPlanPost, createQuotePost } from "../lib/server/legacy-handlers";
@@ -79,7 +80,7 @@ function basket(mode: "swap" | "liquidity" = "swap") {
     amount: "1",
     slippageBps: 50,
     feeBps: 5,
-    range: "full" as const,
+    range: basketSchema.shape.range.safeParse("full").success ? "full" : 0,
     legs: [
       { address: bridgedUsdc, bps: 5000, amount: "1" },
       { address: arb.address, bps: 5000, amount: "1" },

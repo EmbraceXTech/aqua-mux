@@ -1,5 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { basketSchema } from "../lib/model";
 import { quoteBasket } from "../lib/server/swap";
 import {
   intentSnapshot,
@@ -60,7 +61,9 @@ test("every quote consumer rejects non-string, zero, malformed and overflowing o
           amount: "1",
           slippageBps: 50,
           feeBps: 5,
-          range: "full",
+          range: basketSchema.shape.range.parse(
+            basketSchema.shape.range.safeParse("full").success ? "full" : 0,
+          ),
           legs: [
             { address: quote.address, bps: 5000, amount: "0" },
             { address: base.address, bps: 5000, amount: "0" },
@@ -104,7 +107,9 @@ test("every quote consumer rejects non-string, zero, malformed and overflowing o
       amount: "1",
       slippageBps: 50,
       feeBps: 5,
-      range: "full",
+      range: basketSchema.shape.range.parse(
+        basketSchema.shape.range.safeParse("full").success ? "full" : 0,
+      ),
       legs: [
         { address: quote.address, bps: 5000, amount: "0" },
         { address: base.address, bps: 5000, amount: "0" },
