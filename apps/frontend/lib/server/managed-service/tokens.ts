@@ -5,6 +5,7 @@ import type { Token } from "../../managed";
 import { findRegistryToken } from "../../token-registry";
 import { getTokenRegistry } from "../token-registry-source";
 import { checkTokenMetadata } from "../token-validation";
+import { hasVerifiedDecimals } from "../../token-metadata";
 import { client } from "../rpc";
 import { ManagedError } from "./errors";
 
@@ -101,7 +102,7 @@ export async function ensureManagedTokens(
         chainId,
         listed,
       );
-      if (metadata.status !== "verified")
+      if (!hasVerifiedDecimals(metadata, listed.decimals))
         throw new ManagedError(
           "invalid_token",
           "Selected token metadata could not be verified onchain.",
@@ -110,7 +111,7 @@ export async function ensureManagedTokens(
       token = {
         address: listed.address,
         decimals: listed.decimals,
-        symbol: listed.symbol,
+        symbol: metadata.onchainSymbol ?? listed.symbol,
       };
     }
     if (token.address === NATIVE && token.decimals !== 18)

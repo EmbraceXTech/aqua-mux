@@ -1,6 +1,7 @@
 import type { RegistryToken, TokenPairValidation } from "@/lib/token-registry";
 import { managedRequest, type ManagedSession } from "./api";
 import { exactAmount } from "./numeric-input";
+import { hasVerifiedDecimals } from "../token-metadata";
 
 type SelectedAsset = Pick<RegistryToken, "address" | "decimals">;
 
@@ -48,8 +49,13 @@ export async function validateProposalFunding({
         "Token validation does not match the selected funding route. Refresh and retry.",
       );
     if (
-      check.metadata.source.status !== "verified" ||
-      check.metadata.destination.status !== "verified"
+      !hasVerifiedDecimals(check.metadata.source, check.source.decimals) ||
+      !hasVerifiedDecimals(
+        check.metadata.destination,
+        check.destination.decimals,
+      ) ||
+      !check.source.selectable ||
+      !check.destination.selectable
     )
       throw new Error(
         "Token metadata could not be verified. Resolve the selected token before requesting an executable proposal.",

@@ -6,6 +6,7 @@ import type { ProposalIntent } from "./inputs";
 import { ManagedError } from "./errors";
 import { verifiedToken, type WalletSnapshot } from "./snapshot";
 import type { ManagedTokenSnapshot } from "./tokens";
+import { isPositiveUint256Decimal } from "../../token-registry";
 
 /** Shared pair claims use one real token inventory, not the sum of sibling allocations. */
 export function pairInventory(config: StrategyConfig): TokenAmount[] {
@@ -76,8 +77,8 @@ export async function planFunding(
       dst: item.token.address,
       amount: probe.toString(),
     });
-    const output = String(quote.dstAmount);
-    if (!/^[1-9]\d*$/.test(output))
+    const output = quote.dstAmount;
+    if (!isPositiveUint256Decimal(output))
       throw new ManagedError(
         "route_unavailable",
         "A required funding quote is unavailable.",

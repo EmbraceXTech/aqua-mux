@@ -24,7 +24,11 @@ const tokens: RegistryToken[] = [
   selectable: true,
 })) as RegistryToken[];
 
-async function proposalFixture(page: Page, freshDecimals = 6) {
+async function proposalFixture(
+  page: Page,
+  freshDecimals = 6,
+  labelDrift = false,
+) {
   await authenticateFixture(page);
   await page.route("**/api/tokens?**", (route) =>
     route.fulfill({
@@ -59,11 +63,14 @@ async function proposalFixture(page: Page, freshDecimals = 6) {
     const source = { ...tokens[0], decimals: freshDecimals };
     const destination = tokens.find((token) => token.address === input.dst)!;
     const metadata = (decimals: number) => ({
-      status: "verified" as const,
+      status: labelDrift ? ("mismatch" as const) : ("verified" as const),
       checkedAt: new Date().toISOString(),
       registryDecimals: decimals,
       onchainDecimals: decimals,
-      warnings: [],
+      ...(labelDrift ? { onchainSymbol: "CONTRACT" } : {}),
+      warnings: labelDrift
+        ? ["Registry symbol differs from the token contract."]
+        : [],
     });
     const result: TokenPairValidation = {
       chainId: 42161,
@@ -119,6 +126,18 @@ test("labelled single-flight fixture validates two assets sequentially before pr
     "Labelled fixture: review provider unavailable.",
   );
   expect(fixture.peak()).toBe(1);
+  expect(fixture.proposals).toHaveLength(1);
+  expect(fixture.proposals[0].intent.budget).toBe("1250000");
+});
+
+test("contract label drift with matching decimals still reaches proposal review", async ({
+  page,
+}) => {
+  const fixture = await proposalFixture(page, 6, true);
+  await page.getByRole("button", { name: "Generate fresh proposal" }).click();
+  await expect(page.locator(".managed-error")).toContainText(
+    "Labelled fixture: review provider unavailable.",
+  );
   expect(fixture.proposals).toHaveLength(1);
   expect(fixture.proposals[0].intent.budget).toBe("1250000");
 });

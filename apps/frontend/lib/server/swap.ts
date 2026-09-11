@@ -1,6 +1,7 @@
 import { type Address } from "viem";
 import { type Basket, splitAmount, units, type TokenResolver } from "../model";
 import { token, classicRouter } from "../config";
+import { isPositiveUint256Decimal } from "../token-registry";
 export async function swapApi(
   path: string,
   chainId: number,
@@ -54,7 +55,7 @@ export async function quoteBasket(
           }
         : {}),
     });
-    if (!/^\d+$/.test(String(q.dstAmount)) || BigInt(q.dstAmount) <= 0n)
+    if (!isPositiveUint256Decimal(q.dstAmount))
       throw new Error("1inch returned an invalid output amount.");
     const min = (BigInt(q.dstAmount) * BigInt(10000 - b.slippageBps)) / 10000n;
     if (min <= 0n)
@@ -72,7 +73,7 @@ export async function quoteBasket(
     legs.push({
       address: leg.address,
       amountIn: amounts[i].toString(),
-      amountOut: String(q.dstAmount),
+      amountOut: q.dstAmount,
       minAmountOut: min.toString(),
       tx: account ? q.tx : undefined,
     });

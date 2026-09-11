@@ -12,6 +12,7 @@ import type { ProposalIntent } from "./inputs";
 import { client } from "../rpc";
 import { swapApi } from "../swap";
 import { ManagedError } from "./errors";
+import { isPositiveUint256Decimal } from "../../token-registry";
 
 export interface WalletSnapshot extends Record<string, unknown> {
   tokenMetadata: ManagedTokenSnapshot;
@@ -149,8 +150,9 @@ export async function walletSnapshot(
 }
 export async function intentSnapshot(
   intent: ProposalIntent,
+  dependencies: { wallet?: typeof walletSnapshot; quote?: typeof swapApi } = {},
 ): Promise<WalletSnapshot> {
-  const snapshot = await walletSnapshot({
+  const snapshot = await (dependencies.wallet ?? walletSnapshot)({
     ...intent,
     assets: [...intent.permittedAssets, intent.fundingToken],
     maxAgeMs: 60_000,
@@ -181,12 +183,16 @@ export async function intentSnapshot(
         BigInt(intent.budget) / BigInt(intent.permittedAssets.length)
       ).toString();
       const startedAt = Date.now();
-      const quote = await swapApi("quote", intent.chainId, {
-        src: intent.fundingToken,
-        dst: asset,
-        amount: amountIn,
-      });
-      if (!/^[1-9]\d*$/.test(String(quote.dstAmount)))
+      const quote = await (dependencies.quote ?? swapApi)(
+        "quote",
+        intent.chainId,
+        {
+          src: intent.fundingToken,
+          dst: asset,
+          amount: amountIn,
+        },
+      );
+      if (!isPositiveUint256Decimal(quote.dstAmount))
         throw new Error("Invalid quote.");
       quotes.push({
         source: "1inch-route-quote",
@@ -197,7 +203,7 @@ export async function intentSnapshot(
         ),
         toToken: verifiedToken(intent.chainId, asset, snapshot.tokenMetadata),
         amountIn,
-        amountOut: String(quote.dstAmount),
+        amountOut: quote.dstAmount,
         observedAt: startedAt,
         expiresAt: startedAt + 30_000,
       });

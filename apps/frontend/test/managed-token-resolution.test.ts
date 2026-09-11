@@ -175,3 +175,18 @@ test("stored native funding metadata recovers without ERC20 calls or registry ac
     /Stored token decimals/,
   );
 });
+
+test("display label drift uses the contract symbol only after matching decimals", async () => {
+  const resolved = await ensureManagedTokens(42161, [address], [], {
+    registry: async () => registry,
+    metadata: async () => ({
+      status: "mismatch",
+      checkedAt: new Date().toISOString(),
+      registryDecimals: 6,
+      onchainDecimals: 6,
+      onchainSymbol: "CHAIN",
+      warnings: ["Registry symbol differs from the token contract."],
+    }),
+  });
+  assert.equal(verifiedToken(42161, address, resolved).symbol, "CHAIN");
+});
