@@ -153,3 +153,25 @@ test("verified token cache evicts excess entries and removes expired metadata", 
   assert.equal(cache.size, 0);
   assert.equal(cache.get("three"), undefined);
 });
+
+test("stored native funding metadata recovers without ERC20 calls or registry access", async () => {
+  const { NATIVE } = await import("../lib/config");
+  const native = { address: NATIVE, decimals: 18, symbol: "ETH" };
+  await ensureManagedTokens(42161, [NATIVE], [native], {
+    registry: async () => {
+      throw new Error("No registry call allowed");
+    },
+    storedDecimals: async () => {
+      throw new Error("Native sentinel is not an ERC20");
+    },
+  });
+  assert.deepEqual(verifiedToken(42161, NATIVE), native);
+  await assert.rejects(
+    ensureManagedTokens(42161, [NATIVE], [{ ...native, decimals: 6 }], {
+      storedDecimals: async () => {
+        throw new Error("No ERC20 call allowed");
+      },
+    }),
+    /Stored token decimals/,
+  );
+});

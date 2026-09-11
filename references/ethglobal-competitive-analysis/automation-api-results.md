@@ -11,7 +11,7 @@ Core schemas, SQLite migrations, wallet authentication, lifecycle compilation, s
 No pre-existing dirty files or generated files were committed by this worker.
 
 Commits `0263964`, `4e829e5`, and `5a07a89` contain the initial lease/client, durable orchestration, and restart/price corrections.
-Subsequent focused changes add source freshness and full token registry integration.
+Commit `55e5a34` and the API-owned paths recorded in shared commit `6516583` add source freshness and full token registry integration.
 Independent quality review is recorded in `automation-api-quality-review.md`.
 
 ## Implemented behavior
@@ -92,7 +92,7 @@ Cancellation uses `DELETE /reviews/:requestId`, while generation fencing remains
 
 ## Validation and limits
 
-The focused suite passes 21 tests, including actual local HTTP requests with wallet-signature authentication, two-tab fencing, duplicate group refusal, owner isolation, review idempotency, SQLite reopen, stop during model execution, timeout, quota, source age, transaction locking, external status updates, and dynamic token metadata checks.
+The focused suite passes 22 tests, including actual local HTTP requests with wallet-signature authentication, two-tab fencing, duplicate group refusal, owner isolation, review idempotency, SQLite reopen, stop during model execution, timeout, quota, source age, transaction locking, external status updates, and dynamic token metadata checks.
 The suite uses labelled deterministic provider and chain fixtures and does not claim real asset movement.
 TypeScript and scoped ESLint passed after the final implementation edits.
 The HTTP route/session test uses a real local HTTP server and generated test wallet proof.
