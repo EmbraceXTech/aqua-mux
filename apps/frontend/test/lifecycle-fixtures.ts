@@ -11,7 +11,10 @@ import {
 import { configFixture } from "./managed-fixtures";
 import type { LPStrategyConfig } from "../lib/managed/config";
 import { digest } from "../lib/server/lifecycle/digest";
-import { aggregationSwapAbi } from "../lib/server/lifecycle/routes";
+import {
+  aggregationSwapAbi,
+  validateFixtureAggregationRoute,
+} from "../scripts/fixtures/lifecycle-aggregation";
 import { requestTokens } from "../lib/server/lifecycle/metadata";
 import type {
   LifecycleDependencies,
@@ -109,6 +112,8 @@ export function dependenciesFixture(): LifecycleDependencies {
   return {
     now: () => now,
     nonce: () => hash,
+    validateRoute: validateFixtureAggregationRoute,
+    verifyRouteProvenance: async () => {},
     snapshot: async (request) => ({
       chainId: 42161,
       maker: request.config.maker,

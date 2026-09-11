@@ -3,6 +3,7 @@ import type { StrategyConfig } from "../../managed/config";
 import type { Token, TokenAmount } from "../../managed/primitives";
 import type { LifecyclePlan } from "../../managed/lifecycle";
 import type { Call } from "../../model";
+import type { RoutePolicyRequest, VerifiedRoute } from "../route-policy/types";
 
 export type PreviousStrategy = { hash: Hex; app: Address; tokens: Address[] };
 export type LifecycleRequest = {
@@ -51,6 +52,17 @@ export type LifecycleRoute = {
   minimumAmountOut: string;
   quotedAt: number;
   expiresAt: number;
+  request?: RoutePolicyRequest;
+  policy?: VerifiedRoute["policy"];
+  amountIn?: string;
+};
+export type LifecycleRouteBinding = {
+  request: RouteRequest;
+  route: LifecycleRoute;
+};
+export type LifecyclePlanBundle = {
+  plan: LifecyclePlan;
+  routes: LifecycleRouteBinding[];
 };
 export type SimulationResult = {
   success: boolean;
@@ -67,4 +79,14 @@ export type LifecycleDependencies = {
   snapshot(request: LifecycleRequest): Promise<LifecycleSnapshot>;
   quote(request: RouteRequest): Promise<LifecycleRoute>;
   simulate(plan: LifecyclePlan): Promise<SimulationResult>;
+  /** Trusted dependency injection for isolated fixtures, never client-supplied. */
+  validateRoute?(
+    request: RouteRequest,
+    route: LifecycleRoute,
+    now: number,
+  ): void;
+  verifyRouteProvenance?(
+    request: RouteRequest,
+    route: LifecycleRoute,
+  ): Promise<void>;
 };

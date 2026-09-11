@@ -1,6 +1,6 @@
 import { NATIVE, token, wrapped } from "../../config";
 import type { Call } from "../../model";
-import { unwrapCall } from "./calls";
+import { unwrapCall, wrapCall } from "./calls";
 import type { SwapInventory } from "./funding";
 import { Inventory } from "./inventory";
 import type { LifecycleRequest } from "./types";
@@ -26,6 +26,17 @@ export async function convertInventory(
   for (const item of selected.values()) {
     if (BigInt(item.amount) > inventory.amount(item.token))
       throw new Error("Conversion exceeds selected managed inventory.");
+    if (
+      item.token.address === NATIVE &&
+      target.address === wrapped(request.config.chainId).address
+    ) {
+      if (!conversion.unwrap && BigInt(item.amount) > 0n) {
+        inventory.debit(item.token, BigInt(item.amount));
+        inventory.credit(target, BigInt(item.amount));
+        calls.push(wrapCall(target.address, BigInt(item.amount)));
+      }
+      continue;
+    }
     if (item.token.address !== target.address && BigInt(item.amount) > 0n)
       await swap(item.token, target, item.amount, "1");
   }

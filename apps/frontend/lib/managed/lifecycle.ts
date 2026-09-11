@@ -45,6 +45,7 @@ export const lifecyclePlanSchema = z
     kind: z.enum(["fund-and-open", "replace", "close", "close-and-convert"]),
     configDigest: hashSchema,
     snapshotDigest: hashSchema,
+    routesDigest: hashSchema.optional(),
     policyDigest: hashSchema,
     runGeneration: z.number().int().nonnegative(),
     calls: z

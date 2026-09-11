@@ -17,8 +17,8 @@ import {
 } from "../lib/server/lifecycle";
 import {
   aggregationSwapAbi,
-  validateRoute,
-} from "../lib/server/lifecycle/routes";
+  validateFixtureAggregationRoute as validateRoute,
+} from "../scripts/fixtures/lifecycle-aggregation";
 import {
   base,
   dependenciesFixture,

@@ -116,11 +116,80 @@ The reviewer accepted the complete scope through `bb3fbcf2fcd29e4f7c1c3bdb3cfc49
 Its independent checks passed 17 lifecycle tests, scoped lint, full frontend TypeScript, metadata conflict/refusal probes and all 13 fork checks on port 19485 at block 504164351.
 No scoped must-fix finding remains.
 
-The live route adapter currently accepts only a decoded canonical aggregation `swap` call with no partial-fill flags.
-Unsupported optimized encodings fail with a refreshable route error.
-The coordinator assigned verified transparent-route integration to a subsequent dispatch using the route-policy worker's pending interface.
-That follow-up must connect the funded entry and conversion workflow to the signer without accepting opaque executor calldata.
+The live route adapter now accepts only the route-policy worker's verified transparent single-pool encoding.
+It refuses opaque aggregation executors.
+The legacy aggregation validator exists only in an explicitly injected isolated-fork fixture.
 The fork fixture does not establish live 1inch route availability, production resolver discovery, external-wallet batch compatibility or live signer execution.
 Fixed conversion amounts can still revert or leave residuals if balances change before inclusion.
 The implementation reports read-back inventory and does not claim an exact balance sweep.
 User-facing lifecycle acceptance, durable submission recovery and real wallet compatibility remain integration gates owned by the coordinator's other workers.
+
+## Transparent-route integration follow-up
+
+Orca dispatch `ctx_062e6c134321` connects lifecycle planning to `quoteVerifiedRoute`, `validateCompiledRoute` and `verifyRouteProvenance`.
+The lifecycle request independently supplies maker, chain, input asset, output asset, exact input and output minimum.
+The adapter maps token metadata to the route policy's address-only request and checks the returned call against that authority.
+It verifies router and pool code provenance when accepting a route and again after whole-batch simulation.
+No API executor bytes are passed through to the product's signing path.
+
+`buildLifecyclePlanWithRoutes` returns the plan and its server-produced `{ request, route }` records.
+`plan.routesDigest` binds their canonical digest, and the existing canonical plan digest includes that field.
+The authenticated API persists the records with the plan, while the signer independently validates records, exact calls and fresh provenance before signing or broadcasting.
+The legacy `buildLifecyclePlan` entry point remains available as a wrapper.
+Funding, virtual-price validation, freshness deadlines, exact allowance consumption, native recovery reserve and selected-inventory conversion remain in place.
+
+The follow-up owns changes in lifecycle `routes.ts`, `types.ts` and `index.ts`, the minimal shared `routesDigest` schema field, route integration tests and fork fixtures.
+The route-policy worker owns transparent calldata construction, deployment records and on-chain quoting.
+The API and signer workers own durable route-record storage and pre-sign enforcement.
+
+The focused run passed 22 lifecycle tests and four managed-execution tests.
+It checks mutated input amounts, receivers, output minimums, request authority and pool selection, plus rejection when pool provenance changes after simulation.
+The complete normal fork verifier passed 15 checks.
+
+The transparent-route run at `2026-09-11T20:37:13.755Z` started at Arbitrum block `504166841`.
+It used pool `arbitrum-weth-usdt-500` and unchanged forked WETH, USDT, pool and 1inch router code.
+Only its maker test wallet and native funding were fixtures.
+USDT was supplied as a dynamic token and passed the lifecycle's pinned code and decimals checks.
+
+The scenario selected 0.02 ETH, purchased USDT with 0.01 ETH, retained 0.01 WETH backing, and registered an Aqua LP.
+Its closing batch first docked the strategy and then converted the observed USDT inventory back to WETH.
+An intentionally impossible minimum on the final conversion reverted the entire batch and restored the active registration and exact selected balances.
+The successful retry read back `19990002001812947` raw WETH and zero USDT.
+That figure describes this fork execution and is not a performance forecast.
+
+| Fork action | Transaction hash |
+| --- | --- |
+| Fund and open | `0xe883e94eb6cb37e07aeebba5b73a33b466b02023dc862924da7b73045c683ad6` |
+| Failed conversion minimum with rollback | `0x5b046e2d7e729e17b59cb274cf6b9b204a00cce8b9777d50127a9fe4c1f20598` |
+| Successful close and conversion | `0xfeba21a98372cbf2dff53735b6bab4113dc2be0498d96e4f5440dcff9748249f` |
+
+No live transaction was sent.
+The route-policy deployment list bounds currently executable pairs and chains; registry membership alone does not establish route support.
+The initial follow-up paused during the shared-index audit.
+The resumed delivery uses the approved common-directory lock and fresh private index protocol.
+
+
+## Resumed route isolation correction
+
+Dispatch `ctx_b105d1c86f80` inherits the transparent-route integration and preserves the accepted `bb3fbcf` baseline.
+The independent reviewer reproduced a quote callback changing the requested input from one ETH to two ETH while inventory accounting still debited one ETH.
+The regression reproduced that acceptance through `buildLifecyclePlanWithRoutes` before the fix.
+The planner now deep-copies its initial request and exchanges isolated copies with snapshot, quote, validation, provenance and simulation callbacks.
+Returned snapshots, quotes and simulation evidence are copied before retention.
+Nested token metadata and retained quote references cannot alter the canonical plan or the caller's selected inventory.
+The route record and signer contracts are unchanged.
+
+The resumed worker owns lifecycle `index.ts`, `routes.ts`, `types.ts` and `conversion.ts`, the `routesDigest` schema addition, lifecycle test fixtures and tests, verifier integration and isolated route fixtures, and this report.
+The route adapter remains separate from lifecycle orchestration, and the opaque aggregator validator remains under script fixtures only.
+Route-policy deployment code, signer implementation, API persistence, existing dirty frontend code and generated files are outside this commit.
+
+Validation on September 12 passed 30 focused lifecycle and managed-execution tests, scoped ESLint with zero warnings and full frontend TypeScript.
+The normal fork verifier passed all 15 checks using `AQUAMUX_TEST_PORT=19637 npm run verify:fork` at Arbitrum fork block `504193901`.
+The transparent scenario used unchanged forked pool, router, WETH and USDT code and a funded test wallet.
+It funded and opened, proved final-minimum rollback, then closed and converted including selected native residual wrapping.
+Final inventory was `20990001936400169` raw WETH and zero USDT.
+No live transaction was sent.
+The generated verifier output was written by the verifier and is excluded from the commit.
+
+Separate exact-commit review belongs to dispatch `ctx_f2f8da360364`.
+Integration acceptance still requires that review and the API and signer owners' independent verification.

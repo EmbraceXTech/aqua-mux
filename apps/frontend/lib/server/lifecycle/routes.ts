@@ -1,95 +1,48 @@
-import { decodeFunctionData, parseAbi } from "viem";
-import { classicRouter, NATIVE } from "../../config";
-import { minimumOutput, uint } from "../../managed-compiler/arithmetic";
-import { swapApi } from "../swap";
+import { quoteVerifiedRoute } from "../route-policy/quote";
+import { validateCompiledRoute } from "../route-policy/validate";
+import { verifyRouteProvenance } from "../route-policy/provenance";
+import type { RoutePolicyRequest, VerifiedRoute } from "../route-policy/types";
 import type { LifecycleRoute, RouteRequest } from "./types";
 
-export const aggregationSwapAbi = parseAbi([
-  "function swap(address executor,(address srcToken,address dstToken,address srcReceiver,address dstReceiver,uint256 amount,uint256 minReturnAmount,uint256 flags) desc,bytes data) payable returns(uint256 returnAmount,uint256 spentAmount)",
-]);
+/** Derive authority from the independently prepared lifecycle request. */
+export function routePolicyRequest(request: RouteRequest): RoutePolicyRequest {
+  return {
+    chainId: request.chainId,
+    maker: request.maker,
+    source: request.source.address,
+    destination: request.destination.address,
+    amountIn: request.amountIn,
+    minimumAmountOut: request.minimumAmountOut,
+    slippageBps: request.slippageBps,
+  };
+}
 
-/** Decode the actual transaction. A route's descriptive JSON is not authorization. */
+function verifiedRoute(route: LifecycleRoute): VerifiedRoute {
+  if (!route.request || !route.policy || !route.amountIn)
+    throw new Error(
+      "A verified transparent route is required; opaque aggregation is unavailable.",
+    );
+  return route as VerifiedRoute;
+}
+
 export function validateRoute(
   request: RouteRequest,
   route: LifecycleRoute,
-  now: number,
-) {
-  const router = classicRouter(request.chainId);
-  if (
-    route.call.to.toLowerCase() !== router ||
-    route.spender.toLowerCase() !== router ||
-    route.quotedAt > now ||
-    now - route.quotedAt > 30000 ||
-    route.expiresAt <= now
-  )
-    throw new Error("Route is stale or uses an unapproved router.");
-  let decoded;
-  try {
-    decoded = decodeFunctionData({
-      abi: aggregationSwapAbi,
-      data: route.call.data,
-    });
-  } catch {
-    throw new Error(
-      "Route encoding is unsupported; refresh using a verifiable swap route.",
-    );
-  }
-  const [, desc] = decoded.args;
-  const minimum = uint(route.minimumAmountOut),
-    expected = uint(route.amountOut);
-  if (
-    desc.srcToken.toLowerCase() !== request.source.address ||
-    desc.dstToken.toLowerCase() !== request.destination.address ||
-    desc.dstReceiver.toLowerCase() !== request.maker ||
-    desc.amount !== uint(request.amountIn) ||
-    desc.minReturnAmount !== minimum ||
-    desc.flags !== 0n ||
-    minimum < uint(request.minimumAmountOut) ||
-    minimum < minimumOutput(expected, request.slippageBps) ||
-    minimum > expected
-  )
-    throw new Error(
-      "Route calldata does not enforce the reviewed assets, receiver, amount and minimum.",
-    );
-  if (
-    BigInt(route.call.value) !==
-    (request.source.address === NATIVE ? desc.amount : 0n)
-  )
-    throw new Error("Unexpected native value in route.");
+  now = Date.now(),
+): void {
+  validateCompiledRoute(routePolicyRequest(request), verifiedRoute(route), now);
+}
+
+export async function verifyLifecycleRouteProvenance(
+  request: RouteRequest,
+  route: LifecycleRoute,
+): Promise<void> {
+  validateRoute(request, route);
+  await verifyRouteProvenance(verifiedRoute(route));
 }
 
 export async function quoteLifecycleRoute(
   request: RouteRequest,
-): Promise<LifecycleRoute> {
-  const quotedAt = Date.now();
-  const q = await swapApi("swap", request.chainId, {
-    src: request.source.address,
-    dst: request.destination.address,
-    amount: request.amountIn,
-    from: request.maker,
-    receiver: request.maker,
-    slippage: String(request.slippageBps / 100),
-    disableEstimate: "true",
-    allowPartialFill: "false",
-    usePermit2: "false",
-    forceApprove: "false",
-  });
-  const expected = uint(String(q.dstAmount));
-  if (!q.tx || String(q.tx.from).toLowerCase() !== request.maker)
-    throw new Error("Route maker mismatch.");
-  const route: LifecycleRoute = {
-    call: {
-      to: q.tx.to,
-      data: q.tx.data,
-      value: `0x${BigInt(q.tx.value ?? 0).toString(16)}`,
-      label: `Swap ${request.source.symbol} to ${request.destination.symbol}`,
-    },
-    spender: classicRouter(request.chainId),
-    amountOut: String(expected),
-    minimumAmountOut: String(minimumOutput(expected, request.slippageBps)),
-    quotedAt,
-    expiresAt: quotedAt + 30000,
-  };
-  validateRoute(request, route, Date.now());
-  return route;
+): Promise<VerifiedRoute> {
+  return quoteVerifiedRoute(routePolicyRequest(request));
 }

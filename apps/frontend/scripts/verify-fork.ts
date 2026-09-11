@@ -26,6 +26,7 @@ import { AQUA, SWAP_VM, KYC, NATIVE, tokens, wrapped } from "../lib/config";
 import { buildPlan } from "../lib/server/plan";
 import type { Call } from "../lib/model";
 import { verifyManagedLifecycle } from "./verify-managed-lifecycle";
+import { verifyLifecycleRoutesFork } from "./verify-lifecycle-routes-fork";
 process.loadEnvFile(".env");
 const fork = process.env.ARBITRUM_RPC_URL;
 assert.ok(fork, "ARBITRUM_RPC_URL is required");
@@ -112,6 +113,12 @@ try {
       JSON.stringify({
         language: "Solidity",
         sources: {
+          "LifecycleSwap.sol": {
+            content: readFileSync(
+              new URL("./fixtures/LifecycleSwap.sol", import.meta.url),
+              "utf8",
+            ),
+          },
           "TestWallet.sol": {
             content: readFileSync(
               new URL("../../contracts/TestWallet.sol", import.meta.url),
@@ -172,7 +179,7 @@ try {
   for (const t of paired) {
     await rpc("anvil_setCode", [
       t.address,
-      `0x${contracts.TestToken.evm.deployedBytecode.object}`,
+      `0x${output.contracts["LifecycleSwap.sol"].LifecycleToken.evm.deployedBytecode.object}`,
     ]);
     const amount = t.symbol === "USDC" ? 2000000000n : 2500000n;
     const r = await receipt(
@@ -373,6 +380,15 @@ try {
   checks.push(
     "A failing output minimum on the final swap rolls back the first fill and native wrapping.",
   );
+  const transparentRoutes = await verifyLifecycleRoutesFork({
+    client,
+    owner,
+    walletAbi,
+    deployWallet: () => deploy("TestWallet"),
+    execute,
+    rpc,
+  });
+  checks.push(...transparentRoutes.checks);
   const managed = await verifyManagedLifecycle({
     client,
     owner,
@@ -397,6 +413,7 @@ try {
         checks,
         transactionHashes: hashes,
         managedLifecycle: managed,
+        transparentRoutes,
       },
       null,
       2,

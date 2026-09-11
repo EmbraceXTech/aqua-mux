@@ -16,8 +16,13 @@ import { validateSnapshot } from "./guards";
 import { fundInventory } from "./funding";
 import { convertInventory } from "./conversion";
 import { Inventory } from "./inventory";
-import { validateRoute } from "./routes";
-import type { LifecycleDependencies, LifecycleRequest } from "./types";
+import { validateRoute, verifyLifecycleRouteProvenance } from "./routes";
+import type {
+  LifecycleDependencies,
+  LifecycleRequest,
+  LifecyclePlanBundle,
+  LifecycleRouteBinding,
+} from "./types";
 export type * from "./types";
 export { digest } from "./digest";
 export { reconcileResiduals } from "./inventory";
@@ -26,13 +31,26 @@ export async function buildLifecyclePlan(
   input: LifecycleRequest,
   deps: LifecycleDependencies,
 ): Promise<LifecyclePlan> {
+  return (await buildLifecyclePlanWithRoutes(input, deps)).plan;
+}
+
+export async function buildLifecyclePlanWithRoutes(
+  input: LifecycleRequest,
+  deps: LifecycleDependencies,
+): Promise<LifecyclePlanBundle> {
+  const routes: LifecycleRouteBinding[] = [];
+  const validate = deps.validateRoute ?? validateRoute;
+  const provenance =
+    deps.verifyRouteProvenance ?? verifyLifecycleRouteProvenance;
   const request = {
-    ...input,
+    ...structuredClone(input),
     config: strategyConfigSchema.parse(input.config),
   };
   const now = deps.now ?? Date.now,
     createdAt = now();
-  const snapshot = await deps.snapshot(request);
+  const snapshot = structuredClone(
+    await deps.snapshot(structuredClone(request)),
+  );
   validateSnapshot(request, snapshot, now());
   const inventory = new Inventory(request.inventory),
     receipts = new Inventory([]);
@@ -69,8 +87,12 @@ export async function buildLifecyclePlan(
       minimumAmountOut: minimum,
       slippageBps: request.config.policy.maxSlippageBps.value,
     };
-    const route = await deps.quote(routeRequest);
-    validateRoute(routeRequest, route, now());
+    const route = structuredClone(
+      await deps.quote(structuredClone(routeRequest)),
+    );
+    validate(structuredClone(routeRequest), structuredClone(route), now());
+    await provenance(structuredClone(routeRequest), structuredClone(route));
+    routes.push(structuredClone({ request: routeRequest, route }));
     if (
       !request.config.policy.allowedRoutes.value.includes(
         classicRouter(request.config.chainId),
@@ -81,7 +103,7 @@ export async function buildLifecyclePlan(
       throw new Error("Swap deployment provenance is unavailable.");
     if (source.address !== NATIVE)
       approve(source.address, route.spender, amountIn);
-    calls.push(route.call);
+    calls.push({ ...route.call });
     if (source.address !== NATIVE)
       approve.consume(source.address, route.spender, amountIn);
     const output = uint(route.minimumAmountOut);
@@ -142,6 +164,7 @@ export async function buildLifecyclePlan(
     snapshotDigest: digest(snapshot),
     runGeneration: request.runGeneration,
     calls,
+    routesDigest: digest(routes),
     inventoryBefore: new Inventory(request.inventory).values(),
     conservativeInventoryAfter: inventory.values(),
     registrations,
@@ -166,7 +189,9 @@ export async function buildLifecyclePlan(
     atomicRequired: true,
     authorization: { kind: "unconfirmed" },
   });
-  const simulation = await deps.simulate(plan);
+  const simulation = structuredClone(
+    await deps.simulate(structuredClone(plan)),
+  );
   if (
     !simulation.success ||
     !simulation.atomic ||
@@ -177,8 +202,21 @@ export async function buildLifecyclePlan(
     now() >= expiresAt
   )
     throw new Error("A fresh successful whole-batch simulation is required.");
-  const finalSnapshot = await deps.snapshot(request);
+  const finalSnapshot = structuredClone(
+    await deps.snapshot(structuredClone(request)),
+  );
   validateSnapshot(request, finalSnapshot, now());
+  for (const binding of routes) {
+    validate(
+      structuredClone(binding.request),
+      structuredClone(binding.route),
+      now(),
+    );
+    await provenance(
+      structuredClone(binding.request),
+      structuredClone(binding.route),
+    );
+  }
   if (
     now() >= expiresAt ||
     uint(finalSnapshot.blockNumber) < uint(simulation.blockNumber)
@@ -201,5 +239,5 @@ export async function buildLifecyclePlan(
       callsDigest: simulation.callsDigest,
     },
   });
-  return plan;
+  return { plan, routes };
 }

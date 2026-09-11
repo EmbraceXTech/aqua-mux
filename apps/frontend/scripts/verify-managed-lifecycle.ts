@@ -29,7 +29,10 @@ import {
   type LifecycleRequest,
 } from "../lib/server/lifecycle";
 import { readLifecycleSnapshot } from "../lib/server/lifecycle/snapshot";
-import { aggregationSwapAbi } from "../lib/server/lifecycle/routes";
+import {
+  aggregationSwapAbi,
+  validateFixtureAggregationRoute,
+} from "./fixtures/lifecycle-aggregation";
 import { aquaLifecycleAbi, wrapCall } from "../lib/server/lifecycle/calls";
 import { describeLPPrice } from "../lib/managed-compiler/lp";
 
@@ -187,6 +190,8 @@ export async function verifyManagedLifecycle(context: {
   for (const pair of config.pairs) pair.openingPrice = describeLPPrice(pair);
   const deps: LifecycleDependencies = {
     snapshot: readLifecycleSnapshot,
+    validateRoute: validateFixtureAggregationRoute,
+    verifyRouteProvenance: async () => {},
     quote: async (request) => {
       const minimum =
         request.destination.address !== base.address
