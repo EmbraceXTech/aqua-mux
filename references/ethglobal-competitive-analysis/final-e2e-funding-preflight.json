@@ -1,0 +1,56 @@
+{
+  "observedAt": "2026-09-11T20:29:33.325Z",
+  "source": "0xA9aA0Af420578223B11FF5430d428055C52e8C89",
+  "destination": "0x992A6a939579e10Ad47C347a5be3788c94992Dd4",
+  "transactionsSubmitted": 0,
+  "transfers": [
+    {
+      "chainId": 42161,
+      "blockNumber": "504165050",
+      "blockHash": "0x1f244f232fc756f5ae36889134aca0f1f7e8e1d1ab491826a708941964658fde",
+      "sourceBalance": "9471590914460000",
+      "destinationBalance": "0",
+      "value": "1500000000000000",
+      "estimatedGas": "21281",
+      "gasLimit": "25537",
+      "maxFeePerGas": "24043200",
+      "maxPriorityFeePerGas": "0",
+      "maximumFee": "613991198400",
+      "originalWalletMinimumReserve": "7000000000000000",
+      "managedFundingBudget": "200000000000000",
+      "managedGasReserve": "500000000000000"
+    },
+    {
+      "chainId": 56,
+      "blockNumber": "121326095",
+      "blockHash": "0x4fee19f4c1f11e32a2c9f78779b46d02cb6a6c8da3d711cdc06ec7ac75d89959",
+      "sourceBalance": "9217640050000000",
+      "destinationBalance": "0",
+      "value": "1500000000000000",
+      "estimatedGas": "21000",
+      "gasLimit": "25200",
+      "maxFeePerGas": "50000000",
+      "maxPriorityFeePerGas": "50000000",
+      "maximumFee": "1260000000000",
+      "originalWalletMinimumReserve": "7000000000000000",
+      "managedFundingBudget": "500000000000000",
+      "managedGasReserve": "500000000000000"
+    },
+    {
+      "chainId": 4663,
+      "blockNumber": "60539824",
+      "blockHash": "0x1fbee9584097f6f444873d09a15da550c65c7244fcee9097277e1356ed52b34c",
+      "sourceBalance": "9540597869896000",
+      "destinationBalance": "0",
+      "value": "1500000000000000",
+      "estimatedGas": "21000",
+      "gasLimit": "25200",
+      "maxFeePerGas": "135938400",
+      "maxPriorityFeePerGas": "0",
+      "maximumFee": "3425647680000",
+      "originalWalletMinimumReserve": "7000000000000000",
+      "managedFundingBudget": "200000000000000",
+      "managedGasReserve": "500000000000000"
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "observedAt": "2026-09-11T20:28:13.836Z",
+  "revision": "64bc2ae26f0d98c0aec410fcd8c7f6c550ff818b",
+  "transactionsSubmitted": 0,
+  "claim": "Read-only entry quote feasibility. Validator acceptance is not signer approval or complete batch simulation. Quotes expire and cannot authorize later execution.",
+  "results": [
+    {
+      "chainId": 42161,
+      "destination": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+      "symbol": "USDC",
+      "amountIn": "50000000000000",
+      "startedAt": "2026-09-11T20:28:04.339Z",
+      "status": "accepted-by-current-route-validator",
+      "amountOut": "126491",
+      "minimumAmountOut": "125226",
+      "target": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "selector": "0x07ed2379",
+      "quotedAt": 1789158484340
+    },
+    {
+      "chainId": 42161,
+      "destination": "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+      "symbol": "WBTC",
+      "amountIn": "50000000000000",
+      "startedAt": "2026-09-11T20:28:05.902Z",
+      "status": "accepted-by-current-route-validator",
+      "amountOut": "163",
+      "minimumAmountOut": "161",
+      "target": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "selector": "0x07ed2379",
+      "quotedAt": 1789158485902
+    },
+    {
+      "chainId": 56,
+      "destination": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+      "symbol": "USDC",
+      "amountIn": "125000000000000",
+      "startedAt": "2026-09-11T20:28:07.519Z",
+      "status": "accepted-by-current-route-validator",
+      "amountOut": "90195034728470130",
+      "minimumAmountOut": "89293084381185428",
+      "target": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "selector": "0x07ed2379",
+      "quotedAt": 1789158487519
+    },
+    {
+      "chainId": 56,
+      "destination": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+      "symbol": "ETH",
+      "amountIn": "125000000000000",
+      "startedAt": "2026-09-11T20:28:09.081Z",
+      "status": "accepted-by-current-route-validator",
+      "amountOut": "35522654778031",
+      "minimumAmountOut": "35167428230250",
+      "target": "0x111111125421ca6dc452d289314280a0f8842a65",
+      "selector": "0x07ed2379",
+      "quotedAt": 1789158489081
+    },
+    {
+      "chainId": 4663,
+      "destination": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      "symbol": "USDG",
+      "amountIn": "50000000000000",
+      "startedAt": "2026-09-11T20:28:10.596Z",
+      "status": "accepted-by-current-route-validator",
+      "amountOut": "126527",
+      "minimumAmountOut": "125261",
+      "target": "0x5a705de8982235a7fa45bb83dcacf03a211389c7",
+      "selector": "0x07ed2379",
+      "quotedAt": 1789158490596
+    },
+    {
+      "chainId": 4663,
+      "destination": "0x39dbed3a2bd333467115de45665cc57f813c4571",
+      "symbol": "PONS",
+      "amountIn": "50000000000000",
+      "startedAt": "2026-09-11T20:28:12.234Z",
+      "status": "accepted-by-current-route-validator",
+      "amountOut": "210519238243287614",
+      "minimumAmountOut": "208414045860854737",
+      "target": "0x5a705de8982235a7fa45bb83dcacf03a211389c7",
+      "selector": "0x07ed2379",
+      "quotedAt": 1789158492234
+    }
+  ]
+}

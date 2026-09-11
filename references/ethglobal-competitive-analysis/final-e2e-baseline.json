@@ -1,0 +1,501 @@
+{
+  "observedAt": "2026-09-11T20:26:54.483Z",
+  "revision": "bb3fbcf2fcd29e4f7c1c3bdb3cfc4928734b76a0",
+  "dirtyFiles": [
+    "M apps/agent-runner/package-lock.json",
+    " M apps/agent-runner/package.json",
+    " M apps/agent-runner/src/docker-sandbox.mjs",
+    " M apps/agent-runner/src/service/contract.ts",
+    " M apps/agent-runner/src/service/database-lock.ts",
+    " M apps/agent-runner/src/service/errors.ts",
+    " M apps/agent-runner/src/service/http.ts",
+    " M apps/agent-runner/src/service/reviews.ts",
+    " M apps/agent-runner/src/service/store.ts",
+    " M apps/agent-runner/test/service-fixtures.ts",
+    " M apps/agent-runner/test/service.test.ts",
+    " M apps/frontend/app/globals.css",
+    " M apps/frontend/components/aquamux.tsx",
+    " M apps/frontend/components/managed/activity-view.tsx",
+    " M apps/frontend/components/managed/bot-workspace.tsx",
+    " M apps/frontend/components/managed/config-editor.tsx",
+    " M apps/frontend/components/managed/controls-view.tsx",
+    " M apps/frontend/components/managed/format.ts",
+    " M apps/frontend/components/managed/managed-workspace.tsx",
+    " M apps/frontend/components/managed/managed.css",
+    " M apps/frontend/components/managed/plan-review.tsx",
+    " M apps/frontend/components/managed/positions-view.tsx",
+    " M apps/frontend/components/managed/proposal-form.tsx",
+    " M apps/frontend/components/managed/token-select.tsx",
+    " M apps/frontend/e2e/app.spec.ts",
+    " M apps/frontend/lib/config.ts",
+    " M apps/frontend/lib/managed-client/api.ts",
+    " M apps/frontend/lib/managed-client/use-managed-actions.ts",
+    " M apps/frontend/lib/managed-client/use-managed-group.ts",
+    " M apps/frontend/lib/managed-client/use-managed-session.ts",
+    " M apps/frontend/lib/model.ts",
+    " M apps/frontend/lib/server/automation/reviews.ts",
+    " M apps/frontend/lib/server/managed-service/http.ts",
+    " M apps/frontend/lib/server/managed-service/plans.ts",
+    " M apps/frontend/lib/server/managed-service/proposals.ts",
+    " M apps/frontend/lib/server/managed-service/reconciliation.ts",
+    " M apps/frontend/lib/server/managed-service/review-snapshot.ts",
+    " M apps/frontend/lib/server/managed-service/snapshot.ts",
+    " M apps/frontend/lib/server/plan.ts",
+    " M apps/frontend/lib/strategy.ts",
+    " M apps/frontend/next-env.d.ts",
+    " M apps/frontend/test/automation-review.test.ts",
+    " M apps/frontend/test/model.test.ts",
+    " M apps/frontend/test/plan-router.test.ts",
+    " M references/ethglobal-competitive-analysis/automation-api-quality-review.md",
+    " M references/ethglobal-competitive-analysis/managed-ui-quality-review.md",
+    " M references/ethglobal-competitive-analysis/runtime-spike-results.md",
+    "?? .DS_Store",
+    "?? apps/agent-runner/src/service/diagnostics.ts",
+    "?? apps/agent-runner/src/service/main.ts",
+    "?? apps/agent-runner/src/service/output-schema.ts",
+    "?? apps/agent-runner/src/service/provider.ts",
+    "?? apps/agent-runner/src/service/resources.ts",
+    "?? apps/agent-runner/src/service/response.ts",
+    "?? apps/agent-runner/test/service-acquisition-child.ts",
+    "?? apps/agent-runner/test/service-live.ts",
+    "?? apps/agent-runner/test/service-output.test.ts",
+    "?? apps/agent-runner/test/service-resources.test.ts",
+    "?? apps/agent-runner/test/service-response.test.ts",
+    "?? apps/frontend/.data/",
+    "?? apps/frontend/app/api/chart/",
+    "?? apps/frontend/components/managed/group-controller.tsx",
+    "?? apps/frontend/components/managed/observation-view.tsx",
+    "?? apps/frontend/components/managed/route-checks.tsx",
+    "?? apps/frontend/components/price-range-chart.tsx",
+    "?? apps/frontend/e2e/managed.config.ts",
+    "?? apps/frontend/e2e/managed.spec.ts",
+    "?? apps/frontend/e2e/price-range.spec.ts",
+    "?? apps/frontend/lib/managed-client/numeric-input.ts",
+    "?? apps/frontend/lib/managed-client/wallet-recovery.ts",
+    "?? apps/frontend/lib/price-range.ts",
+    "?? apps/frontend/lib/server/charts.ts",
+    "?? apps/frontend/lib/server/managed-service/freshness.ts",
+    "?? apps/frontend/lib/server/managed-service/tokens.ts",
+    "?? apps/frontend/public/networks/",
+    "?? apps/frontend/scripts/managed-e2e-preflight.ts",
+    "?? apps/frontend/test/charts.test.ts",
+    "?? apps/frontend/test/managed-freshness.test.ts",
+    "?? apps/frontend/test/managed-token-resolution.test.ts"
+  ],
+  "maker": "0xA9aA0Af420578223B11FF5430d428055C52e8C89",
+  "transactionsSubmitted": 0,
+  "scope": "Historical evidence registrations and their tokens only; not a full wallet asset or event-history census. All listed pre-existing inventory is excluded from new managed capital. Pending nonce is an unpinned liveness check.",
+  "chains": [
+    {
+      "chainId": 42161,
+      "name": "Arbitrum",
+      "blockNumber": "504164402",
+      "blockHash": "0x0d425b3acac5de33a196a724cceb88078bcaff9d148aeeaab9aa6b3239e7a0bf",
+      "blockTimestamp": "1789158409",
+      "nativeBalance": "9471590914460000",
+      "formattedNativeBalance": "0.00947159091446",
+      "minedNonce": 8,
+      "pendingNonce": 8,
+      "accountCode": "0xef010063c0c19a282a1b52b07dd5a65b58948a07dae32b",
+      "contracts": [
+        {
+          "address": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+          "codeHash": "0x720bc02d220db318164dc3bade86eec1f3655bdc00fc1174de7d816a95c341f8"
+        },
+        {
+          "address": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "codeHash": "0x7cb8785de84b35bced79fbecbbc6336f473623568cba28b7af3ed001b20d580e"
+        },
+        {
+          "address": "0x111111125421ca6dc452d289314280a0f8842a65",
+          "codeHash": "0xaae25d52ea3e7bbb8cc826b589060f063c7f6ca2c2da88bc9b3b0e0a57bd8fb6"
+        }
+      ],
+      "inventory": [
+        {
+          "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "symbol": "WETH",
+          "decimals": 18,
+          "rawBalance": "209226636101739",
+          "formattedBalance": "0.000209226636101739",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "1889659104481"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+              "amount": "0"
+            }
+          ]
+        },
+        {
+          "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+          "symbol": "USDC",
+          "decimals": 6,
+          "rawBalance": "391350",
+          "formattedBalance": "0.39135",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "245432"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+              "amount": "0"
+            }
+          ]
+        },
+        {
+          "address": "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+          "symbol": "WBTC",
+          "decimals": 8,
+          "rawBalance": "14",
+          "formattedBalance": "0.00000014",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "5"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "strategies": [
+        {
+          "hash": "0xcafc7442f1abe7446e4177e87c60905af71ca80800dd9fe4d8400dc29c056228",
+          "pair": "WETH / USDC",
+          "tokens": [
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+            "0xaf88d065e77c8cc2239327c5edb3a432268e5831"
+          ],
+          "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "allocations": [
+            {
+              "token": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "amount": "100000000000000",
+              "tokenCount": 2
+            },
+            {
+              "token": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "amount": "245432",
+              "tokenCount": 2
+            }
+          ],
+          "ownership": "pre-existing; excluded from this workflow"
+        },
+        {
+          "hash": "0x1d988e89e7fdb27ae53d45ec101237238dba40c7574b29a6eda9fb194238b340",
+          "pair": "WETH / WBTC",
+          "tokens": [
+            "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+          ],
+          "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "allocations": [
+            {
+              "token": "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+              "amount": "311",
+              "tokenCount": 2
+            },
+            {
+              "token": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "amount": "100000000000000",
+              "tokenCount": 2
+            }
+          ],
+          "ownership": "pre-existing; excluded from this workflow"
+        }
+      ]
+    },
+    {
+      "chainId": 56,
+      "name": "BNB Chain",
+      "blockNumber": "121325738",
+      "blockHash": "0x19e8149ab386cdd5275aa05653e67d326ab8ec206f6ca92e60b61fd1ab388dea",
+      "blockTimestamp": "1789158411",
+      "nativeBalance": "9217640050000000",
+      "formattedNativeBalance": "0.00921764005",
+      "minedNonce": 5,
+      "pendingNonce": 5,
+      "accountCode": "0x",
+      "contracts": [
+        {
+          "address": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+          "codeHash": "0x720bc02d220db318164dc3bade86eec1f3655bdc00fc1174de7d816a95c341f8"
+        },
+        {
+          "address": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "codeHash": "0x1d0fee80375eefa84811dd8231b159e97e4925e3e7a35cd227eb0279d54d3754"
+        },
+        {
+          "address": "0x111111125421ca6dc452d289314280a0f8842a65",
+          "codeHash": "0x7b9ea7c1da2784fe89f77fb8dba143f593a5ebf5afe45d0970d57007a98233af"
+        }
+      ],
+      "inventory": [
+        {
+          "address": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+          "symbol": "WBNB",
+          "decimals": 18,
+          "rawBalance": "250000000000000",
+          "formattedBalance": "0.00025",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "250000000000000"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+              "amount": "0"
+            }
+          ]
+        },
+        {
+          "address": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+          "symbol": "USDC",
+          "decimals": 18,
+          "rawBalance": "187476771933647486",
+          "formattedBalance": "0.187476771933647486",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "185602004214311011"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+              "amount": "0"
+            }
+          ]
+        },
+        {
+          "address": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+          "symbol": "ETH",
+          "decimals": 18,
+          "rawBalance": "75304329823471",
+          "formattedBalance": "0.000075304329823471",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "74551286525236"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x111111125421ca6dc452d289314280a0f8842a65",
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "strategies": [
+        {
+          "hash": "0xdb3edec3a967f81eb643d7d850670fc7f14b32555a259b1506ba8639b27c1d19",
+          "pair": "WBNB / USDC",
+          "tokens": [
+            "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+            "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+          ],
+          "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "allocations": [
+            {
+              "token": "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+              "amount": "185602004214311011",
+              "tokenCount": 2
+            },
+            {
+              "token": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+              "amount": "250000000000000",
+              "tokenCount": 2
+            }
+          ],
+          "ownership": "pre-existing; excluded from this workflow"
+        },
+        {
+          "hash": "0x0e5fab3c2c00606bfe172c8d1cf2e58e92d3746cc76a84f0fb72597b283c4714",
+          "pair": "WBNB / ETH",
+          "tokens": [
+            "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+            "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
+          ],
+          "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "allocations": [
+            {
+              "token": "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+              "amount": "74551286525236",
+              "tokenCount": 2
+            },
+            {
+              "token": "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c",
+              "amount": "250000000000000",
+              "tokenCount": 2
+            }
+          ],
+          "ownership": "pre-existing; excluded from this workflow"
+        }
+      ]
+    },
+    {
+      "chainId": 4663,
+      "name": "Robinhood Chain",
+      "blockNumber": "60538313",
+      "blockHash": "0x437e2227923ff301ef2e6f1520a7671f463a5741acda640aab3d62aa8b32187f",
+      "blockTimestamp": "1789158412",
+      "nativeBalance": "9540597869896000",
+      "formattedNativeBalance": "0.009540597869896",
+      "minedNonce": 6,
+      "pendingNonce": 6,
+      "accountCode": "0x",
+      "contracts": [
+        {
+          "address": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+          "codeHash": "0x720bc02d220db318164dc3bade86eec1f3655bdc00fc1174de7d816a95c341f8"
+        },
+        {
+          "address": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "codeHash": "0xc945eab9457f0edc9673118443b9cadac7e7bdedf0dd734b260c2f39fef5f1c4"
+        },
+        {
+          "address": "0x5a705de8982235a7fa45bb83dcacf03a211389c7",
+          "codeHash": "0x2d953ea912513133437636b2f9c6854cbe418d038f82107ae432a5459c54a8a0"
+        }
+      ],
+      "inventory": [
+        {
+          "address": "0x0bd7d308f8e1639fab988df18a8011f41eacad73",
+          "symbol": "WETH",
+          "decimals": 18,
+          "rawBalance": "100000000000000",
+          "formattedBalance": "0.0001",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "100000000000000"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x5a705de8982235a7fa45bb83dcacf03a211389c7",
+              "amount": "0"
+            }
+          ]
+        },
+        {
+          "address": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+          "symbol": "USDG",
+          "decimals": 6,
+          "rawBalance": "247505",
+          "formattedBalance": "0.247505",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "245029"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x5a705de8982235a7fa45bb83dcacf03a211389c7",
+              "amount": "0"
+            }
+          ]
+        },
+        {
+          "address": "0x39dbed3a2bd333467115de45665cc57f813c4571",
+          "symbol": "PONS",
+          "decimals": 18,
+          "rawBalance": "315189690092606371",
+          "formattedBalance": "0.315189690092606371",
+          "allowances": [
+            {
+              "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+              "amount": "312037793191680307"
+            },
+            {
+              "spender": "0x111111338c5091e8440b67b168bae16a668ac0de",
+              "amount": "0"
+            },
+            {
+              "spender": "0x5a705de8982235a7fa45bb83dcacf03a211389c7",
+              "amount": "0"
+            }
+          ]
+        }
+      ],
+      "strategies": [
+        {
+          "hash": "0xa18b65f38c500cd9af6723a64f877cd2be6130ebcb60f4b30bebab4f9b345e81",
+          "pair": "WETH / USDG",
+          "tokens": [
+            "0x0bd7d308f8e1639fab988df18a8011f41eacad73",
+            "0x5fc5360d0400a0fd4f2af552add042d716f1d168"
+          ],
+          "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "allocations": [
+            {
+              "token": "0x0bd7d308f8e1639fab988df18a8011f41eacad73",
+              "amount": "100000000000000",
+              "tokenCount": 2
+            },
+            {
+              "token": "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+              "amount": "245029",
+              "tokenCount": 2
+            }
+          ],
+          "ownership": "pre-existing; excluded from this workflow"
+        },
+        {
+          "hash": "0xbd152be633f9468bc128c607be68373597cc9264959086741cb045d299fffac7",
+          "pair": "WETH / PONS",
+          "tokens": [
+            "0x0bd7d308f8e1639fab988df18a8011f41eacad73",
+            "0x39dbed3a2bd333467115de45665cc57f813c4571"
+          ],
+          "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+          "allocations": [
+            {
+              "token": "0x0bd7d308f8e1639fab988df18a8011f41eacad73",
+              "amount": "100000000000000",
+              "tokenCount": 2
+            },
+            {
+              "token": "0x39dbed3a2bd333467115de45665cc57f813c4571",
+              "amount": "312037793191680307",
+              "tokenCount": 2
+            }
+          ],
+          "ownership": "pre-existing; excluded from this workflow"
+        }
+      ]
+    }
+  ]
+}
