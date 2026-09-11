@@ -22,7 +22,8 @@ test('real container transport isolates host files and environment and kills abo
     await sandbox.writeTextFile({ path: '/home/node/workspace/test.txt', content: 'one\ntwo\nthree' });
     assert.equal(await sandbox.readTextFile({ path: '/home/node/workspace/test.txt', startLine: 2, endLine: 2 }), 'two');
     assert.equal(await sandbox.readTextFile({ path: '/home/node/workspace/missing' }), null);
-    const restricted = sandbox.restricted();
+    const restrictedFactory = sandbox.restricted;
+    const restricted = restrictedFactory();
     assert.equal(restricted.destroy, undefined);
     const resumed = await createDockerSandbox({ identity: sandbox.identity });
     assert.equal(resumed.id, sandbox.id);

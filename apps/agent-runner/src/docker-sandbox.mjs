@@ -25,11 +25,26 @@ export async function createDockerSandbox(options = {}) {
       stopped = true;
     },
     spawn(options) { return spawnSandboxProcess(identity.instanceId, options); },
+    /** @returns {import('ai').Experimental_SandboxSession} */
+    restricted() {
+      return {
+        description: session.description,
+        spawn: session.spawn.bind(session),
+        run: session.run.bind(session),
+        readFile: session.readFile.bind(session),
+        readBinaryFile: session.readBinaryFile.bind(session),
+        readTextFile: session.readTextFile.bind(session),
+        writeFile: session.writeFile.bind(session),
+        writeBinaryFile: session.writeBinaryFile.bind(session),
+        writeTextFile: session.writeTextFile.bind(session),
+      };
+    },
     async run(options) {
       const proc = await this.spawn(options);
       const [stdout, stderr, { exitCode }] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text(), proc.wait()]);
       return { stdout, stderr, exitCode };
     },
+    /** @param {{ path: string, abortSignal?: AbortSignal }} options */
     async readBinaryFile({ path, abortSignal }) {
       const result = await this.run({ command: `node -e ${quote("const f=require('fs');try{process.stdout.write(f.readFileSync(process.argv[1]).toString('base64'))}catch(e){process.exit(e.code==='ENOENT'?2:3)}")} ${quote(path)}`, abortSignal });
       if (result.exitCode === 2) return null;
@@ -43,6 +58,7 @@ export async function createDockerSandbox(options = {}) {
       const text = new TextDecoder(options.encoding).decode(bytes);
       return options.startLine || options.endLine ? text.split('\n').slice((options.startLine ?? 1) - 1, options.endLine).join('\n') : text;
     },
+    /** @param {{ path: string, content: Uint8Array, abortSignal?: AbortSignal }} options */
     async writeBinaryFile({ path, content, abortSignal }) {
       const script = "const f=require('fs'),p=require('path');f.mkdirSync(p.dirname(process.argv[1]),{recursive:true});f.writeFileSync(process.argv[1],Buffer.from(process.argv[2],'base64'))";
       const result = await this.run({ command: `node -e ${quote(script)} ${quote(path)} ${quote(Buffer.from(content).toString('base64'))}`, abortSignal });
@@ -51,10 +67,6 @@ export async function createDockerSandbox(options = {}) {
     async writeTextFile(options) { await this.writeBinaryFile({ ...options, content: Buffer.from(options.content) }); },
     async writeFile(options) { await this.writeBinaryFile({ ...options, content: new Uint8Array(await new Response(options.content).arrayBuffer()) }); },
   };
-  session.restricted = () => Object.fromEntries([
-    'description', 'spawn', 'run', 'readFile', 'readBinaryFile', 'readTextFile',
-    'writeFile', 'writeBinaryFile', 'writeTextFile',
-  ].map(key => [key, typeof session[key] === 'function' ? session[key].bind(session) : session[key]]));
   return session;
 }
 function quote(value) { return `'${value.replaceAll("'", "'\\''")}'`; }

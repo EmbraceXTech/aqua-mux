@@ -41,6 +41,7 @@ export async function retireContainer(id) {
   }
 }
 
+/** @returns {Promise<import('ai').Experimental_SandboxProcess>} */
 export async function spawnSandboxProcess(id, { command, workingDirectory = '/home/node/workspace', env = {}, abortSignal }) {
   abortSignal?.throwIfAborted();
   const pidFile = `/tmp/spike-${randomUUID()}.pid`;
