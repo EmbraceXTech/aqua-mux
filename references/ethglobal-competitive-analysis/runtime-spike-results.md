@@ -73,6 +73,8 @@ The source resolved the value from the native subscription store after API-key e
 
 Each value below comes from a real model request, unless explicitly described as a container test.
 Timing measures one observed run and is not a latency benchmark or service-level promise.
+Turn timings begin after session creation and exclude container provisioning and dependency bootstrap.
+Timeout and cancellation timings measure host acknowledgment; confirmed container cleanup and fresh-container recovery happen afterward.
 
 | Check | Codex | Claude Code |
 | --- | --- | --- |
@@ -190,4 +192,6 @@ An awaited optional `onAcquiring` callback allows the service to persist resourc
 Factory calls reject API-key and Gateway environment overrides before environment stripping, including when imported outside the spike CLI.
 Synthetic evidence tests cover URL query credentials, environment-shaped values, unknown token formats, and direct stderr output.
 Cleanup failures remain explicit `unconfirmed` evidence and cause a failed exit.
-Independent re-review of the repair is required before integration acceptance.
+The [final independent review](runtime-final-quality-review.md), committed as `ef0458d`, accepted the private-prototype transport after 16 extracted-commit tests and twelve additional real Docker cases.
+A later service typing check required explicit sandbox method annotations and a directly declared restricted view; the service typecheck and real-container regressions pass with that boundary fix.
+Normal process `wait()` completion alone does not prove all detached descendants are gone; complete cleanup requires explicit handle kill, abort-driven container retirement, or container destruction.
