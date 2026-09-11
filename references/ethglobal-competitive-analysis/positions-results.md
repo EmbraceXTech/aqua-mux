@@ -55,6 +55,8 @@ It rejects duplicate baseline tokens, unbacked allocations, mismatched chains or
 Aqua logs alone cannot prove the absence of external token transfers.
 An independent complete transfer audit is therefore required before attribution is known; otherwise the caller must request explicit user-selected amounts.
 The baseline and audit must identify the same maker, chain, canonical baseline block and hash, and exact audited-through block and hash as the accounting snapshot.
+Transfer-audit evidence is trusted server input from an independent audit implementation.
+Authenticated routes must never promote client-supplied completeness assertions into this evidence.
 Realized profit, unrealized profit, fee decomposition, spread capture, and markout remain null.
 
 ## Validation
@@ -98,6 +100,7 @@ The coordinator assigned a separate code-quality reviewer, `ctx_d339c0f7239e`.
 The reviewer identified a retained-prefix reorg race, insufficient accounting provenance checks, and the need for reconciliation at an explicitly finalized cursor.
 The implementation now addresses these findings with focused regression tests.
 The initial focused implementation commit is `2f3704a`.
+Persistence, bounded history, provenance hardening, and live evidence are in `1ea39a2`.
 
 No real transaction was sent by this worker.
 The two-direction fill tests are ABI fixtures and do not replace the separately required credential-fixtured fork execution scenario.
