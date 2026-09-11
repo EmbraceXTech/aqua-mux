@@ -28,6 +28,7 @@ test("siblings share wallet reads and retain independent virtual upper bounds at
     }),
     [position, { ...position, id: "sibling" }],
     aqua,
+    { baselineBlock: { number: "9", hash: blockHash(9n) } },
   );
   assert.equal(reads, 2);
   assert.equal(result.health, "current");
@@ -146,8 +147,18 @@ test("inventory counts shared token once and refuses unexplained or unaudited wa
     rpc({ head: async () => 10n }),
     [position, { ...position, id: "sibling" }],
     aqua,
+    { baselineBlock: { number: "9", hash: blockHash(9n) } },
   );
   const baseline = {
+    chainId: 42161,
+    maker,
+    blockHash: blockHash(9n),
+    audit: {
+      chainId: 42161,
+      maker,
+      from: { number: "9", hash: blockHash(9n) },
+      through: { number: "10", hash: blockHash(10n) },
+    },
     blockNumber: "9",
     tokens: [{ token: tokenA, walletBalance: "100", allocated: "60" }],
     externalActivityCoverage: "complete" as const,
@@ -192,5 +203,160 @@ test("inventory counts shared token once and refuses unexplained or unaudited wa
       "g",
       changed,
     )[0].reasons.includes("unexplained_wallet_change"),
+  );
+});
+
+test("inventory refuses matching block numbers from a different fork or chain", async () => {
+  const state = await observeChain(
+    rpc({ head: async () => 12n }),
+    repository(),
+    config,
+  );
+  const reconciled = await reconcilePositions(
+    rpc({ head: async () => 10n }),
+    [position],
+    aqua,
+    { baselineBlock: { number: "9", hash: blockHash(9n) } },
+  );
+  const baseline = {
+    chainId: 42161,
+    maker,
+    blockHash: blockHash(9n),
+    audit: {
+      chainId: 42161,
+      maker,
+      from: { number: "9", hash: blockHash(9n) },
+      through: { number: "10", hash: blockHash(10n) },
+    },
+    blockNumber: "9",
+    tokens: [{ token: tokenA, walletBalance: "100", allocated: "60" }],
+    externalActivityCoverage: "complete" as const,
+  };
+  for (const snapshot of [
+    { ...reconciled, block: { number: "10", hash: blockHash(10n, 1) } },
+    { ...reconciled, chainId: 56 },
+  ]) {
+    assert.equal(
+      attributeGroupInventory(
+        state,
+        snapshot,
+        [position],
+        maker,
+        "g",
+        baseline,
+      )[0].attributableAmount,
+      null,
+    );
+  }
+  assert.equal(
+    attributeGroupInventory(state, reconciled, [position], maker, "g", {
+      ...baseline,
+      blockNumber: "11",
+    })[0].attributableAmount,
+    null,
+  );
+});
+
+test("accounting can reconcile the finalized cursor while submission reads stay at head", async () => {
+  const client = rpc({ head: async () => 12n });
+  const state = await observeChain(client, repository(), config);
+  const finalized = await reconcilePositions(client, [position], aqua, {
+    atBlock: state.indexedThrough!,
+    baselineBlock: { number: "9", hash: blockHash(9n) },
+  });
+  assert.equal(finalized.block?.number, "10");
+  assert.equal(
+    (await reconcilePositions(client, [position], aqua)).block?.number,
+    "12",
+  );
+  const baseline = {
+    chainId: 42161,
+    maker,
+    blockHash: blockHash(9n),
+    audit: {
+      chainId: 42161,
+      maker,
+      from: { number: "9", hash: blockHash(9n) },
+      through: { number: "10", hash: blockHash(10n) },
+    },
+    blockNumber: "9",
+    tokens: [{ token: tokenA, walletBalance: "100", allocated: "60" }],
+    externalActivityCoverage: "complete" as const,
+  };
+  assert.equal(
+    attributeGroupInventory(
+      state,
+      finalized,
+      [position],
+      maker,
+      "g",
+      baseline,
+    )[0].attributableAmount,
+    "60",
+  );
+  const orphan = await reconcilePositions(client, [position], aqua, {
+    atBlock: { number: "10", hash: blockHash(10n, 1) },
+  });
+  assert.equal(orphan.health, "unavailable");
+  assert.equal(orphan.block, null);
+});
+
+test("baseline and transfer audit must cover the same maker, chain and canonical interval", async () => {
+  const client = rpc({ head: async () => 12n });
+  const state = await observeChain(client, repository(), config);
+  const from = { number: "9", hash: blockHash(9n) };
+  const through = state.indexedThrough!;
+  const snapshot = await reconcilePositions(client, [position], aqua, {
+    atBlock: through,
+    baselineBlock: from,
+  });
+  const baseline = {
+    chainId: 42161,
+    maker,
+    blockNumber: "9",
+    blockHash: from.hash,
+    tokens: [{ token: tokenA, walletBalance: "100", allocated: "60" }],
+    externalActivityCoverage: "complete" as const,
+    audit: { chainId: 42161, maker, from, through },
+  };
+  assert.equal(
+    attributeGroupInventory(
+      state,
+      snapshot,
+      [position],
+      maker,
+      "g",
+      baseline,
+    )[0].attributableAmount,
+    "60",
+  );
+  for (const invalid of [
+    { ...baseline, chainId: 56 },
+    { ...baseline, maker: aqua },
+    { ...baseline, blockHash: blockHash(9n, 1) },
+    { ...baseline, audit: undefined },
+    { ...baseline, audit: { ...baseline.audit, through: from } },
+    { ...baseline, audit: { ...baseline.audit, maker: aqua } },
+  ]) {
+    assert.equal(
+      attributeGroupInventory(
+        state,
+        snapshot,
+        [position],
+        maker,
+        "g",
+        invalid,
+      )[0].attributableAmount,
+      null,
+    );
+  }
+  assert.equal(
+    (
+      await reconcilePositions(client, [position], aqua, {
+        atBlock: through,
+        baselineBlock: { number: "9", hash: blockHash(9n, 1) },
+      })
+    ).health,
+    "unavailable",
   );
 });

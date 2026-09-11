@@ -1,10 +1,19 @@
-import type { Address } from "viem";
+import type { Address, Hex } from "viem";
 import { matchesPosition, movementDelta } from "./history";
 import type { ChainObservation, PositionRef } from "./types";
 import type { Reconciliation } from "./reconcile";
 
 export type InventoryBaseline = {
+  chainId: number;
+  maker: Address;
   blockNumber: string;
+  blockHash: Hex;
+  audit?: {
+    chainId: number;
+    maker: Address;
+    from: { number: string; hash: Hex };
+    through: { number: string; hash: Hex };
+  };
   tokens: { token: Address; walletBalance: string; allocated: string }[];
   /** Must come from an independent complete transfer audit, never inferred from Aqua logs. */
   externalActivityCoverage: "complete" | "unknown";
@@ -52,13 +61,35 @@ export function attributeGroupInventory(
     if (
       !observation ||
       observation.health !== "current" ||
+      observation.config.chainId !== chainId ||
+      reconciliation.chainId !== chainId ||
       !through ||
       BigInt(observation.config.startBlock) >
         BigInt(baseline.blockNumber) + 1n ||
       !reconciliation.block ||
-      through !== reconciliation.block.number
+      through !== reconciliation.block.number ||
+      observation.indexedThrough?.hash !== reconciliation.block.hash ||
+      BigInt(baseline.blockNumber) > BigInt(through)
     )
       reasons.push("incomplete_observation");
+    if (
+      baseline.chainId !== chainId ||
+      baseline.maker.toLowerCase() !== maker ||
+      reconciliation.baselineBlock?.number !== baseline.blockNumber ||
+      reconciliation.baselineBlock?.hash !== baseline.blockHash
+    )
+      reasons.push("baseline_provenance_unknown");
+    const audit = baseline.audit;
+    if (
+      !audit ||
+      audit.chainId !== chainId ||
+      audit.maker.toLowerCase() !== maker ||
+      audit.from.number !== baseline.blockNumber ||
+      audit.from.hash !== baseline.blockHash ||
+      audit.through.number !== through ||
+      audit.through.hash !== observation?.indexedThrough?.hash
+    )
+      reasons.push("transfer_audit_provenance_unknown");
     if (baseline.externalActivityCoverage !== "complete")
       reasons.push("external_activity_unknown");
     if (

@@ -52,7 +52,7 @@ export function shipped(number = 10n, fork = 0): Log {
     transactionIndex: 0,
     logIndex: 0,
     removed: false,
-    topics: encodeEventTopics({ abi: ABI.AQUA_ABI, eventName: "Shipped" }),
+    topics: [encodeEventTopics({ abi: ABI.AQUA_ABI, eventName: "Shipped" })[0]],
     data: encodeAbiParameters(event.inputs, [maker, app, hash, "0x1234"]),
   };
 }

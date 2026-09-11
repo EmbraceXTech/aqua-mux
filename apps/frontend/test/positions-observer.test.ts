@@ -114,14 +114,14 @@ test("movement and fill history retain separate facts without double-counting or
     {
       ...shipped(),
       logIndex: 1,
-      topics: encodeEventTopics({ abi, eventName: "Pushed" }),
+      topics: [encodeEventTopics({ abi, eventName: "Pushed" })[0]],
       data: encodeAbiParameters(abi[0].inputs, [maker, app, hash, tokenA, 20n]),
     },
     {
       ...shipped(),
       address: app,
       logIndex: 2,
-      topics: encodeEventTopics({ abi, eventName: "Swapped" }),
+      topics: [encodeEventTopics({ abi, eventName: "Swapped" })[0]],
       data: encodeAbiParameters(abi[1].inputs, [
         hash,
         maker,
@@ -149,4 +149,139 @@ test("movement and fill history retain separate facts without double-counting or
     0,
   );
   assert.equal(getPositionHistory(null, [position], maker, "g").coverage, null);
+});
+
+test("reorg after retained-prefix check cannot commit a mixed-chain chunk", async () => {
+  const store = repository();
+  await observeChain(rpc({ logs: async () => [shipped()] }), store, config);
+  let prefixReads = 0;
+  const next = await observeChain(
+    rpc({
+      block: async (number) => ({
+        hash: blockHash(
+          number,
+          number === 19n ? (prefixReads++ === 0 ? 0 : 1) : 1,
+        ),
+      }),
+    }),
+    store,
+    config,
+  );
+  assert.equal(next.health, "unavailable");
+  assert.equal(next.indexedThrough?.number, "19");
+  assert.equal(next.events.length, 1);
+});
+
+test("both fill directions and docking retain exact Aqua movements", async () => {
+  const abi = parseAbi([
+    "event Pushed(address maker,address app,bytes32 strategyHash,address token,uint256 amount)",
+    "event Pulled(address maker,address app,bytes32 strategyHash,address token,uint256 amount)",
+    "event Docked(address maker,address app,bytes32 strategyHash)",
+    "event Swapped(bytes32 orderHash,address maker,address taker,address tokenIn,address tokenOut,uint256 amountIn,uint256 amountOut)",
+  ]);
+  const eventLog = (
+    index: number,
+    name: "Pushed" | "Pulled" | "Docked" | "Swapped",
+    data: Log["data"],
+  ): Log => ({
+    ...shipped(),
+    logIndex: index,
+    address: name === "Swapped" ? app : aqua,
+    topics: [encodeEventTopics({ abi, eventName: name })[0]],
+    data,
+  });
+  const logs = [
+    shipped(),
+    eventLog(
+      1,
+      "Pushed",
+      encodeAbiParameters(abi[0].inputs, [maker, app, hash, tokenA, 20n]),
+    ),
+    eventLog(
+      2,
+      "Pulled",
+      encodeAbiParameters(abi[1].inputs, [maker, app, hash, tokenB, 10n]),
+    ),
+    eventLog(
+      3,
+      "Swapped",
+      encodeAbiParameters(abi[3].inputs, [
+        hash,
+        maker,
+        aqua,
+        tokenA,
+        tokenB,
+        20n,
+        10n,
+      ]),
+    ),
+    eventLog(
+      4,
+      "Pushed",
+      encodeAbiParameters(abi[0].inputs, [maker, app, hash, tokenB, 5n]),
+    ),
+    eventLog(
+      5,
+      "Pulled",
+      encodeAbiParameters(abi[1].inputs, [maker, app, hash, tokenA, 8n]),
+    ),
+    eventLog(
+      6,
+      "Swapped",
+      encodeAbiParameters(abi[3].inputs, [
+        hash,
+        maker,
+        aqua,
+        tokenB,
+        tokenA,
+        5n,
+        8n,
+      ]),
+    ),
+    eventLog(
+      7,
+      "Docked",
+      encodeAbiParameters(abi[2].inputs, [maker, app, hash]),
+    ),
+  ];
+  const state = await observeChain(
+    rpc({ head: async () => 12n, logs: async () => logs }),
+    repository(),
+    config,
+  );
+  const history = getPositionHistory(state, [position], maker, "g");
+  assert.equal(history.positions[0].registration?.state, "docked");
+  assert.equal(history.positions[0].observedFills, 2);
+  const deltas = history.activity.flatMap((item) =>
+    item.delta ? [item.delta] : [],
+  );
+  assert.equal(
+    deltas
+      .filter((item) => item.token === tokenA)
+      .reduce((sum, item) => sum + BigInt(item.amount), 0n),
+    12n,
+  );
+  assert.equal(
+    deltas
+      .filter((item) => item.token === tokenB)
+      .reduce((sum, item) => sum + BigInt(item.amount), 0n),
+    -5n,
+  );
+});
+
+test("local history capacity refuses excess events without claiming complete coverage", async () => {
+  const store = repository();
+  const log = shipped();
+  const limited = await observeChain(
+    rpc({
+      logs: async () =>
+        Array.from({ length: 10_001 }, (_, logIndex) => ({ ...log, logIndex })),
+    }),
+    store,
+    config,
+  );
+  assert.equal(limited.health, "limited");
+  assert.equal(limited.error, "history_limit");
+  assert.equal(limited.indexedThrough, null);
+  assert.equal(limited.events.length, 0);
 });

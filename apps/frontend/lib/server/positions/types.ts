@@ -34,9 +34,9 @@ export type ChainObservation = {
   config: ChainObservationConfig;
   indexedThrough: { number: string; hash: Hex } | null;
   targetBlock: string | null;
-  health: "unknown" | "backfilling" | "current" | "unavailable";
+  health: "unknown" | "backfilling" | "current" | "unavailable" | "limited";
   checkedAt: string;
-  error: "rpc_unavailable" | "chain_changed" | null;
+  error: "rpc_unavailable" | "chain_changed" | "history_limit" | null;
   events: ObservedEvent[];
 };
 export type PositionRef = {

@@ -1,3 +1,4 @@
+import { canonicalJson } from "../../managed";
 import { decodePositionLog } from "./decode";
 import type {
   ChainObservation,
@@ -5,6 +6,10 @@ import type {
   ObservationRepository,
   PositionRpc,
 } from "./types";
+
+export const MAX_OBSERVATION_EVENTS = 10_000;
+export const MAX_OBSERVATION_BYTES = 4 * 1024 * 1024;
+class HistoryLimitError extends Error {}
 
 export function observationKey(config: ChainObservationConfig) {
   return `${config.chainId}:${config.aqua.toLowerCase()}:${config.swapVm.toLowerCase()}`;
@@ -42,7 +47,7 @@ export async function observeChain(
   }
   const key = observationKey(config);
   const stored = repository.read(key);
-  if (stored && JSON.stringify(stored.value.config) !== JSON.stringify(config))
+  if (stored && canonicalJson(stored.value.config) !== canonicalJson(config))
     throw new Error("Observer configuration changed; explicit reset required.");
   let state = stored ? structuredClone(stored.value) : initial(config);
   state.checkedAt = new Date().toISOString();
@@ -78,6 +83,7 @@ export async function observeChain(
           : target;
       const anchor = await rpc.block(to);
       const logs = await rpc.logs([config.aqua, config.swapVm], from, to);
+      if (logs.length > MAX_OBSERVATION_EVENTS) throw new HistoryLimitError();
       const unique = new Map(state.events.map((event) => [event.id, event]));
       const hashes = new Map<string, string>([[to.toString(), anchor.hash]]);
       for (const log of logs) {
@@ -97,10 +103,24 @@ export async function observeChain(
         if (hashes.get(event.blockNumber) !== event.blockHash)
           throw new Error("Log block changed.");
         unique.set(event.id, event);
+        if (unique.size > MAX_OBSERVATION_EVENTS) throw new HistoryLimitError();
       }
       if ((await rpc.block(to)).hash !== anchor.hash)
         throw new Error("Chain changed while indexing.");
-      state.events = [...unique.values()].sort((a, b) =>
+      if (
+        state.indexedThrough &&
+        (await rpc.block(BigInt(state.indexedThrough.number))).hash !==
+          state.indexedThrough.hash
+      ) {
+        throw new Error("Retained history changed while indexing.");
+      }
+      const events = [...unique.values()];
+      if (
+        Buffer.byteLength(JSON.stringify(events), "utf8") >
+        MAX_OBSERVATION_BYTES
+      )
+        throw new HistoryLimitError();
+      state.events = events.sort((a, b) =>
         BigInt(a.blockNumber) < BigInt(b.blockNumber)
           ? -1
           : BigInt(a.blockNumber) > BigInt(b.blockNumber)
@@ -112,9 +132,11 @@ export async function observeChain(
       state.health = to === target ? "current" : "backfilling";
       state.error = null;
     }
-  } catch {
-    state.health = "unavailable";
-    state.error = "rpc_unavailable";
+  } catch (error) {
+    state.health =
+      error instanceof HistoryLimitError ? "limited" : "unavailable";
+    state.error =
+      error instanceof HistoryLimitError ? "history_limit" : "rpc_unavailable";
   }
   repository.write(key, stored?.revision ?? null, state);
   return state;

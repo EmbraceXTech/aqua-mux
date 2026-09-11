@@ -15,6 +15,8 @@ export type ReconciledPosition = {
   backing: TokenBacking[];
 };
 export type Reconciliation = {
+  chainId: number | null;
+  baselineBlock: { number: string; hash: Hex } | null;
   block: { number: string; hash: Hex } | null;
   checkedAt: string;
   health: "current" | "partial" | "unavailable";
@@ -33,13 +35,19 @@ const unknown = (position: PositionRef): ReconciledPosition => ({
   })),
 });
 
-/** Fresh, block-pinned reads for preview, submission checks and reload recovery. */
+/** Defaults to fresh head reads. atBlock is only for accounting against a canonical observer cursor. */
 export async function reconcilePositions(
   rpc: PositionRpc,
   positions: PositionRef[],
   aqua: Address,
+  options: {
+    atBlock?: { number: string; hash: Hex };
+    baselineBlock?: { number: string; hash: Hex };
+  } = {},
 ): Promise<Reconciliation> {
   const result: Reconciliation = {
+    chainId: null,
+    baselineBlock: null,
     block: null,
     checkedAt: new Date().toISOString(),
     health: "unavailable",
@@ -49,8 +57,22 @@ export async function reconcilePositions(
     const chainId = await rpc.chainId();
     if (positions.some((position) => position.chainId !== chainId))
       throw new Error("Mixed or incorrect reconciliation chain.");
-    const number = await rpc.head();
+    const head = await rpc.head();
+    const number = options.atBlock ? BigInt(options.atBlock.number) : head;
+    if (number < 0n || number > head)
+      throw new Error("Invalid reconciliation block.");
     const anchor = await rpc.block(number);
+    if (options.atBlock && anchor.hash !== options.atBlock.hash)
+      throw new Error("Requested reconciliation block is no longer canonical.");
+    if (options.baselineBlock) {
+      const baselineNumber = BigInt(options.baselineBlock.number);
+      if (
+        baselineNumber < 0n ||
+        baselineNumber > number ||
+        (await rpc.block(baselineNumber)).hash !== options.baselineBlock.hash
+      )
+        throw new Error("Invalid or noncanonical baseline block.");
+    }
     const wallets = new Map<
       string,
       Promise<readonly [string | null, string | null]>
@@ -126,6 +148,14 @@ export async function reconcilePositions(
     );
     if ((await rpc.block(number)).hash !== anchor.hash)
       throw new Error("Reconciliation block changed.");
+    if (
+      options.baselineBlock &&
+      (await rpc.block(BigInt(options.baselineBlock.number))).hash !==
+        options.baselineBlock.hash
+    )
+      throw new Error("Baseline block changed during reconciliation.");
+    result.baselineBlock = options.baselineBlock ?? null;
+    result.chainId = chainId;
     result.block = { number: number.toString(), hash: anchor.hash };
     result.health = partial ? "partial" : "current";
   } catch {
