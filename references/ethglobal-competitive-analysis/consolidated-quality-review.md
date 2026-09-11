@@ -146,3 +146,43 @@ The coordinator relayed updated user rules during this checkpoint.
 Do not add or expand unit-test files, and use Orca's embedded browser commands for browser validation.
 Existing unit tests may remain regression evidence, while new behavioral evidence must use the allowed end-to-end interfaces.
 This reviewer has edited no implementation or unit-test files and has run no Playwright browser suite during this task.
+
+## Shared authentication UI accepted
+
+Commit `7e8c60b84aa377aea0a21d38e85aafa43be44194` is accepted for its shared session, authenticated legacy requests and managed navigation scope.
+The reviewer used an isolated archive on port 33347 with a separate SQLite database and an authentication-only controlled provider on port 33348.
+The actual challenge and signature-verification endpoints returned success.
+The provider held a newly generated test key, exposed no private key and refused transaction methods.
+Quote and plan responses were explicitly labelled transport fixtures that recorded only whether an Authorization header was present.
+
+Orca page `b9bb90f7-f69e-40c6-9cba-c2b71a06f5e1` demonstrated authenticated quote and liquidity-plan requests, successful Strategies rendering without the previous wallet.session crash, and no additional quote request while the managed workspace remained open.
+A controlled 401 response then cleared session storage and restored the Connect wallet interface.
+The two invoked provider methods were eth_requestAccounts and personal_sign.
+No transaction was signed or sent.
+The reviewer inspected the retained liquidity screenshot and observed no horizontal overflow in the desktop journey.
+Screenshots, snapshot and sanitized transport evidence are retained at `/tmp/aquamux-review-7e8c60b-evidence/`, with the liquidity image at `/tmp/aquamux-review-7e8c60b-liquidity.png`.
+The isolated servers were stopped after capture.
+
+Scoped ESLint passes for the changed components, session hook, quote hook and catalog resolver.
+The small resolver separates token lookup from rendering, and the quote hook owns debounce, abort and result identity.
+The component now receives the shared wallet object explicitly.
+No additional module split is required for these changes.
+The account and chain event guards were inspected in source; this browser journey did not independently test provider events because the controlled provider was installed after page mount.
+
+Turbopack rejected the linked dependency directory in the isolated archive, so the reviewer used the existing Next webpack development option without changing source.
+The first authentication attempt correctly rejected an unconfigured origin; restarting the isolated server with AQUAMUX_AUTH_ORIGIN set to its actual port resolved that test setup error.
+An Orca browser command briefly reported a closed runtime connection, then subsequent snapshots and actions succeeded with the same page identity.
+These setup events are not product failures or evidence of wallet incompatibility.
+The accepted UI scope does not close the separately recorded committed range-fixture errors, runner contract mismatch or external execution gates.
+
+## External adapter review started
+
+The chain owner delivered `d95f89361e9b229cca193777345562896e1fafb6` with 23 owned files.
+The code separates account provenance, preflight, signature verification, relay, transaction proof and provider interaction.
+The proposed adapter now requires eth_signTransaction without broadcasting, with backend relay after renewed checks.
+No wallet brand compatibility is claimed by the owner.
+The new exact root trace and transaction prestate checks must replace the old envelope-only shortcut in application reconciliation.
+The current fork scenario verifies the proof helper, then marks the attempt confirmed and releases its lock directly.
+It therefore does not independently establish production reconciliation or HTTP recovery behavior.
+Those remain explicit app integration gates.
+An uncommitted management-rules import is a required dependency of the delivered chain milestone; execution verification awaits its exact commit rather than importing a changing shared file.
