@@ -71,7 +71,8 @@ The provider signing helper is under `lib/external-adapter/` and does not import
 The managed-service capability, execution authorization and transaction-proof modules expose the integration boundary.
 Lifecycle snapshot and development signer asset checks carry deployment evidence.
 
-Independent code-quality review of this external adapter milestone is required before acceptance.
+Independent review accepted backend commits `d95f893`, `fd68e4a`, `41ae2f7` and the additional bridged-USDC route commit `e123941`.
+The full lifecycle evidence below is a subsequent focused deliverable for independent review.
 The application owner must complete authenticated HTTP and Orca browser wiring, including unsupported-provider messaging and unknown-attempt recovery.
 No real wallet brand has passed this adapter yet.
 Robinhood direct-pool funding now passes with WETH/USDG and WETH/PONS and zero residual token balances; its unknown aggregation router remains unapproved.
@@ -94,3 +95,32 @@ Unavailable external RPC or verification now returns the named `external_preflig
 Existing precise account, policy and expiry errors remain intact.
 The fork flow temporarily points only its process-local endpoint to a closed loopback port and verifies the named refusal and zero journal entries before continuing.
 No upstream error text, credential, signed transaction or real private key is included in this evidence.
+
+
+## Complete controlled-fork lifecycle
+
+The expanded verifier runs four scenarios: Arbitrum native USDC with USDT, BNB USDC with USDT, Robinhood USDG with PONS, and Arbitrum bridged USDC.e with USDT.
+Each scenario starts with synthetic native funding, compiles and confirms two positions, and executes through the named external signing adapter.
+The production `reconcileManagedTransactions` function now settles each submitted or unknown attempt, verifies execution proof, persists active and docked strategy records, updates the group and releases the execution lock.
+The verifier no longer finalizes transaction attempts manually.
+It injects an isolated in-memory store only within the verification process and restores the previous store reference afterward.
+
+After entry, a second synthetic account fills the first strategy in both directions through the actual deployed SwapVM and real token contracts.
+The uncredentialed origin is first refused.
+Only the resolver credential contract is temporarily replaced with an explicit local fixture returning a positive balance, then restored after the fills.
+No production credential check or strategy program is removed.
+The reverse fill reduces the maker's real base balance shared with the sibling pair.
+The artifact records both fill hashes and the exact base balances before and after that outflow.
+This proves execution under a credential fixture, not public resolver discovery or production access eligibility.
+
+A fresh replacement uses the observed post-fill inventory and recomputed pair prices.
+An intentionally invalid last call first forces the replacement batch to revert on the fork.
+The verifier reads old and proposed registrations, virtual balances and real token balances before and after the failed batch and requires exact equality.
+The valid replacement then executes through the production external adapter and receipt reconciliation docks the old strategy records.
+A final signed close-and-convert retires the replacements and leaves the group closed with every strategy record docked.
+Robinhood again leaves zero WETH, USDG and PONS; the other scenarios retain explicitly reported conservative wrapped-native surplus.
+
+Verification concerns are split into focused scenario configuration, external signing and reconciliation, local signer, resolver fill, rollback and altered-call helpers under `scripts/fixtures/`.
+The main script orchestrates the four scenarios and writes the evidence artifact.
+No public transaction, actual wallet extension or real resolver credential was used.
+Privy automation, market making and Hedera payments remain outside this Phase 1 execution deliverable.

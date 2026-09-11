@@ -1,5 +1,8 @@
+import { createExternalConfig } from "./fixtures/external-config";
+import { createExternalExecution } from "./fixtures/external-execution";
+import { verifyReplacementRollback } from "./fixtures/lifecycle-rollback";
+import { verifyResolverFills } from "./fixtures/resolver-fills";
 import { verifyDevSignerExecution } from "./fixtures/dev-signer-execution";
-import { rejectAlteredSignedPlans } from "./fixtures/external-adversarial";
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { erc20Abi, parseEther, toHex, type Address } from "viem";
@@ -11,31 +14,20 @@ import {
   tokens,
   wrapped,
 } from "../lib/config";
-import {
-  planDigest,
-  type LPStrategyConfig,
-  type BotRun,
-  type Token,
-} from "../lib/managed";
+import { planDigest, type BotRun, type Token } from "../lib/managed";
 import {
   buildLifecyclePlanWithRoutes,
   digest,
   type LifecycleRequest,
 } from "../lib/server/lifecycle";
-import { routePolicyTargets } from "../lib/server/route-policy/route-calls";
 import { quoteLifecycleRoute } from "../lib/server/lifecycle/routes";
 import { readLifecycleSnapshot } from "../lib/server/lifecycle/snapshot";
 import { simulateLifecyclePlan } from "../lib/server/dev-wallet/simulation";
 import { ManagedStore } from "../lib/server/store";
 import { confirmManagedPlan } from "../lib/server/managed-service/execution";
-import {
-  prepareExternalExecution,
-  relayExternalExecution,
-} from "../lib/server/external-adapter/execution";
+import { prepareExternalExecution } from "../lib/server/external-adapter/execution";
 import { encodeDevBatch } from "../lib/server/dev-wallet/batch";
 import { delegatedAccountCode } from "../lib/server/external-adapter/account";
-import { verifyManagedTransactionProof } from "../lib/server/managed-service/transaction-proof";
-import { signExternalTransaction } from "../lib/external-adapter/sign";
 
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
 const results: unknown[] = [];
@@ -51,6 +43,11 @@ for (const { chainId, bridged } of scenarios) {
   const fork = await controlledFork(chainId, upstream);
   process.env[setting.env] = fork.url;
   const store = new ManagedStore(":memory:");
+  const storeGlobal = globalThis as typeof globalThis & {
+    aquamuxManagedStore?: ManagedStore;
+  };
+  const previousStore = storeGlobal.aquamuxManagedStore;
+  storeGlobal.aquamuxManagedStore = store;
   try {
     const maker = fork.account.address.toLowerCase() as Address;
     await fork.request("anvil_setBalance", [maker, toHex(parseEther("2"))]);
@@ -108,62 +105,14 @@ for (const { chainId, bridged } of scenarios) {
           slippageBps: 100,
         }),
       );
-    const broker = <T>(value: T) => ({
-      value,
-      enforcedBy: "execution-broker" as const,
-    });
-    const config: LPStrategyConfig = {
-      version: 1,
-      family: "lp",
-      recipeId: "wide-range-lp",
-      recipeVersion: 1,
+    const config = createExternalConfig({
       chainId,
       maker,
-      pairs: quotes.map((quote, index) => ({
-        baseToken: base,
-        quoteToken: quote,
-        baseAmount: amountIn,
-        quoteAmount: initial[index].minimumAmountOut,
-        feeBps: 5,
-        openingPrice: {
-          baseToken: base.address,
-          quoteToken: quote.address,
-          numerator: String(
-            BigInt(initial[index].minimumAmountOut) * 10n ** 18n,
-          ),
-          denominator: String(BigInt(amountIn) * 10n ** BigInt(quote.decimals)),
-        },
-        range: { kind: "full" },
-      })),
-      policy: {
-        id: "fork-policy",
-        version: 1,
-        intervalMs: broker(60000),
-        cooldownMs: broker(0),
-        maxActions: broker(10),
-        spendBudgets: broker([]),
-        gasBudgetWei: broker(parseEther("0.1").toString()),
-        allowedAssets: broker([
-          NATIVE,
-          base.address,
-          ...quotes.map((t) => t.address),
-        ]),
-        allowedRoutes: broker(routePolicyTargets(chainId)),
-        maxSlippageBps: broker(100),
-        maxReferenceAgeMs: broker(30000),
-        expiresAt: broker(Date.now() + 3600000),
-        allowedActions: broker([
-          "fund-and-open",
-          "close",
-          "propose-conversion",
-        ]),
-        triggers: broker({
-          rangeExit: false,
-          inventoryDriftBps: 500,
-          upwardOnly: false,
-        }),
-      },
-    };
+      base,
+      quotes,
+      amountIn,
+      initial,
+    });
     const groupId = `external-fork-${chainId}`;
     store.put(
       "group",
@@ -226,6 +175,7 @@ for (const { chainId, bridged } of scenarios) {
     const opened = await buildLifecyclePlanWithRoutes(request, deps);
     const save = (bundle: typeof opened) => {
       store.put("plan", bundle.plan, maker);
+      store.putDocument("plan-configuration", bundle.plan.id, maker, config);
       store.putDocument("plan-context", bundle.plan.id, maker, {
         requiresLease: false,
         sessionId: null,
@@ -271,157 +221,15 @@ for (const { chainId, bridged } of scenarios) {
     assert.equal(store.list("transaction", maker, groupId).length, 0);
     process.env[setting.env] = fork.url;
     await fork.request("anvil_setCode", [maker, delegatedAccountCode]);
-    const methods: string[] = [];
-    const provider = {
-      request: async ({
-        method,
-        params,
-      }: {
-        method: string;
-        params?: unknown[];
-      }) => {
-        methods.push(method);
-        if (method === "eth_accounts") return [maker];
-        if (method === "eth_chainId") return toHex(chainId);
-        assert.equal(method, "eth_signTransaction");
-        const t = params![0] as Awaited<
-          ReturnType<typeof prepareExternalExecution>
-        >["transaction"];
-        return fork.account.signTransaction({
-          type: "eip1559",
-          chainId,
-          to: t.to,
-          data: t.data,
-          value: BigInt(t.value),
-          nonce: Number(BigInt(t.nonce)),
-          gas: BigInt(t.gas),
-          maxFeePerGas: BigInt(t.maxFeePerGas),
-          maxPriorityFeePerGas: BigInt(t.maxPriorityFeePerGas),
-        });
-      },
-    };
-    const execute = async (planId: string, ambiguous = false) => {
-      const plan = store.get("plan", planId, maker)!;
-      const prepared = await prepareExternalExecution(
-        { ...input, planId, idempotencyKey: planId },
-        store,
-      );
-      const signed = await signExternalTransaction(
-        provider,
-        prepared.transaction,
-        plan.expiresAt,
-        () => {},
-      );
-      await rejectAlteredSignedPlans(
-        plan,
-        (data) =>
-          fork.account.signTransaction({
-            type: "eip1559",
-            chainId,
-            to: maker,
-            data,
-            value: 0n,
-            nonce: Number(BigInt(prepared.transaction.nonce)),
-            gas: BigInt(prepared.transaction.gas),
-            maxFeePerGas: BigInt(prepared.transaction.maxFeePerGas),
-            maxPriorityFeePerGas: BigInt(
-              prepared.transaction.maxPriorityFeePerGas,
-            ),
-          }),
-        (serializedTransaction) =>
-          relayExternalExecution(
-            {
-              owner: maker,
-              groupId,
-              planId,
-              attemptId: prepared.attempt.id,
-              serializedTransaction,
-            },
-            store,
-          ),
-      );
-      assert.equal(
-        store.get("transaction", prepared.attempt.id, maker)!.transactionHash,
-        null,
-      );
-      const originalPlan = store.get("plan", planId, maker)!;
-      store.put(
-        "plan",
-        {
-          ...originalPlan,
-          createdAt: Date.now() - 60000,
-          expiresAt: Date.now() - 1,
-        },
-        maker,
-      );
-      await assert.rejects(
-        relayExternalExecution(
-          {
-            owner: maker,
-            groupId,
-            planId,
-            attemptId: prepared.attempt.id,
-            serializedTransaction: signed,
-          },
-          store,
-        ),
-        /expired/,
-      );
-      assert.equal(
-        store.get("transaction", prepared.attempt.id, maker)!.transactionHash,
-        null,
-      );
-      store.put("plan", originalPlan, maker);
-      const attempt = await relayExternalExecution(
-        {
-          owner: maker,
-          groupId,
-          planId,
-          attemptId: prepared.attempt.id,
-          serializedTransaction: signed,
-        },
-        store,
-        ambiguous
-          ? {
-              ...fork.rpc,
-              sendRawTransaction: async (args) => {
-                await fork.rpc.sendRawTransaction(args);
-                throw new Error(
-                  "Controlled transport lost response after submission",
-                );
-              },
-            }
-          : undefined,
-      );
-      assert.equal(attempt.status, ambiguous ? "unknown" : "submitted");
-      const receipt = await fork.rpc.waitForTransactionReceipt({
-        hash: attempt.transactionHash!,
-      });
-      assert.equal(receipt.status, "success");
-      const tx = await fork.rpc.getTransaction({
-        hash: receipt.transactionHash,
-      });
-      assert.equal(
-        await verifyManagedTransactionProof(fork.rpc, tx, plan),
-        true,
-      );
-      store.releaseExecutionLock(
-        store.getDocument<{
-          lockToken: Parameters<typeof store.releaseExecutionLock>[0];
-        }>("external-attempt", attempt.id, maker)!.data.lockToken,
-      );
-      store.put(
-        "transaction",
-        {
-          ...attempt,
-          status: "confirmed",
-          receipt: { blockNumber: receipt.blockNumber.toString() },
-        },
-        maker,
-      );
-      return receipt;
-    };
+    const { execute, methods } = createExternalExecution(fork, store, input);
     const openReceipt = await execute(opened.plan.id);
+    const fills = await verifyResolverFills(
+      fork,
+      opened.plan,
+      base,
+      quotes[0],
+      BigInt(amountIn) / 20n,
+    );
     const balances = [];
     for (const token of [base, ...quotes])
       balances.push({
@@ -435,6 +243,57 @@ for (const { chainId, bridged } of scenarios) {
           }),
         ),
       });
+    for (const pair of config.pairs) {
+      pair.baseAmount = balances.find(
+        (balance) => balance.token.address === base.address,
+      )!.amount;
+      pair.quoteAmount = balances.find(
+        (balance) => balance.token.address === pair.quoteToken.address,
+      )!.amount;
+      pair.openingPrice.numerator = String(
+        BigInt(pair.quoteAmount) * 10n ** BigInt(base.decimals),
+      );
+      pair.openingPrice.denominator = String(
+        BigInt(pair.baseAmount) * 10n ** BigInt(pair.quoteToken.decimals),
+      );
+    }
+    store.put(
+      "group",
+      { ...store.get("group", groupId, maker)!, config },
+      maker,
+    );
+    const replaced = await buildLifecyclePlanWithRoutes(
+      {
+        ...request,
+        id: `replace-${chainId}`,
+        config,
+        kind: "replace",
+        funding: undefined,
+        inventory: balances,
+        previous: opened.plan.registrations.map(({ hash, app, tokens }) => ({
+          hash,
+          app,
+          tokens,
+        })),
+        expiresAt: Date.now() + 120000,
+      },
+      deps,
+    );
+    const replacementRollback = await verifyReplacementRollback(
+      fork,
+      opened.plan,
+      replaced.plan,
+      [base, ...quotes],
+    );
+    save(replaced);
+    const replacementReceipt = await execute(replaced.plan.id);
+    for (const old of opened.plan.registrations)
+      assert.equal(
+        store
+          .list("strategy", maker, groupId)
+          .find((strategy) => strategy.hash === old.hash)?.state,
+        "docked",
+      );
     const closed = await buildLifecyclePlanWithRoutes(
       {
         ...request,
@@ -442,7 +301,7 @@ for (const { chainId, bridged } of scenarios) {
         kind: "close-and-convert",
         funding: undefined,
         inventory: balances,
-        previous: opened.plan.registrations.map(({ hash, app, tokens }) => ({
+        previous: replaced.plan.registrations.map(({ hash, app, tokens }) => ({
           hash,
           app,
           tokens,
@@ -506,7 +365,13 @@ for (const { chainId, bridged } of scenarios) {
       });
     assert.equal(
       methods.filter((method) => method === "eth_signTransaction").length,
-      2,
+      3,
+    );
+    assert.equal(store.get("group", groupId, maker)!.state, "closed");
+    assert.ok(
+      store
+        .list("strategy", maker, groupId)
+        .every((strategy) => strategy.state === "docked"),
     );
     results.push({
       chainId,
@@ -517,6 +382,10 @@ for (const { chainId, bridged } of scenarios) {
       localSigner,
       unavailableRpcRefusedBeforeJournaling: true,
       openHash: openReceipt.transactionHash,
+      fills,
+      replacementHash: replacementReceipt.transactionHash,
+      replacementRollback,
+      productionReceiptReconciliation: true,
       closeHash: closeReceipt.transactionHash,
       callDigest: digest(opened.plan.calls),
       residual,
@@ -531,6 +400,7 @@ for (const { chainId, bridged } of scenarios) {
     });
     console.log(JSON.stringify(results.at(-1)));
   } finally {
+    storeGlobal.aquamuxManagedStore = previousStore;
     store.close();
     fork.stop();
     process.env[setting.env] = upstream;

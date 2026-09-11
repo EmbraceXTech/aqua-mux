@@ -180,3 +180,8 @@ The new twelfth deployment attestation retains the full code, block number and s
 The controlled-provider fork now includes a separate native-funded WETH/USDC.e and WETH/USDT entry and close-convert scenario, with zero USDC.e and USDT residuals.
 The same local-signer, refusal, recovery and receipt-proof checks passed for this scenario.
 Idle fork headers are advanced with a local mined block before snapshot reads; production staleness checks remain unchanged.
+
+
+The final controlled-fork lifecycle now uses production receipt reconciliation and extends all four supported scenarios through credential-fixtured fills in both directions, failed replacement rollback, successful replacement and close-convert.
+Runtime adapter and route policy reviews accepted commits through `e123941`; the subsequent E2E helper split and full lifecycle artifact receive a separate review.
+See `execution-integration-results.md` for the fixture boundaries, exact ownership and remaining wallet/browser acceptance scope.
