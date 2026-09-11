@@ -6,10 +6,10 @@ Scope includes `apps/frontend/lib/managed-compiler/`, `apps/frontend/lib/server/
 
 ## Verdict
 
-The reviewed lifecycle corrections pass; final acceptance is pending the coordinator-requested dynamic token extension.
-No must-fix finding remains in the previously reviewed files.
-The reviewed implementation consists of base commit `0409fa6`, correction commit `131827d43738b9ef2b715f272c5e64be179ffb2b`, and fork verification commit `29b1f6562323f58a45885f23de0d45ee10258af3`.
-The owner froze these files for final verification, and a scoped diff against `29b1f65` was empty.
+Accept the scoped lifecycle deliverable, including the coordinator-requested dynamic token extension.
+No must-fix finding remains in the reviewed files.
+The reviewed implementation consists of base commit `0409fa6`, correction commit `131827d43738b9ef2b715f272c5e64be179ffb2b`, fork verification commit `29b1f6562323f58a45885f23de0d45ee10258af3`, and dynamic token commit `bb3fbcf2fcd29e4f7c1c3bdb3cfc4928734b76a0`.
+The owner froze these files for final verification, and a scoped diff against `bb3fbcf` was empty.
 This acceptance does not establish completion of the product UI, caller-side attribution, external-wallet compatibility, or delegated execution.
 
 ## Corrected findings
@@ -59,12 +59,24 @@ Integer arithmetic, inventory accounting, route decoding, snapshots, and call en
 The unused verifier import was removed, and scoped ESLint passes.
 The fork verifier remains a sequential integration scenario with a separate Solidity route fixture; its length reflects setup, execution, and chain assertions rather than product logic.
 
+## Dynamic token extension
+
+The compiler no longer restricts ERC20 addresses to the static fallback catalog.
+The 65-line `metadata.ts` module collects request tokens, normalizes their schema, and rejects conflicting decimals or symbols for the same address.
+The snapshot reader verifies nonempty contract code and exact token decimals at its pinned block before reading balances and allowances.
+Guards compare requested metadata against the verified snapshot, while the native and wrapped-token definitions remain chain-configured.
+The API remains responsible for registry membership, risk selection, and authorization.
+Unit tests cover a token outside the static catalog, pinned metadata reads, wrong decimals, and absent contract code.
+Additional independent assertions confirmed refusal of conflicting request metadata and mismatched observed decimals.
+The fork's paired-token fixture now implements explicit decimals without changing its balance and allowance storage layout.
+This verifies the lifecycle metadata path but does not establish that every registry token has safe ERC20 behavior.
+
 ## Independent final verification
 
-All 15 tests passed with `npx tsx --test test/lifecycle.test.ts`.
+All 17 tests passed with `npx tsx --test test/lifecycle.test.ts`.
 Scoped ESLint passed with `--max-warnings=0` across the compiler, lifecycle modules, lifecycle test and fixture, and both verification scripts.
-The final fork passed all 13 checks on isolated Anvil port 19484.
-The fork began at Arbitrum block `504163162` and completed at `2026-09-11T20:21:48.881Z`.
+The final fork passed all 13 checks on isolated Anvil port 19485.
+The fork began at Arbitrum block `504164351` and completed at `2026-09-11T20:26:46.465Z`.
 The verifier ran from a temporary working directory, so it did not overwrite the shared workspace's generated verification report.
 
 The fork proves native and ERC20 shortage funding, conservative receipt accounting, shared WETH counted once, a bounded executable opening-price quote, two-way resolver fills, replacement rollback after a failing final call, successful replacement, deadline acceptance and refusal, route-independent close-only simulation, and atomic close-and-convert with paired balances read back as zero.
@@ -76,6 +88,7 @@ These results do not establish compatibility with an unmodified production aggre
 Full frontend `npx tsc --noEmit` initially encountered syntax errors in the concurrently edited `test/managed-auth-next.test.ts`.
 The reviewer reported that separate failure to the coordinator.
 A subsequent independent run passed after the authentication worker's edits settled.
+The final dynamic-token revision also passed full frontend typechecking.
 
 ## Accounting and execution boundaries
 
