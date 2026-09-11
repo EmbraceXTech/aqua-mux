@@ -79,6 +79,7 @@ const ok = (value: unknown) =>
 export async function managedApi(
   request: Request,
   segments: string[],
+  dependencies: { ensureTokens?: typeof ensureManagedTokens } = {},
 ): Promise<Response> {
   try {
     const method = request.method;
@@ -112,7 +113,7 @@ export async function managedApi(
         });
       if (method === "POST") {
         const input = groupInputSchema.parse(await body(request));
-        await ensureManagedTokens(
+        await (dependencies.ensureTokens ?? ensureManagedTokens)(
           input.config.chainId,
           input.config.policy.allowedAssets.value,
         );
@@ -141,7 +142,7 @@ export async function managedApi(
         const input = z
           .strictObject({ config: strategyConfigSchema })
           .parse(await body(request));
-        await ensureManagedTokens(
+        await (dependencies.ensureTokens ?? ensureManagedTokens)(
           input.config.chainId,
           input.config.policy.allowedAssets.value,
           group.config.pairs.flatMap((pair) => [
@@ -291,6 +292,25 @@ export async function managedApi(
       z.strictObject({ code: z.literal(4001) }).parse(await body(request));
       return ok({
         attempt: rejectPreparedAttempt(owner, id, idSchema.parse(segments[3])),
+      });
+    }
+    if (
+      action === "attempts" &&
+      segments.length === 5 &&
+      segments[4] === "not-sent"
+    ) {
+      const input = z
+        .strictObject({
+          reason: z.enum(["workspace_changed", "preflight_refused"]),
+        })
+        .parse(await body(request));
+      return ok({
+        attempt: rejectPreparedAttempt(
+          owner,
+          id,
+          idSchema.parse(segments[3]),
+          input.reason,
+        ),
       });
     }
     if (action === "reconcile" && segments.length === 3) {

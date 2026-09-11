@@ -100,3 +100,56 @@ test("stale registry cannot authorize a new token and persisted metadata can rec
   });
   assert.deepEqual(verifiedToken(42161, next), saved);
 });
+
+test("fallback catalog selection still requires current registry risk and onchain decimals", async () => {
+  const { base } = await import("./lifecycle-fixtures");
+  let checked = 0;
+  const listed = { ...registry.tokens[0], ...base, name: base.symbol };
+  await assert.rejects(
+    ensureManagedTokens(42161, [base.address], [], {
+      registry: async () => ({
+        ...registry,
+        tokens: [{ ...listed, selectable: false, risk: "malicious" }],
+      }),
+      metadata: async () => {
+        checked++;
+        throw new Error("Must refuse risk first");
+      },
+    }),
+    /not selectable/,
+  );
+  assert.equal(checked, 0);
+  await assert.rejects(
+    ensureManagedTokens(42161, [base.address], [], {
+      registry: async () => ({ ...registry, tokens: [listed] }),
+      metadata: async () => ({
+        status: "mismatch",
+        checkedAt: new Date().toISOString(),
+        registryDecimals: 18,
+        onchainDecimals: 6,
+        warnings: ["Mismatch"],
+      }),
+    }),
+    /could not be verified/,
+  );
+});
+
+test("verified token cache evicts excess entries and removes expired metadata", async () => {
+  const { VerifiedTokenCache } =
+    await import("../lib/server/managed-service/token-cache");
+  let now = 100;
+  const cache = new VerifiedTokenCache(2, 10, () => now);
+  const token = {
+    address: address as `0x${string}`,
+    decimals: 6,
+    symbol: "CACHE",
+  };
+  cache.set("one", token);
+  cache.set("two", token);
+  cache.set("three", token);
+  assert.equal(cache.size, 2);
+  assert.equal(cache.get("one"), undefined);
+  now = 111;
+  assert.equal(cache.size, 0);
+  assert.equal(cache.get("three"), undefined);
+});

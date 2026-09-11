@@ -63,6 +63,10 @@ export function rejectPreparedAttempt(
   owner: string,
   groupId: string,
   attemptId: string,
+  reason:
+    | "wallet_rejected"
+    | "workspace_changed"
+    | "preflight_refused" = "wallet_rejected",
 ) {
   const store = openManagedStore();
   return store.transaction(() => {
@@ -107,8 +111,8 @@ export function rejectPreparedAttempt(
         ...attempt,
         status: "failed",
         receipt: {
-          reason: "Owner reported an explicit wallet rejection",
-          providerCode: 4001,
+          reason: `Owner reported no submission: ${reason}`,
+          ...(reason === "wallet_rejected" ? { providerCode: 4001 } : {}),
         },
       },
       owner,

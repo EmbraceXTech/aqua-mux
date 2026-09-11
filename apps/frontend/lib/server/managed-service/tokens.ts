@@ -1,3 +1,4 @@
+import { VerifiedTokenCache } from "./token-cache";
 import { erc20Abi } from "viem";
 import { NATIVE, token as catalogToken } from "../../config";
 import type { Token } from "../../managed";
@@ -7,10 +8,10 @@ import { checkTokenMetadata } from "../token-validation";
 import { client } from "../rpc";
 import { ManagedError } from "./errors";
 
-const verified = new Map<string, { token: Token; expiresAt: number }>();
+const verified = new VerifiedTokenCache();
 export function verifiedToken(chainId: number, address: string): Token {
   const saved = verified.get(`${chainId}:${address.toLowerCase()}`);
-  if (saved && saved.expiresAt > Date.now()) return saved.token;
+  if (saved) return saved;
   const token = catalogToken(chainId, address);
   return {
     address: token.address,
@@ -29,16 +30,9 @@ export async function ensureManagedTokens(
     storedDecimals?: (chainId: number, token: Token) => Promise<number>;
   } = {},
 ) {
-  const missing = [...new Set(addresses.map((a) => a.toLowerCase()))].filter(
-    (address) => {
-      try {
-        catalogToken(chainId, address);
-        return false;
-      } catch {
-        return true;
-      }
-    },
-  );
+  const missing = [
+    ...new Set(addresses.map((address) => address.toLowerCase())),
+  ];
   if (!missing.length) return;
   const registry = missing.some(
     (address) => !stored.some((token) => token.address === address),
@@ -49,13 +43,16 @@ export async function ensureManagedTokens(
     let token: Token;
     const saved = stored.find((t) => t.address === address);
     if (saved) {
-      const decimals = dependencies.storedDecimals
-        ? await dependencies.storedDecimals(chainId, saved)
-        : await client(chainId).readContract({
-            address: saved.address,
-            abi: erc20Abi,
-            functionName: "decimals",
-          });
+      const decimals =
+        saved.address === NATIVE
+          ? 18
+          : dependencies.storedDecimals
+            ? await dependencies.storedDecimals(chainId, saved)
+            : await client(chainId).readContract({
+                address: saved.address,
+                abi: erc20Abi,
+                functionName: "decimals",
+              });
       if (decimals !== saved.decimals)
         throw new ManagedError(
           "invalid_token",
@@ -99,9 +96,6 @@ export async function ensureManagedTokens(
         "Native token decimals are invalid.",
         400,
       );
-    verified.set(`${chainId}:${address}`, {
-      token,
-      expiresAt: Date.now() + 300_000,
-    });
+    verified.set(`${chainId}:${address}`, token);
   }
 }
