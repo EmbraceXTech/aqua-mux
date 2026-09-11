@@ -9,8 +9,9 @@ This spike implements no LP recipes, review HTTP service, scheduler, transaction
 The preferred AI SDK HarnessAgent path supports the existing local subscriptions.
 Claude Code passed invocation, incremental text streaming, structured output, timeout, cancellation, and recovery after a separate host process restarted the stopped runtime.
 Codex passed invocation, event streaming, structured output, timeout, cancellation, and recovery after a separate host process restarted the stopped runtime.
-An interrupted Codex session must be retired before the next review because immediate reuse reproduced a late abort-frame error.
-The final retest passed with session retirement after each interruption.
+An interrupted runtime must retire its entire dedicated container before the next review.
+Immediate Codex session reuse reproduced a late abort-frame error, and process-group-only cleanup did not contain detached children.
+The final transport destroys interrupted containers and creates fresh containers for subsequent reviews.
 
 Use the existing harness adapters with the isolated local Docker transport in `apps/agent-runner`.
 A custom native-runtime bridge is not justified by the tested authentication path.
@@ -76,15 +77,15 @@ Timing measures one observed run and is not a latency benchmark or service-level
 | Check | Codex | Claude Code |
 | --- | --- | --- |
 | Basic inference | Returned `SPIKE_OK`. | Returned `SPIKE_OK`. |
-| Text streaming | One completed text delta in the weather response; event transport worked, token-by-token text was not observed. | 91 text deltas in the repaired run; first at 3435 ms, last at 8144 ms. |
+| Text streaming | One completed text delta in the weather response; event transport worked, token-by-token text was not observed. | 86 text deltas in the final transport run; first at 8743 ms, last at 13321 ms. |
 | Structured response | Schema-constrained object with `status: hold` and `marker: schema-proof`, followed by host validation. | Same schema-constrained object and host validation. |
 | Restart/session recovery | Stopped runtime, persisted state, exited host process, then recalled the exact prior random marker in a new process. | Same two-process test and exact marker recall. |
-| Timeout | Host rejected at 1502 ms in the final test; a fresh session returned `RECOVERED`. | Host rejected at 1503 ms; a fresh session returned `RECOVERED`. |
-| Explicit cancellation | Host rejected at 1501 ms; a fresh session returned `RECOVERED`. | Host rejected at 1503 ms; a fresh session returned `RECOVERED`. |
+| Timeout | Host rejected at 1502 ms in the final test; a fresh container returned `RECOVERED`. | Host rejected at 1502 ms; a fresh container returned `RECOVERED`. |
+| Explicit cancellation | Host rejected at 1502 ms; a fresh container returned `RECOVERED`. | Host rejected at 1501 ms; a fresh container returned `RECOVERED`. |
 | Immediate session reuse after interruption | Failed once with the previous turn's late abort error. | Passed for both timeout and cancellation. |
 
-Claude's repaired streaming request reported 25281 input tokens and 244 output tokens through the adapter.
-The repaired Codex weather request reported 8305 input tokens and 219 output tokens.
+Claude's final streaming request reported 25280 input tokens and 248 output tokens through the adapter.
+The final Codex weather request reported 8306 input tokens and 211 output tokens.
 These are reported usage counts, not measured subscription charges.
 No monetary inference cost was inferred from subscription usage.
 Final repaired evidence includes only approved event type counts, numeric timings and usage, fixed check results, image identity, diagnostic counts, and closed error classifications.
@@ -110,9 +111,11 @@ This is acceptable only for the private spike and must be reviewed before broade
 
 A real container test confirmed that a synthetic signing-secret environment canary was absent, `/Users/sainytk` was absent, and `/var/run/docker.sock` was absent.
 It also confirmed non-root execution, no mounts, capability removal, and loopback binding through Docker inspection.
-A subprocess cancellation test killed a process group before its delayed file write could happen.
-Additional real-container regressions cover immediate startup cancellation and a background child whose parent shell has already exited.
-The supervisor terminates remaining members of the command process group when the parent exits.
+The transport stops and verifies the entire dedicated container on explicit process-handle kill or abort, including when the parent process already completed.
+It does not rely on process groups to contain daemonized children.
+Real-container regressions cover foreground cancellation, immediate startup cancellation, a background shell child, and detached Node children after both normal parent completion and cancellation.
+No delayed child marker appeared after container retirement and an explicit inspection-only restart.
+Model reviews after interruption instead delete that container and acquire a fresh one.
 No real signing key was loaded for these tests.
 
 The container permits outbound networking for package installation and inference.
@@ -138,11 +141,14 @@ Expose normalized `started`, `text-delta`, `completed`, `cancelled`, `timed-out`
 Do not imply incremental token streaming for Codex when its tested SDK supplies only completed text items.
 Do not publish hidden reasoning or raw adapter diagnostics.
 Persist a terminal review state before accepting another run for the same bot.
-After timeout or cancellation, retire the interrupted session before starting a fresh review from the current snapshot and run generation.
+After timeout or cancellation, stop and remove the interrupted container before starting a fresh container and review from the current snapshot and run generation.
+Treat the interrupted session as discarded; do not reuse its filesystem for another model review.
 An old stream's output cannot authorize a transaction.
 
 Store resume state only on the trusted runner side and scope it to one owner and runtime.
-The test proves graceful stop/resume across host processes while the same container filesystem survives.
+The test proves graceful stop/resume across host processes while the same exact container filesystem survives.
+Ordinary resume rejects a stopped container; the deliberate graceful recovery path passes `restartStopped: true` only after validating the saved immutable container ID, image, ownership, and full supported isolation policy.
+This graceful path is separate from interruption recovery, which uses a new container.
 It does not prove recovery after container deletion, lost storage, machine reboot, token revocation, or an abrupt crash before lifecycle state was persisted.
 Those failure modes remain acceptance work for the durable review service.
 
@@ -168,13 +174,19 @@ Use the two commands in order and do not run concurrent spike sessions for the s
 If interrupted between those commands, use the private state file to identify and remove that exact spike container.
 Do not remove unrelated Docker containers.
 
-All 13 expanded tests pass with `RUN_DOCKER_TESTS=1`, including real-container regressions and controlled subprocess failures.
+The expanded checks include 13 unit/control tests and 3 real-container tests, run with `RUN_DOCKER_TESTS=1`, including real-container regressions and controlled subprocess failures.
 `git diff --check` passed for the owned spike files.
 The initial implementation is committed as `f0a06ad`.
-Both repaired provider matrices finished successfully at 2026-09-11 20:08 UTC and recorded `runtime: stopped` and `container: removed` cleanup outcomes.
-The [independent quality review](runtime-quality-review.md) identified four transport and evidence issues in the initial commit.
-The repair adds bounded Docker control commands and separate cleanup budgets, comprehensive owned-container acquisition cleanup, process-group supervision, and fail-closed resume validation against saved container ownership and immutable image identity.
+The final Codex matrix began at 2026-09-11 20:19:40 UTC, and the final Claude matrix began at 20:20:47 UTC.
+Both completed every check with `runtime: stopped` and `container: removed` cleanup outcomes.
+Both interruption checks recorded `recoveryPolicy: destroy-container-create-fresh`.
+The final transport is committed as `88f4ca5`, with the durable acquisition callback in `d0401aa`.
+The [initial quality review](runtime-quality-review.md) identified four transport and evidence issues.
+The [second review](runtime-repair-quality-review.md) required complete detached-process retirement and exact security-option checks, which the final transport implements.
+The repairs add bounded Docker control commands and separate cleanup budgets, comprehensive owned-container acquisition cleanup, whole-container retirement, and fail-closed resume validation against saved ownership plus immutable container and image identities.
 Resume also verifies the effective capability, privilege, resource, namespace, running-state, mount, and complete port configuration.
+Security options are exact rather than accepting weaker supersets, and host UTS, user, and cgroup namespaces are refused.
+An awaited optional `onAcquiring` callback allows the service to persist resource ownership before Docker creation; registration failure creates no container.
 Factory calls reject API-key and Gateway environment overrides before environment stripping, including when imported outside the spike CLI.
 Synthetic evidence tests cover URL query credentials, environment-shaped values, unknown token formats, and direct stderr output.
 Cleanup failures remain explicit `unconfirmed` evidence and cause a failed exit.
