@@ -112,7 +112,7 @@ try {
         language: "Solidity",
         sources: {
           "TestWallet.sol": {
-            content: readFileSync("contracts/TestWallet.sol", "utf8"),
+            content: readFileSync(new URL("../../contracts/TestWallet.sol", import.meta.url), "utf8"),
           },
         },
         settings: {
@@ -189,7 +189,7 @@ try {
     amount: "1",
     slippageBps: 50,
     feeBps: 5,
-    range: 20,
+    range: { minPct: -20, maxPct: 20 },
     legs: paired.map((t, i) => ({
       address: t.address,
       bps: 5000,
