@@ -8,6 +8,7 @@ import {
 
 const REGISTRY_TTL_MS = 6 * 60 * 1_000;
 const REGISTRY_STALE_MS = 24 * 60 * 60 * 1_000;
+const REGISTRY_RETRY_MS = 30 * 1_000;
 
 export type TokenRegistrySnapshot = {
   chainId: TokenRegistryChainId;
@@ -116,7 +117,14 @@ async function refreshTokenRegistry(
   } catch {
     const cached = registryCache.get(chainId);
     if (cached && nowMs <= cached.staleUntilMs) {
-      return { ...snapshotWithoutExpiry(cached), stale: true, degraded: true };
+      const staleEntry: RegistryCacheEntry = {
+        ...cached,
+        stale: true,
+        degraded: true,
+        expiresAtMs: nowMs + REGISTRY_RETRY_MS,
+      };
+      registryCache.set(chainId, staleEntry);
+      return snapshotWithoutExpiry(staleEntry);
     }
     return fallbackSnapshot(chainId, nowMs);
   }

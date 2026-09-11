@@ -80,6 +80,35 @@ test("server registry falls back to the committed catalog without a key", async 
   assert.ok(snapshot.tokens.length >= 1);
 });
 
+test("stale cache applies a retry delay during a provider outage", async () => {
+  resetTokenRegistryCacheForTests();
+  let calls = 0;
+  const request = async () => {
+    calls++;
+    if (calls === 1) return Response.json(registryPayload());
+    throw new Error("Provider unavailable");
+  };
+  await getTokenRegistry(1, {
+    apiKey: "test-key",
+    fetch: request as typeof fetch,
+    now: () => 1_000,
+  });
+  const stale = await getTokenRegistry(1, {
+    apiKey: "test-key",
+    fetch: request as typeof fetch,
+    now: () => 400_000,
+  });
+  const delayed = await getTokenRegistry(1, {
+    apiKey: "test-key",
+    fetch: request as typeof fetch,
+    now: () => 410_000,
+  });
+
+  assert.equal(calls, 2);
+  assert.equal(stale.stale, true);
+  assert.equal(delayed.stale, true);
+});
+
 test("metadata validation detects decimals mismatches", async () => {
   const token = parseTokenRegistry(1, registryPayload()).tokens.find(
     (item) => item.address === usdc,
