@@ -120,6 +120,7 @@ export function useManagedGroup(
             ? cause.message
             : "Browser review paused. Reconcile before resuming.",
         );
+        if (active) await refresh().catch(() => {});
       } finally {
         heartbeatPending = false;
       }
