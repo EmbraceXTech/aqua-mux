@@ -54,6 +54,7 @@ test("registry parsing keeps address identity and rejects malformed records", ()
   );
   assert.equal(parsed.tokens[1].risk, "unverified");
   assert.equal(parsed.tokens[1].selectable, true);
+  assert.equal(parsed.tokens[0].risk, "unknown");
 });
 
 test("registry search prioritizes an exact address and preserves duplicate symbols", () => {

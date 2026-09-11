@@ -5,7 +5,8 @@ export const TOKEN_REGISTRY_CHAIN_IDS = [1, 56, 42161, 4663] as const;
 export type TokenRegistryChainId = (typeof TOKEN_REGISTRY_CHAIN_IDS)[number];
 
 export type TokenRisk =
-  | "normal"
+  | "unknown"
+  | "no_known_risk"
   | "info"
   | "unverified"
   | "suspicious"
@@ -36,6 +37,44 @@ export type TokenSearchResult = {
   items: RegistryToken[];
 };
 
+export type TokenSearchResponse = TokenSearchResult & {
+  chainId: TokenRegistryChainId;
+  source: string;
+  fetchedAt: string;
+  stale: boolean;
+  degraded: boolean;
+  rejected: number;
+};
+
+export type TokenMetadataCheck = {
+  status: "verified" | "mismatch" | "unavailable";
+  checkedAt: string;
+  registryDecimals: number;
+  onchainDecimals?: number;
+  onchainSymbol?: string;
+  onchainName?: string;
+  warnings: string[];
+};
+
+export type TokenRouteCheck = {
+  status: "available" | "unavailable";
+  reason?: "no_route" | "provider_error" | "invalid_response";
+  checkedAt: string;
+  amountIn: string;
+  amountOut?: string;
+};
+
+export type TokenPairValidation = {
+  chainId: TokenRegistryChainId;
+  source: RegistryToken;
+  destination: RegistryToken;
+  metadata: {
+    source: TokenMetadataCheck;
+    destination: TokenMetadataCheck;
+  };
+  route: TokenRouteCheck;
+};
+
 const rawTokenSchema = z
   .object({
     address: z.string(),
@@ -54,6 +93,7 @@ const RISK_TAGS: ReadonlyArray<[string, TokenRisk]> = [
   ["RISK:suspicious", "suspicious"],
   ["RISK:unverified", "unverified"],
   ["RISK:info", "info"],
+  ["RISK:norisk", "no_known_risk"],
 ];
 
 export function tokenRegistryChainId(value: unknown): TokenRegistryChainId {
@@ -68,7 +108,7 @@ export function tokenRisk(tags: readonly string[]): TokenRisk {
   for (const [tag, risk] of RISK_TAGS) {
     if (tags.includes(tag)) return risk;
   }
-  return "normal";
+  return "unknown";
 }
 
 export function parseTokenRegistry(
