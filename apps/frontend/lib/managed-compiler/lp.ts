@@ -8,36 +8,11 @@ import {
 import { AquaProtocolContract } from "@1inch/aqua-sdk";
 import { keccak256, toHex, type Hex } from "viem";
 import { AQUA, KYC, NATIVE, SWAP_VM, token } from "../config";
-import {
-  strategyConfigSchema,
-  type StrategyConfig,
-  type LPPair,
-} from "../managed/config";
-import { rawPriceRatio, type DenominatedPrice } from "../managed/primitives";
+import { strategyConfigSchema, type StrategyConfig } from "../managed/config";
 import type { Call } from "../model";
-import { ceilDiv, uint } from "./arithmetic";
-
-function bounds(pair: LPPair, sorted: boolean) {
-  if (pair.range.kind === "full") return undefined;
-  const encode = (price: DenominatedPrice, up: boolean) => {
-    const ratio = rawPriceRatio(price, pair.baseToken, pair.quoteToken);
-    const n = (sorted ? ratio.numerator : ratio.denominator) * 10n ** 18n;
-    const d = sorted ? ratio.denominator : ratio.numerator;
-    return up ? ceilDiv(n, d) : n / d;
-  };
-  // Round inward so executable bounds cannot exceed the reviewed interval.
-  const rawPriceMin = encode(
-    sorted ? pair.range.lower : pair.range.upper,
-    true,
-  );
-  const rawPriceMax = encode(
-    sorted ? pair.range.upper : pair.range.lower,
-    false,
-  );
-  if (rawPriceMin <= 0n || rawPriceMin >= rawPriceMax)
-    throw new Error("Range cannot be represented by the deployed LP encoding.");
-  return { rawPriceMin, rawPriceMax };
-}
+import { uint } from "./arithmetic";
+import { describeLPPrice, encodePriceBounds } from "./pricing";
+export { describeLPPrice } from "./pricing";
 
 export function compileLP(input: StrategyConfig, nonce: Hex, now: number) {
   const config = strategyConfigSchema.parse(input);
@@ -59,17 +34,16 @@ export function compileLP(input: StrategyConfig, nonce: Hex, now: number) {
     }
     const base = uint(pair.baseAmount, 248),
       quote = uint(pair.quoteAmount, 248);
-    const ratio = rawPriceRatio(
-      pair.openingPrice,
-      pair.baseToken,
-      pair.quoteToken,
-    );
-    if (quote * ratio.denominator !== base * ratio.numerator)
+    const actual = describeLPPrice(pair);
+    if (
+      BigInt(actual.numerator) * BigInt(pair.openingPrice.denominator) !==
+      BigInt(pair.openingPrice.numerator) * BigInt(actual.denominator)
+    )
       throw new Error(
-        "Opening price does not match the conservative registration reserves.",
+        "Opening price does not match the encoded virtual reserves; refresh the reviewed configuration.",
       );
     const sorted = pair.baseToken.address < pair.quoteToken.address;
-    const range = bounds(pair, sorted);
+    const range = encodePriceBounds(pair);
     const curve = range
       ? AquaXYCAmmStrategy.newConcentrate(range)
       : AquaXYCAmmStrategy.new();
@@ -123,8 +97,8 @@ export function compileLP(input: StrategyConfig, nonce: Hex, now: number) {
       pair,
       encodedBounds: range
         ? {
-            lower: range.rawPriceMin.toString(),
-            upper: range.rawPriceMax.toString(),
+            sqrtPriceMin: range.sqrtPriceMin.toString(),
+            sqrtPriceMax: range.sqrtPriceMax.toString(),
           }
         : null,
       call: {

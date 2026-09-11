@@ -29,6 +29,11 @@ export async function readLifecycleSnapshot(
   if ((await rpc.getChainId()) !== chainId)
     throw new Error("RPC chain mismatch.");
   const block = await rpc.getBlock();
+  if (
+    Date.now() - Number(block.timestamp) * 1000 >
+    Math.min(30000, request.config.policy.maxReferenceAgeMs.value)
+  )
+    throw new Error("Latest chain block is stale.");
   const blockNumber = block.number;
   const addresses = new Set<Address>([
     NATIVE,

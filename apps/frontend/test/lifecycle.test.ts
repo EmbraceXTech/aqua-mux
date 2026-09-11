@@ -1,9 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { decodeFunctionData } from "viem";
-import { NATIVE, SWAP_VM } from "../lib/config";
+import { decodeFunctionData, erc20Abi } from "viem";
+import { NATIVE, SWAP_VM, classicRouter, tokens } from "../lib/config";
 import { allocate, minimumOutput } from "../lib/managed-compiler/arithmetic";
-import { compileLP } from "../lib/managed-compiler/lp";
+import { compileLP, describeLPPrice } from "../lib/managed-compiler/lp";
+import {
+  AquaProgramBuilder,
+  SwapVmProgram,
+  instructions,
+} from "@1inch/swap-vm-sdk";
 import {
   buildLifecyclePlan,
   digest,
@@ -203,6 +208,7 @@ test("bounded price encoding preserves quote-per-base semantics after token sort
     lower: { ...pair.openingPrice, numerator: "1600" },
     upper: { ...pair.openingPrice, numerator: "2400" },
   };
+  pair.openingPrice = describeLPPrice(pair);
   const forward = compileLP(request.config, hash, now)[0];
   request.config.pairs[0] = {
     ...pair,
@@ -232,8 +238,127 @@ test("bounded price encoding preserves quote-per-base semantics after token sort
       },
     },
   };
+  request.config.pairs[0].openingPrice = describeLPPrice(
+    request.config.pairs[0],
+  );
   assert.deepEqual(
     compileLP(request.config, hash, now)[0].encodedBounds,
     forward.encodedBounds,
   );
+});
+
+test("concentrated preview rejects raw reserve price and accepts encoded virtual spot", () => {
+  const request = lifecycleFixture();
+  if (request.config.family !== "lp") throw new Error("Expected LP fixture.");
+  const pair = request.config.pairs[0];
+  pair.range = {
+    kind: "bounded",
+    lower: { ...pair.openingPrice, numerator: "1000" },
+    upper: { ...pair.openingPrice, numerator: "3000" },
+  };
+  assert.throws(() => compileLP(request.config, hash, now), /virtual reserves/);
+  pair.openingPrice = describeLPPrice(pair);
+  assert.ok(
+    Number(pair.openingPrice.numerator) /
+      Number(pair.openingPrice.denominator) <
+      1800,
+  );
+  assert.equal(compileLP(request.config, hash, now).length, 1);
+});
+
+test("snapshot freshness deadline survives a slow whole-batch simulation", async () => {
+  const request = lifecycleFixture(),
+    deps = dependenciesFixture();
+  let clock = now;
+  deps.now = () => clock;
+  const simulate = deps.simulate;
+  deps.simulate = async (plan) => {
+    clock += 31000;
+    return { ...(await simulate(plan)), simulatedAt: clock };
+  };
+  await assert.rejects(buildLifecyclePlan(request, deps), /whole-batch/);
+});
+
+test("compiler preserves distinct per-pair fees and inward square-root bounds", () => {
+  const request = lifecycleFixture();
+  if (request.config.family !== "lp") throw new Error("Expected LP fixture.");
+  const pair = request.config.pairs[0];
+  pair.range = {
+    kind: "bounded",
+    lower: { ...pair.openingPrice, numerator: "1001" },
+    upper: { ...pair.openingPrice, numerator: "2999" },
+  };
+  for (const fee of [5, 37]) {
+    pair.feeBps = fee;
+    pair.openingPrice = describeLPPrice(pair);
+    const compiled: ReturnType<typeof compileLP>[number] = compileLP(
+      request.config,
+      hash,
+      now,
+    )[0];
+    const program: ReturnType<AquaProgramBuilder["getInstructions"]> =
+      AquaProgramBuilder.decode(
+        new SwapVmProgram(compiled.program),
+      ).getInstructions();
+    assert.equal(
+      program
+        .find((i) => i.opcode === instructions.fee.flatFeeAmountInXD)
+        ?.args.toJSON()?.fee,
+      String(fee * 100000),
+    );
+    const range = compiled.encodedBounds!;
+    assert.ok(BigInt(range.sqrtPriceMin) ** 2n >= 1001n * 10n ** 24n);
+    assert.ok(BigInt(range.sqrtPriceMax) ** 2n <= 2999n * 10n ** 24n);
+  }
+});
+
+test("repeated ERC20 purchases replenish consumed allowances for equal and unequal spends", async () => {
+  for (const second of ["500000000000000000", "400000000000000000"]) {
+    const request = lifecycleFixture();
+    if (request.config.family !== "lp") throw new Error("Expected LP fixture.");
+    const btc = tokens(42161).find((t) => t.symbol === "WBTC")!;
+    const btcToken = {
+      address: btc.address,
+      decimals: btc.decimals,
+      symbol: btc.symbol,
+    };
+    request.config.policy.allowedAssets.value.push(btc.address);
+    request.config.pairs.push({
+      ...request.config.pairs[0],
+      quoteToken: btcToken,
+      quoteAmount: "2500000",
+      openingPrice: {
+        baseToken: base.address,
+        quoteToken: btc.address,
+        numerator: "1",
+        denominator: "40",
+      },
+    });
+    request.inventory = [{ token: base, amount: "2000000000000000000" }];
+    request.funding = {
+      token: base,
+      amount: "2000000000000000000",
+      purchases: [
+        {
+          token: quote,
+          amountIn: "500000000000000000",
+          minimumAmountOut: "2000000000",
+        },
+        { token: btcToken, amountIn: second, minimumAmountOut: "2500000" },
+      ],
+    };
+    const plan = await buildLifecyclePlan(request, dependenciesFixture());
+    const approvals = plan.calls
+      .filter((c) => c.to === base.address && c.data.startsWith("0x095ea7b3"))
+      .map((c) => decodeFunctionData({ abi: erc20Abi, data: c.data }))
+      .filter(
+        (c) =>
+          c.functionName === "approve" &&
+          c.args[0].toLowerCase() === classicRouter(42161),
+      );
+    assert.deepEqual(
+      approvals.map((c) => c.args[1]),
+      [500000000000000000n, BigInt(second)],
+    );
+  }
 });

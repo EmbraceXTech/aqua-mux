@@ -56,7 +56,7 @@ export function approvalBuilder(snapshot: LifecycleSnapshot, calls: Call[]) {
       BigInt(a.amount),
     ]),
   );
-  return (token: Address, spender: Address, amount: bigint) => {
+  const approve = (token: Address, spender: Address, amount: bigint) => {
     const key = `${token}:${spender}`,
       current = allowances.get(key) ?? 0n;
     if (current === amount) return;
@@ -75,4 +75,13 @@ export function approvalBuilder(snapshot: LifecycleSnapshot, calls: Call[]) {
     if (amount > 0n) push(amount);
     allowances.set(key, amount);
   };
+  return Object.assign(approve, {
+    consume(token: Address, spender: Address, amount: bigint) {
+      const key = `${token}:${spender}`,
+        current = allowances.get(key) ?? 0n;
+      if (amount > current)
+        throw new Error("Swap exceeds its planned allowance.");
+      allowances.set(key, current - amount);
+    },
+  });
 }

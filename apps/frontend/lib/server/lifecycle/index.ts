@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { Hex } from "viem";
-import { NATIVE, classicRouter, token, wrapped } from "../../config";
+import { NATIVE, classicRouter } from "../../config";
 import { strategyConfigSchema } from "../../managed/config";
 import {
   lifecyclePlanSchema,
@@ -10,10 +10,11 @@ import type { Token } from "../../managed/primitives";
 import { uint } from "../../managed-compiler/arithmetic";
 import { compileLP } from "../../managed-compiler/lp";
 import type { Call } from "../../model";
-import { approvalBuilder, dockCall, unwrapCall } from "./calls";
+import { approvalBuilder, dockCall } from "./calls";
 import { digest } from "./digest";
 import { validateSnapshot } from "./guards";
 import { fundInventory } from "./funding";
+import { convertInventory } from "./conversion";
 import { Inventory } from "./inventory";
 import { validateRoute } from "./routes";
 import type { LifecycleDependencies, LifecycleRequest } from "./types";
@@ -41,6 +42,11 @@ export async function buildLifecyclePlan(
     request.kind === "fund-and-open" || request.kind === "replace"
       ? Math.min(request.expiresAt, request.config.policy.expiresAt.value)
       : request.expiresAt;
+  expiresAt = Math.min(
+    expiresAt,
+    snapshot.observedAt +
+      Math.min(30000, request.config.policy.maxReferenceAgeMs.value),
+  );
   const previous = request.previous ?? [];
   calls.push(...previous.map(dockCall));
   async function swap(
@@ -76,6 +82,8 @@ export async function buildLifecyclePlan(
     if (source.address !== NATIVE)
       approve(source.address, route.spender, amountIn);
     calls.push(route.call);
+    if (source.address !== NATIVE)
+      approve.consume(source.address, route.spender, amountIn);
     const output = uint(route.minimumAmountOut);
     inventory.credit(destination, output);
     receipts.credit(destination, output);
@@ -118,35 +126,8 @@ export async function buildLifecyclePlan(
         expiresAt = Math.min(expiresAt, strategy.pair.programExpiresAt);
     }
   }
-  if (request.kind === "close-and-convert") {
-    const conversion = request.conversion;
-    if (!conversion)
-      throw new Error(
-        "Choose explicit attributable inventory and a conversion target.",
-      );
-    const selected = new Inventory(conversion.amounts),
-      target = conversion.targetToken;
-    if (target.address === NATIVE)
-      throw new Error(
-        "Select wrapped native as target and request unwrap explicitly.",
-      );
-    for (const item of selected.values()) {
-      if (BigInt(item.amount) > inventory.amount(item.token))
-        throw new Error("Conversion exceeds selected managed inventory.");
-      if (item.token.address !== target.address && BigInt(item.amount) > 0n)
-        await swap(item.token, target, item.amount, "1");
-    }
-    if (conversion.unwrap) {
-      if (target.address !== wrapped(request.config.chainId).address)
-        throw new Error("Only wrapped native can be unwrapped.");
-      const amount = selected.amount(target) + receipts.amount(target);
-      if (amount > 0n) {
-        inventory.debit(target, amount);
-        inventory.credit(token(request.config.chainId, NATIVE), amount);
-        calls.push(unwrapCall(target.address, amount));
-      }
-    }
-  }
+  if (request.kind === "close-and-convert")
+    await convertInventory(request, inventory, receipts, calls, swap);
   const zeroHash = `0x${"0".repeat(64)}` as Hex;
   let plan = lifecyclePlanSchema.parse({
     version: 1,
@@ -196,14 +177,22 @@ export async function buildLifecyclePlan(
     now() >= expiresAt
   )
     throw new Error("A fresh successful whole-batch simulation is required.");
+  const finalSnapshot = await deps.snapshot(request);
+  validateSnapshot(request, finalSnapshot, now());
+  if (
+    now() >= expiresAt ||
+    uint(finalSnapshot.blockNumber) < uint(simulation.blockNumber)
+  )
+    throw new Error("Snapshot expired or predates the completed simulation.");
   const nativeValue = calls.reduce((sum, c) => sum + BigInt(c.value), 0n);
   if (
-    uint(snapshot.nativeBalance) <
+    uint(finalSnapshot.nativeBalance) <
     nativeValue + uint(request.gasReserveWei) + uint(simulation.estimatedGasWei)
   )
     throw new Error("Insufficient native gas reserve after execution costs.");
   plan = lifecyclePlanSchema.parse({
     ...plan,
+    snapshotDigest: digest(finalSnapshot),
     estimatedGasWei: simulation.estimatedGasWei,
     simulation: {
       blockNumber: simulation.blockNumber,
