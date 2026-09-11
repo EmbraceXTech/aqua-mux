@@ -94,6 +94,7 @@ An entry without a 1inch risk tag reports `unknown` rather than implying that so
 `lib/server/token-registry-source.ts` fetches the authenticated 1inch Classic Swap inventory and caches one validated snapshot per chain for six minutes.
 Concurrent refreshes for the same chain share one request.
 A failed refresh may use a validated in-memory snapshot for up to 24 hours and marks the response stale and degraded.
+After a failed refresh, a 30-second retry delay prevents token-search keystrokes from repeatedly calling an unavailable provider.
 If no usable runtime snapshot exists, the server returns the committed fallback and marks it degraded.
 Unavailable data remains unavailable instead of becoming an empty token list.
 
@@ -111,11 +112,12 @@ Provider errors and invalid quote responses cannot become an available route.
 
 The committed fallback generator uses explicit addresses and fails if a required address disappears from the source.
 It validates chain ID, address shape, symbol, name, decimals, unique addresses, and logo host before writing generated files.
+It uses each response's media type for the file extension and removed seven existing WebP files that had been mislabeled with `.png` names.
 Its console output reports the full registry count, fallback count, and duplicate-symbol count for each chain.
 
 ## Test evidence
 
-The focused token registry suite passed 10 tests.
+The focused token registry suite passed 11 tests.
 Those tests cover malformed data, wrong-chain records, duplicate addresses and symbols, risk states, search ordering and limits, cache reuse, no-key fallback, decimals mismatch, successful route checks, failed route checks, and API input bounds.
 Focused ESLint completed with zero warnings.
 The generator completed for all four chains and produced fallback counts of 11, 8, 10, and 6.
