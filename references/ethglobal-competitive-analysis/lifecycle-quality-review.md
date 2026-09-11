@@ -11,6 +11,7 @@ No must-fix finding remains in the reviewed files.
 The reviewed implementation consists of base commit `0409fa6`, correction commit `131827d43738b9ef2b715f272c5e64be179ffb2b`, fork verification commit `29b1f6562323f58a45885f23de0d45ee10258af3`, and dynamic token commit `bb3fbcf2fcd29e4f7c1c3bdb3cfc4928734b76a0`.
 The owner froze these files for final verification, and a scoped diff against `bb3fbcf` was empty.
 This acceptance does not establish completion of the product UI, caller-side attribution, external-wallet compatibility, or delegated execution.
+The owner subsequently announced a planned compiled-route policy integration; that future change is outside these reviewed commits and requires its own review before this verdict can cover it.
 
 ## Corrected findings
 
