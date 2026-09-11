@@ -298,7 +298,7 @@ for (const { chainId, bridged } of scenarios) {
       {
         ...request,
         id: `close-${chainId}`,
-        kind: "close-and-convert",
+        kind: bridged ? "close" : "close-and-convert",
         funding: undefined,
         inventory: balances,
         previous: replaced.plan.registrations.map(({ hash, app, tokens }) => ({
@@ -306,13 +306,48 @@ for (const { chainId, bridged } of scenarios) {
           app,
           tokens,
         })),
-        conversion: { targetToken: base, amounts: balances, unwrap: true },
+        conversion: bridged
+          ? undefined
+          : { targetToken: base, amounts: balances, unwrap: true },
         expiresAt: Date.now() + 120000,
       },
       deps,
     );
     save(closed);
     const closeReceipt = await execute(closed.plan.id, true);
+    let separateConversionHash = null;
+    if (bridged) {
+      const conversionRequest: LifecycleRequest = {
+        ...request,
+        id: `conversion-after-close-${chainId}`,
+        kind: "close-and-convert",
+        funding: undefined,
+        previous: [],
+        inventory: balances,
+        conversion: { targetToken: base, amounts: balances, unwrap: true },
+        expiresAt: Date.now() + 120000,
+      };
+      await assert.rejects(
+        buildLifecyclePlanWithRoutes(
+          {
+            ...conversionRequest,
+            inventory: [],
+            conversion: { ...conversionRequest.conversion!, amounts: [] },
+          },
+          deps,
+        ),
+        /explicit positive inventory/,
+      );
+      const conversion = await buildLifecyclePlanWithRoutes(
+        conversionRequest,
+        deps,
+      );
+      assert.equal(conversion.plan.retirements.length, 0);
+      assert.equal(conversion.plan.registrations.length, 0);
+      save(conversion);
+      separateConversionHash = (await execute(conversion.plan.id))
+        .transactionHash;
+    }
     const wrappedBeforeRollback = await fork.rpc.readContract({
       address: base.address,
       abi: erc20Abi,
@@ -365,7 +400,7 @@ for (const { chainId, bridged } of scenarios) {
       });
     assert.equal(
       methods.filter((method) => method === "eth_signTransaction").length,
-      3,
+      bridged ? 4 : 3,
     );
     assert.equal(store.get("group", groupId, maker)!.state, "closed");
     assert.ok(
@@ -387,6 +422,7 @@ for (const { chainId, bridged } of scenarios) {
       replacementRollback,
       productionReceiptReconciliation: true,
       closeHash: closeReceipt.transactionHash,
+      separateConversionHash,
       callDigest: digest(opened.plan.calls),
       residual,
       unsupportedAccountJournalEntries: 0,

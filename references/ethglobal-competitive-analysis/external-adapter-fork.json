@@ -6,32 +6,33 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0xb293b5f2eeb949ae75885b242f74fb2f9a417190bbf2f791fe04da7d558e88fd",
+      "hash": "0x29ec179bae775face49bfdce081e0237d5ef53405ffea6360bed44c648840a60",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0xe7efce20fd887439446f5a8e74ba192c049c883152c5ca58feb8d688139b6ab8",
+    "openHash": "0xa4a815328e067e7ec7d07ac92d7b848c59b608c5b46a02cf8c3627fdd78626ec",
     "fills": {
-      "forward": "0x65ade252885328fccd2c9477eb1beb4c9fedce55f8778a03d6f00da71e201d8a",
-      "reverse": "0xe9912bc301f0574645f815c5f10a4e3635b66ab288126be15b1f691e5bf4bbf1",
+      "forward": "0xe3bbcaa8cbf2ad907857cc1babec517c6eea9ccc15fea08b9016529ab00cb5b6",
+      "reverse": "0x4639a618e20008a4b5d53acce900dcfce39239f00635e1f74ad64d9a28f23f7b",
       "uncredentialedOriginRejected": true,
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "1050000000000000",
-      "sharedBaseAfter": "1024415579387670"
+      "sharedBaseAfter": "1024415682813721"
     },
-    "replacementHash": "0x495c54e5a661800a0a7a894317087aa83da46fef2e5b200680908b6c6d0654d3",
+    "replacementHash": "0xef88a0a83afab1dc7594cf0a43a2ccb7041fb36d9944e626a7870e70bc8f3229",
     "replacementRollback": {
-      "hash": "0x0a1c699775287af87287a4373662b5a96f18aa9bbd4e0bb52f3be8039d185497",
+      "hash": "0xff46d8d1a63492b854b68c2f6e63d9c9ddfc2b652d9af47387cf9cfbb7791b1c",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0xbec575de4343eb9028c3de8cf8296939c997422c3d1fe49ca906e96287a32e52",
-    "callDigest": "0x1eff4971dda39f4a390fc8e7aa0859e4e8ae12da5932d645ac767c14daf51276",
+    "closeHash": "0x83442884c4b449806f59c3f3d8c6db27725b18e797412c7a14394c4a107db89c",
+    "separateConversionHash": null,
+    "callDigest": "0x53d132c03072be4108b793d1749b86d8b591994482a9828f842700606ba545c7",
     "residual": [
       {
         "symbol": "WETH",
-        "amount": "19744628650838"
+        "amount": "19744628699473"
       },
       {
         "symbol": "USDC",
@@ -48,7 +49,7 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
-    "atomicRollbackHash": "0x162bb3b6be987069459b936f6fbf0c33b4e385c7340e2d462bdfdf22c87e54eb"
+    "atomicRollbackHash": "0x7486eb010b4f948c59ad957c38402b583412526683eeb17f58d3d37d37a26380"
   },
   {
     "chainId": 56,
@@ -57,28 +58,29 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0x1e2a904b4279fec3f436660e85dcc464ca0d10bb870c820d7f898edd540a236d",
+      "hash": "0x2bfab2c01e154125e0072cafba9f88ecfd830bdd545db966d314d554862128e5",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0xf289ec8c7587b0e1a46210c307f26377402c3d140b4e1a994d0c8199ad973ba0",
+    "openHash": "0x90e86eefbcb330b090ead2fa6f14aff4f47515359ccefae67d77f80094810101",
     "fills": {
-      "forward": "0x350dee03815bd1cc626e048f675ed0df4d01ad5525436a12f8a0962985fd1e3f",
-      "reverse": "0x2bde8d538a9a50bfd7d9020bb0c26558dff2e15813a70bf4afab2f37dffd54ac",
+      "forward": "0xfdce00bd258f9baa90f9c70f0bedd9ef7c60465ccf2dc43f5ce5a8bff1f526cd",
+      "reverse": "0x41a39a8a940ed424421eb1a724f9af1f7aac9c05092080c71d71cb9c5abb99ad",
       "uncredentialedOriginRejected": true,
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "1050000000000000",
       "sharedBaseAfter": "1024415223393161"
     },
-    "replacementHash": "0x0c3b8b8f6aec562824a8b40cf6a3f05236dd85e7871ebcf3b527c3e14c6fe756",
+    "replacementHash": "0x63599b5bf9575540ac46e047291aa2eb4a4600656311ae79a903b34928d2cb3b",
     "replacementRollback": {
-      "hash": "0xf9e43d19385afc57d4d745b9917942e434b591333fc0ae33d4707d3e70086f8b",
+      "hash": "0x37e65e600df4564881d0f43d958836b78108ca6dd39940489b9977245d81e5da",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0x5d88a87a5b286cd4c846ea78dc39d845f15d4737b94f6b4d4fda4b641de75237",
-    "callDigest": "0xb5c86e0e4f445086139f0956c9bb906f125c39888afe4fffcf4b67d34caf89e1",
+    "closeHash": "0x0fc8060b9889da25e1528ac64f78bd273d5e3b8da75f7a73672a6622ec5b1206",
+    "separateConversionHash": null,
+    "callDigest": "0x02d61bdc8f6f4620a13cca33fd59a6ecaf7f8dcd3f35f04765df9ce1b2ec5d91",
     "residual": [
       {
         "symbol": "WBNB",
@@ -108,28 +110,29 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0xff9f291fa98587049b2fcbc9d21d2acb66bce3bdf1de8b511d9966fbad8c4453",
+      "hash": "0x067998bba6b88c4188adb1b3c81408c95a6d09deec99c6ec1ea9426b48e5a823",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0x2126ca55cca6583c81d728a55402d16aaaa9d88207004a9f7a6eea5810bef9b3",
+    "openHash": "0x32305dee8a737bc873e08f89c2fadaad6f21dfd26d3fac26e9edd075f9bb7a45",
     "fills": {
-      "forward": "0x488e0ee8a534c08fd7df1466226d82ff9ffb25b47f5f416d9985e3eedf7b4619",
-      "reverse": "0xd3403cb21254b8be61c7b3644f6a6e0fc3d64295dc7a676c5dd36990af631f84",
+      "forward": "0x9d2f05701e2ff23a863031b61218274d3373d4c0caef0d889c342d25baef8d0a",
+      "reverse": "0xf3759ac27fae19859962d69450ff3261302dcbae3b00f7fdf6bf850928ee70b9",
       "uncredentialedOriginRejected": true,
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "52500000000000",
-      "sharedBaseAfter": "51221018073126"
+      "sharedBaseAfter": "51221101629170"
     },
-    "replacementHash": "0xe96aa01729f9a37d414c404624dc4f485b507c518f38799377812201f03dff75",
+    "replacementHash": "0x32505b90aead9abca528fefe36374868e6caf14eec97e87776cb7d296873119a",
     "replacementRollback": {
-      "hash": "0xc035cddd19ceae72278bb461ae6d7736b235e81cab4a5c3a4cc33ac78244a117",
+      "hash": "0x466b779e47ed0828adaaf0621b613e9b2299783418ad2c125af1bb7f91e15221",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0x81510352391d5654607f529b185ef253da4607b41c8568fe3679a7f5cbb4f432",
-    "callDigest": "0xe5a3ea088545adaa6dd574bf3383668da5d500108735fd3fbf20dc24d0c66871",
+    "closeHash": "0xb35832537bfe6f25eed01f2526aa869267292a20b3987e8c0ae6f1ee82e7030e",
+    "separateConversionHash": null,
+    "callDigest": "0xaee458531eb724655fe9e1ff6ff3595264c3c7f8326996ff8b563f840a7c4dd3",
     "residual": [
       {
         "symbol": "WETH",
@@ -150,7 +153,7 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": true,
-    "atomicRollbackHash": "0x984859fbded2d0f09a2501f8e1c74ca861e1a65afffb7b13e8b6dcb269c7c8fc"
+    "atomicRollbackHash": "0x06fa548d49c8e8e145d10f61d59d930d76fe91df92ce46b4f02cab7f125f17d5"
   },
   {
     "chainId": 42161,
@@ -159,32 +162,33 @@
     "publicBroadcasts": 0,
     "registrations": 2,
     "localSigner": {
-      "hash": "0xfab04894f682e7006a3e8d03a8cc57065c1d88ccbc463792d27cc78197ca6f2c",
+      "hash": "0x076e6561c7153c2e7725a02bd646a660812bdb5924ec0c67d35f85cb4b58501c",
       "initialSelfAuthorizationProved": true,
       "changedCodeAndNonceRefused": true
     },
     "unavailableRpcRefusedBeforeJournaling": true,
-    "openHash": "0x0c0c48385147062f5eec6f4985ab6736f464d02a4f87e30eddb3b5a135070a93",
+    "openHash": "0x4d66f5164875bfe41b8bd26a210249a7bace7bca82334754aa236e4b9405343f",
     "fills": {
-      "forward": "0xe95a648504629679cb6df4ded171ecb95957607e23af650f51a48f178910a5ab",
-      "reverse": "0xd3b8424e132ff64ea999694221f213e5243cf220ce5cff6c963c6c0de6058308",
+      "forward": "0xabd0a86fb336c30a58425f220a3318eed7d9c05a692654453804be18f6afa16e",
+      "reverse": "0xac13fed745630e5a6d1d584f5936e9a359a5fd1871cfa896405935a69c0881e8",
       "uncredentialedOriginRejected": true,
       "credentialFixtureOnly": true,
       "sharedBaseBefore": "1050000000000000",
-      "sharedBaseAfter": "1024415489241592"
+      "sharedBaseAfter": "1024415453471143"
     },
-    "replacementHash": "0x853675e2f3a24d9b18f797f1adae461fb0cd30dba6652947d5941e544821b00e",
+    "replacementHash": "0xc914bf7aef76db83f005ebbf1bc1f2e1323c24689b54a64daac3ad1e8af50284",
     "replacementRollback": {
-      "hash": "0xf6bc4d977e9713e5f0dfbdd8de3af5937c53f1085689fc6ac1993cf18194870d",
+      "hash": "0x06255b6ff4dccb56067b9f6c70a85ab152df4dc90c228c196208782bc968e44a",
       "oldPositionsAndInventoryRestored": true
     },
     "productionReceiptReconciliation": true,
-    "closeHash": "0x211354acda8b4ae711a2de9ea62f801c7eae753302faa91e1b874c537a3fbf33",
-    "callDigest": "0x551428c128c1a7ec78e406c85d00f3e1c261a8861bfc1e5ac019b0fb63e01979",
+    "closeHash": "0xcbb0eedd26f4bbe7a729682f5ce528ea93021b3e3b4c0dc6acd0e71a297503b6",
+    "separateConversionHash": "0xe3c1bd8bc06a7a7d90c4b84a19490d0a446cc2f579b61740454e82bcc4928157",
+    "callDigest": "0x11ee1cdc6ec7da3e8cbfdd690764758336686f744936aea0a29a51c1b0c60e57",
     "residual": [
       {
         "symbol": "WETH",
-        "amount": "19744629892119"
+        "amount": "19744632034020"
       },
       {
         "symbol": "USDC.e",
@@ -201,6 +205,6 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
-    "atomicRollbackHash": "0x8c0fdbc01dabd5df2820d5a8959018361ca3fb832cfc3c110e8ab031c6d1b48b"
+    "atomicRollbackHash": "0x6f9f1e8209d5f89273e37552bec0ccce0f9dfad9e3e56be2111d6b239a1f2b47"
   }
 ]

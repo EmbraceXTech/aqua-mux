@@ -124,3 +124,12 @@ Verification concerns are split into focused scenario configuration, external si
 The main script orchestrates the four scenarios and writes the evidence artifact.
 No public transaction, actual wallet extension or real resolver credential was used.
 Privy automation, market making and Hedera payments remain outside this Phase 1 execution deliverable.
+
+
+## Conversion recovery after close-only
+
+The authenticated app flow exposed a compiler guard that required an active retirement even when the user had already closed positions and explicitly selected remaining inventory for conversion.
+The guard now permits zero retirements only for close-and-convert with a positive conversion amount covered by explicitly selected inventory.
+Close-only and replacement still require active prior strategies, and every conversion amount remains bounded by current balances, selected inventory, allowed assets and reviewed routes.
+The bridged-USDC fork scenario now closes positions first and then signs a separate zero-retirement inventory conversion through the production adapter and receipt reconciler.
+The same scenario refuses an empty selection before preparing a transaction.

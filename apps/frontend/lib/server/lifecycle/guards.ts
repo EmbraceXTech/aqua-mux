@@ -83,8 +83,20 @@ export function validateSnapshot(
     throw new Error("Duplicate retirement.");
   if (request.kind === "fund-and-open" && previous.length)
     throw new Error("Opening cannot retire existing strategies.");
-  if (request.kind !== "fund-and-open" && !previous.length)
-    throw new Error("Select existing managed strategies to retire.");
+  const selectedConversion =
+    request.kind === "close-and-convert" &&
+    request.conversion?.amounts.some(
+      ({ token, amount }) =>
+        uint(amount) > 0n && selected.amount(token) >= uint(amount),
+    );
+  if (
+    request.kind !== "fund-and-open" &&
+    !previous.length &&
+    !selectedConversion
+  )
+    throw new Error(
+      "Select existing managed strategies to retire or explicit positive inventory to convert.",
+    );
   for (const old of previous) {
     const observed = snapshot.strategies.find((s) => s.hash === old.hash);
     if (
