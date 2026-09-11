@@ -11,6 +11,7 @@ import {
 } from "viem";
 import { client } from "../lib/server/rpc";
 import { network } from "../lib/config";
+import { reconcileFundingPrefix } from "./managed-e2e-funding-resume";
 
 const SOURCE = "0xA9aA0Af420578223B11FF5430d428055C52e8C89";
 const DESTINATION = "0x992A6a939579e10Ad47C347a5be3788c94992Dd4";
@@ -41,10 +42,12 @@ type Attempt = {
   sourceCodeAfter?: Hex;
 };
 
+let checkpoint = "arguments";
 async function main() {
-  const [output, flag] = process.argv.slice(2);
+  const [output, flag, priorPath] = process.argv.slice(2);
+  const resuming = flag === "--resume-bnb-robinhood-funding";
   assert.ok(
-    output && flag === "--execute-bounded-funding",
+    output && (flag === "--execute-bounded-funding" || (resuming && priorPath)),
     "Explicit bounded funding flag required.",
   );
   process.loadEnvFile(".env");
@@ -57,6 +60,8 @@ async function main() {
     .replace(/^PRIVATE_KEY=/, "");
   assert.match(targetKey, /^0x[0-9a-fA-F]{64}$/);
   assert.equal(privateKeyToAddress(targetKey as Hex), DESTINATION);
+  checkpoint = "reconcile-prior-journal";
+  const prior = resuming ? await reconcileFundingPrefix(priorPath) : undefined;
   const report = {
     gate: "Coordinator msg_21ac15722687: plain native funding only",
     revision: execFileSync("git", ["rev-parse", "HEAD"], {
@@ -65,6 +70,13 @@ async function main() {
     createdAt: new Date().toISOString(),
     source: SOURCE,
     destination: DESTINATION,
+    ...(prior
+      ? {
+          prior,
+          resumedGate:
+            "Coordinator msg_37e577db9b29: BNB and Robinhood funding only",
+        }
+      : {}),
     attempts: [] as Attempt[],
   };
   // Refuse all reruns of a journal. An ambiguous broadcast must be reconciled by hash.
@@ -78,7 +90,8 @@ async function main() {
     });
     renameSync(`${output}.tmp`, output);
   };
-  for (const chainId of [42161, 56, 4663]) {
+  for (const chainId of resuming ? [56, 4663] : [42161, 56, 4663]) {
+    checkpoint = `${chainId}:preflight`;
     const rpc = client(chainId);
     assert.equal(await rpc.getChainId(), chainId);
     const wallet = createWalletClient({
@@ -114,6 +127,7 @@ async function main() {
     assert.ok(maximumFee <= FEE_CAP, "Funding maximum fee exceeded.");
     const before = await rpc.getBalance({ address: SOURCE });
     assert.ok(before >= VALUE + maximumFee + SOURCE_RESERVE);
+    checkpoint = `${chainId}:sign`;
     const raw = await wallet.signTransaction({
       account: source,
       chain: rpc.chain,
@@ -127,6 +141,7 @@ async function main() {
       maxPriorityFeePerGas: fees.maxPriorityFeePerGas,
     });
     // No authorizationList, account self-call, contract calldata or token approval is permitted.
+    checkpoint = `${chainId}:final-guards`;
     assert.equal(await rpc.getChainId(), chainId);
     assert.equal(
       await rpc.getTransactionCount({ address: SOURCE, blockTag: "pending" }),
@@ -151,10 +166,12 @@ async function main() {
     };
     report.attempts.push(attempt);
     save();
+    checkpoint = `${chainId}:broadcast`;
     assert.equal(
       await rpc.sendRawTransaction({ serializedTransaction: raw }),
       hash,
     );
+    checkpoint = `${chainId}:receipt`;
     const receipt = await rpc.waitForTransactionReceipt({
       hash,
       timeout: 120_000,
@@ -171,6 +188,7 @@ async function main() {
     // Preserve mined evidence even when a later read fails or a postcondition refuses.
     save();
     assert.equal(receipt.status, "success");
+    checkpoint = `${chainId}:readback`;
     const blockNumber = receipt.blockNumber;
     const after = await rpc.getBalance({ address: SOURCE, blockNumber });
     const destinationAfter = await rpc.getBalance({
@@ -211,6 +229,7 @@ async function main() {
   }
 }
 main().catch(() => {
+  console.error(`Funding checkpoint: ${checkpoint}`);
   console.error(
     "Bounded funding stopped. Inspect the durable public transaction journal before any retry; a broadcast may already exist. Credential and raw transaction details withheld.",
   );
