@@ -1,6 +1,8 @@
 import { network } from "@/lib/config";
+import { formatUnits } from "viem";
 import type { GroupDetail } from "@/lib/managed-client/api";
 import { dateLabel, titleLabel } from "./format";
+import { ObservedActivity } from "./observed-activity";
 
 export function ActivityView({ detail }: { detail: GroupDetail }) {
   const entries = [
@@ -25,6 +27,7 @@ export function ActivityView({ detail }: { detail: GroupDetail }) {
   ].sort((a, b) => b.at - a.at);
   return (
     <div className="managed-stack">
+      <ObservedActivity detail={detail} />
       <section className="managed-panel">
         <h2>Decisions and transactions</h2>
         {entries.length ? (
@@ -68,6 +71,14 @@ export function ActivityView({ detail }: { detail: GroupDetail }) {
                   : "Noncanonical observation"}
                 . Fee accounting {movement.feeAccounting}.
               </p>
+              <ul>
+                {movement.deltas.map((delta) => (
+                  <li key={delta.token.address}>
+                    {formatUnits(BigInt(delta.amount), delta.token.decimals)}{" "}
+                    {delta.token.symbol}
+                  </li>
+                ))}
+              </ul>
               <a
                 className="managed-link"
                 href={`${network(detail.group.chainId).explorer}/tx/${movement.transactionHash}`}

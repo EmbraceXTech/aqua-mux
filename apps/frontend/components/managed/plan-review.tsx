@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { formatUnits } from "viem";
 import type { LifecyclePlan } from "@/lib/managed";
 import { Button } from "../ui/button";
 import { Modal } from "../ui/modal";
@@ -8,6 +9,8 @@ export function PlanReview({
   plan,
   digest,
   devWallet,
+  maxFeeWei,
+  executionAvailable,
   busy,
   onConfirm,
   onClose,
@@ -15,6 +18,8 @@ export function PlanReview({
   plan: LifecyclePlan;
   digest: string;
   devWallet: boolean;
+  maxFeeWei?: string;
+  executionAvailable: boolean;
   busy: boolean;
   onConfirm: () => Promise<void>;
   onClose: () => void;
@@ -38,6 +43,13 @@ export function PlanReview({
       description="Confirm the exact plan below. An agent proposal alone does not authorize execution."
     >
       <div className="managed-stack">
+        {!executionAvailable && (
+          <div className="managed-notice">
+            Managed execution is unavailable for this external wallet. Its
+            account adapter and receipt recovery have not been verified. You can
+            inspect this plan and recover existing records.
+          </div>
+        )}
         <div className="managed-notice">
           <strong>
             {devWallet ? "LOCAL DEVELOPMENT WALLET" : "External wallet"}
@@ -46,6 +58,16 @@ export function PlanReview({
           {plan.chainId}. {plan.calls.length} calls in an atomic batch.
         </div>
         <dl className="managed-facts">
+          {devWallet && (
+            <div>
+              <dt>Development signer fee cap, native</dt>
+              <dd>
+                {maxFeeWei
+                  ? formatUnits(BigInt(maxFeeWei), 18)
+                  : "Unavailable. Reconnect before signing."}
+              </dd>
+            </div>
+          )}
           <div>
             <dt>Plan expires</dt>
             <dd>{dateLabel(plan.expiresAt)}</dd>
@@ -54,7 +76,40 @@ export function PlanReview({
             <dt>Run generation</dt>
             <dd>{plan.runGeneration}</dd>
           </div>
+          <div>
+            <dt>Estimated gas cost, native</dt>
+            <dd>{formatUnits(BigInt(plan.estimatedGasWei), 18)}</dd>
+          </div>
+          <div>
+            <dt>Reserved gas funds, native</dt>
+            <dd>{formatUnits(BigInt(plan.gasReserveWei), 18)}</dd>
+          </div>
+          <div>
+            <dt>Simulation</dt>
+            <dd>
+              Block {plan.simulation.blockNumber} /{" "}
+              {dateLabel(plan.simulation.simulatedAt)}
+            </dd>
+          </div>
         </dl>
+        <section>
+          <h3>Selected inventory before execution</h3>
+          <ul>
+            {plan.inventoryBefore.map((item) => (
+              <li key={item.token.address}>{amountLabel(item)}</li>
+            ))}
+          </ul>
+          <h3>Conservative inventory after execution</h3>
+          <ul>
+            {plan.conservativeInventoryAfter.map((item) => (
+              <li key={item.token.address}>{amountLabel(item)}</li>
+            ))}
+          </ul>
+          <p className="managed-footnote">
+            Excess swap output may remain in the maker wallet. Reconciliation
+            must verify actual balances and residual inventory.
+          </p>
+        </section>
         <section>
           <h3>Expected effects</h3>
           <ul>
@@ -112,7 +167,13 @@ export function PlanReview({
           </div>
         )}
         <Button
-          disabled={busy || !confirmed || expired}
+          disabled={
+            !executionAvailable ||
+            busy ||
+            !confirmed ||
+            expired ||
+            (devWallet && !maxFeeWei)
+          }
           onClick={() => void onConfirm()}
         >
           {busy

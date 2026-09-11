@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { LPStrategyConfig } from "@/lib/managed";
+import { canonicalDigest, type LPStrategyConfig } from "@/lib/managed";
 import type { GroupDetail } from "@/lib/managed-client/api";
 import { Button } from "../ui/button";
 import { StrategyView } from "./strategy-view";
@@ -13,6 +13,7 @@ import type { SelectedToken } from "./token-select";
 export function BotWorkspace({
   detail,
   busy,
+  stopBusy,
   onAction,
   onClose,
   onSave,
@@ -22,6 +23,7 @@ export function BotWorkspace({
 }: {
   detail: GroupDetail;
   busy: boolean;
+  stopBusy: boolean;
   onAction: (
     kind: "start" | "resume" | "stop" | "takeover" | "reconcile",
   ) => Promise<void>;
@@ -32,7 +34,23 @@ export function BotWorkspace({
   onBack: () => void;
 }) {
   const [tab, setTab] = useState("Strategy");
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState<"current" | "suggested" | null>(null);
+  const latestReview = detail.reviews?.toSorted(
+    (a, b) => b.createdAt - a.createdAt,
+  )[0];
+  const suggested = latestReview?.result?.proposedConfig;
+  const configChanged =
+    !!suggested &&
+    canonicalDigest(suggested) !== canonicalDigest(detail.group.config);
+  const decision =
+    latestReview?.status === "succeeded" &&
+    latestReview.runGeneration === detail.bot.runGeneration
+      ? latestReview.result?.decision
+      : undefined;
+  const canPlan =
+    !configChanged &&
+    !!decision &&
+    ["fund-and-open", "replace", "close"].includes(decision);
   return (
     <section>
       <div className="managed-heading">
@@ -52,6 +70,27 @@ export function BotWorkspace({
         {["Strategy", "Positions", "Activity", "Controls"].map((name) => (
           <button
             role="tab"
+            tabIndex={tab === name ? 0 : -1}
+            onKeyDown={(event) => {
+              const names = ["Strategy", "Positions", "Activity", "Controls"];
+              const index = names.indexOf(name);
+              const next =
+                event.key === "ArrowRight"
+                  ? (index + 1) % names.length
+                  : event.key === "ArrowLeft"
+                    ? (index + names.length - 1) % names.length
+                    : event.key === "Home"
+                      ? 0
+                      : event.key === "End"
+                        ? names.length - 1
+                        : null;
+              if (next === null) return;
+              event.preventDefault();
+              setTab(names[next]);
+              document
+                .getElementById(`managed-tab-button-${names[next]}`)
+                ?.focus();
+            }}
             aria-selected={tab === name}
             aria-controls={`managed-tab-${name}`}
             id={`managed-tab-button-${name}`}
@@ -71,13 +110,17 @@ export function BotWorkspace({
           <div className="managed-stack">
             {editing && detail.group.config.family === "lp" ? (
               <ConfigEditor
-                config={detail.group.config}
+                config={
+                  editing === "suggested" && suggested?.family === "lp"
+                    ? suggested
+                    : detail.group.config
+                }
                 busy={busy}
                 onSave={async (config) => {
                   await onSave(config);
-                  setEditing(false);
+                  setEditing(null);
                 }}
-                onCancel={() => setEditing(false)}
+                onCancel={() => setEditing(null)}
               />
             ) : (
               <>
@@ -85,7 +128,7 @@ export function BotWorkspace({
                   <Button
                     variant="outline"
                     disabled={busy}
-                    onClick={() => setEditing(true)}
+                    onClick={() => setEditing("current")}
                   >
                     Edit proposal
                   </Button>
@@ -96,12 +139,30 @@ export function BotWorkspace({
                   >
                     Regenerate fresh review
                   </Button>
-                  <Button disabled={busy} onClick={() => void onPlan()}>
-                    {detail.group.state === "draft"
-                      ? "Review initial position"
-                      : "Review proposed replacement"}
+                  {configChanged && (
+                    <Button
+                      variant="outline"
+                      disabled={busy}
+                      onClick={() => setEditing("suggested")}
+                    >
+                      Review suggested changes
+                    </Button>
+                  )}
+                  <Button
+                    disabled={busy || !canPlan}
+                    onClick={() => void onPlan()}
+                  >
+                    {canPlan
+                      ? `Review ${titleLabel(decision!).toLowerCase()}`
+                      : "No executable review"}
                   </Button>
                 </div>
+                {configChanged && (
+                  <div className="managed-notice">
+                    The agent proposed changed parameters. Review and save those
+                    changes, then regenerate the review before preparing a plan.
+                  </div>
+                )}
                 <StrategyView detail={detail} />
               </>
             )}
@@ -113,6 +174,7 @@ export function BotWorkspace({
           <ControlsView
             detail={detail}
             busy={busy}
+            stopBusy={stopBusy}
             onAction={onAction}
             onClose={onClose}
           />

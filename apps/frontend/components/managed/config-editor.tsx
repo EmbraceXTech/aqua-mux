@@ -1,20 +1,12 @@
 import { useState } from "react";
-import { formatUnits, parseUnits } from "viem";
+import { formatUnits } from "viem";
 import { strategyConfigSchema, type LPStrategyConfig } from "@/lib/managed";
 import { Button } from "../ui/button";
-import { priceLabel } from "./format";
-
-function decimalRatio(value: string) {
-  if (!/^\d+(\.\d{1,18})?$/.test(value))
-    throw new Error(
-      "Prices must be positive decimals with at most 18 decimal places.",
-    );
-  const decimals = value.split(".")[1]?.length ?? 0;
-  return {
-    numerator: parseUnits(value, decimals).toString(),
-    denominator: (10n ** BigInt(decimals)).toString(),
-  };
-}
+import {
+  exactPriceInput,
+  parsePriceInput,
+  exactAmount,
+} from "@/lib/managed-client/numeric-input";
 
 export function ConfigEditor({
   config,
@@ -32,10 +24,12 @@ export function ConfigEditor({
       base: formatUnits(BigInt(pair.baseAmount), pair.baseToken.decimals),
       quote: formatUnits(BigInt(pair.quoteAmount), pair.quoteToken.decimals),
       fee: String(pair.feeBps),
-      opening: priceLabel(pair.openingPrice),
+      opening: exactPriceInput(pair.openingPrice),
       full: pair.range.kind === "full",
-      lower: pair.range.kind === "bounded" ? priceLabel(pair.range.lower) : "",
-      upper: pair.range.kind === "bounded" ? priceLabel(pair.range.upper) : "",
+      lower:
+        pair.range.kind === "bounded" ? exactPriceInput(pair.range.lower) : "",
+      upper:
+        pair.range.kind === "bounded" ? exactPriceInput(pair.range.upper) : "",
     })),
   );
   const [error, setError] = useState("");
@@ -54,26 +48,37 @@ export function ConfigEditor({
           const price = (value: string) => ({
             baseToken: pair.baseToken.address,
             quoteToken: pair.quoteToken.address,
-            ...decimalRatio(value),
+            ...parsePriceInput(value),
           });
           return {
             ...pair,
-            baseAmount: parseUnits(
+            baseAmount: exactAmount(
               draft.base,
               pair.baseToken.decimals,
             ).toString(),
-            quoteAmount: parseUnits(
+            quoteAmount: exactAmount(
               draft.quote,
               pair.quoteToken.decimals,
             ).toString(),
             feeBps: Number(draft.fee),
-            openingPrice: price(draft.opening),
+            openingPrice:
+              draft.opening === exactPriceInput(pair.openingPrice)
+                ? pair.openingPrice
+                : price(draft.opening),
             range: draft.full
               ? { kind: "full" as const }
               : {
                   kind: "bounded" as const,
-                  lower: price(draft.lower),
-                  upper: price(draft.upper),
+                  lower:
+                    pair.range.kind === "bounded" &&
+                    draft.lower === exactPriceInput(pair.range.lower)
+                      ? pair.range.lower
+                      : price(draft.lower),
+                  upper:
+                    pair.range.kind === "bounded" &&
+                    draft.upper === exactPriceInput(pair.range.upper)
+                      ? pair.range.upper
+                      : price(draft.upper),
                 },
           };
         }),

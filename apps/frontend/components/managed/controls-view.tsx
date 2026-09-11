@@ -1,6 +1,5 @@
 import { useState } from "react";
 import type { GroupDetail } from "@/lib/managed-client/api";
-import { capabilities } from "@/lib/managed/catalog";
 import { Button } from "../ui/button";
 import { TokenSelect, type SelectedToken } from "./token-select";
 import { dateLabel } from "./format";
@@ -8,11 +7,13 @@ import { dateLabel } from "./format";
 export function ControlsView({
   detail,
   busy,
+  stopBusy,
   onAction,
   onClose,
 }: {
   detail: GroupDetail;
   busy: boolean;
+  stopBusy: boolean;
   onAction: (
     kind: "start" | "resume" | "stop" | "takeover" | "reconcile",
   ) => Promise<void>;
@@ -30,7 +31,11 @@ export function ControlsView({
           lease. Every proposed transaction still needs your confirmation.
         </p>
         <div className="managed-notice">
-          Lease expiry: {dateLabel(detail.bot.lease?.expiresAt)}. Background
+          Lease timeout:{" "}
+          {detail.leaseTimeoutMs == null
+            ? "unavailable"
+            : `${detail.leaseTimeoutMs / 1000} seconds`}
+          . Lease expiry: {dateLabel(detail.bot.lease?.expiresAt)}. Background
           tabs and device sleep can pause reviews. Stop does not cancel
           submitted transactions or close positions.
         </div>
@@ -55,7 +60,7 @@ export function ControlsView({
           </Button>
           <Button
             variant="outline"
-            disabled={busy || detail.bot.state === "stopped"}
+            disabled={stopBusy || detail.bot.state === "stopped"}
             onClick={() => void onAction("stop")}
           >
             Stop bot
@@ -81,7 +86,10 @@ export function ControlsView({
           {detail.bot.stopReason ?? "There is no recorded stop reason."}
         </p>
         <h3>Automation authorization</h3>
-        <p>{capabilities.delegatedPrivy.reason}</p>
+        <p>
+          Delegated automation is unavailable for this wallet. Every transaction
+          requires owner confirmation.
+        </p>
         <Button variant="outline" disabled>
           Revoke automation unavailable
         </Button>
@@ -93,8 +101,9 @@ export function ControlsView({
       <section className="managed-panel managed-stack">
         <h2>Close managed positions</h2>
         <p>
-          Close stops management and prepares a transaction to dock this group&apos;s
-          positions. Tokens remain in the maker wallet after confirmation.
+          Close stops management and prepares a transaction to dock this
+          group&apos;s positions. Tokens remain in the maker wallet after
+          confirmation.
         </p>
         <Button
           variant="outline"
@@ -106,9 +115,9 @@ export function ControlsView({
         <hr />
         <h3>Close and convert</h3>
         <p>
-          Convert only the selected group&apos;s attributable inventory to one token.
-          Review amounts, minimum receipts, gas reserve, and residuals before
-          confirming.
+          Convert only the selected group&apos;s attributable inventory to one
+          token. Review amounts, minimum receipts, gas reserve, and residuals
+          before confirming.
         </p>
         <TokenSelect
           chainId={detail.group.chainId}

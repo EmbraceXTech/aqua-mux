@@ -1,0 +1,75 @@
+import type { RegistryToken, TokenPairValidation } from "@/lib/token-registry";
+import { managedRequest, type ManagedSession } from "./api";
+import { exactAmount } from "./numeric-input";
+
+type SelectedAsset = Pick<RegistryToken, "address" | "decimals">;
+
+export async function validateProposalFunding({
+  chainId,
+  funding,
+  assets,
+  budget,
+  session,
+  assertCurrent,
+  onCheck,
+}: {
+  chainId: number;
+  funding: SelectedAsset;
+  assets: SelectedAsset[];
+  budget: string;
+  session: ManagedSession;
+  assertCurrent: () => void;
+  onCheck: (check: TokenPairValidation) => void;
+}): Promise<string> {
+  const destinations = assets.filter(
+    (asset) => asset.address.toLowerCase() !== funding.address.toLowerCase(),
+  );
+  if (!destinations.length)
+    throw new Error("Choose a paired asset different from the funding token.");
+  const amount = exactAmount(budget, funding.decimals).toString();
+  // The API admits one in-flight validation per owner. Each result must also
+  // bind the displayed amount to freshly verified metadata before submission.
+  for (const asset of destinations) {
+    assertCurrent();
+    const check = await managedRequest<TokenPairValidation>(
+      "/api/tokens/validate",
+      session,
+      { chainId, src: funding.address, dst: asset.address, amount },
+    );
+    assertCurrent();
+    onCheck(check);
+    if (
+      check.chainId !== chainId ||
+      check.source.address.toLowerCase() !== funding.address.toLowerCase() ||
+      check.destination.address.toLowerCase() !== asset.address.toLowerCase() ||
+      check.route.amountIn !== amount
+    )
+      throw new Error(
+        "Token validation does not match the selected funding route. Refresh and retry.",
+      );
+    if (
+      check.metadata.source.status !== "verified" ||
+      check.metadata.destination.status !== "verified"
+    )
+      throw new Error(
+        "Token metadata could not be verified. Resolve the selected token before requesting an executable proposal.",
+      );
+    if (
+      check.source.decimals !== funding.decimals ||
+      check.metadata.source.registryDecimals !== funding.decimals ||
+      check.metadata.source.onchainDecimals !== funding.decimals
+    )
+      throw new Error(
+        "Funding token decimals changed. Reselect the funding token and review your budget before retrying.",
+      );
+    if (
+      check.destination.decimals !== asset.decimals ||
+      check.metadata.destination.registryDecimals !== asset.decimals ||
+      check.metadata.destination.onchainDecimals !== asset.decimals
+    )
+      throw new Error(
+        "Paired token decimals changed. Reselect the paired token before retrying.",
+      );
+  }
+  return amount;
+}

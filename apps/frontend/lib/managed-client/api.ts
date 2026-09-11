@@ -6,6 +6,8 @@ import type {
   StrategyGroup,
 } from "@/lib/managed";
 import { connectWallet } from "@/lib/wallet";
+import type { Reconciliation } from "@/lib/server/positions/reconcile";
+import type { getPositionHistory } from "@/lib/server/positions/history";
 
 export type ManagedSession = {
   token: string;
@@ -13,6 +15,7 @@ export type ManagedSession = {
   sessionId: string;
   expiresAt: number;
   mode: "external" | "local-development";
+  maxFeeWei?: string;
 };
 export type GroupDetail = {
   group: StrategyGroup;
@@ -23,6 +26,15 @@ export type GroupDetail = {
   transactions?: Records["transaction"][];
   movements?: Records["movement"][];
   payments?: Records["payment"][];
+  observation?: {
+    positions: Reconciliation;
+    history: ReturnType<typeof getPositionHistory>;
+  } | null;
+  serverTime?: number;
+  leaseTimeoutMs?: number;
+  executionCapabilities?: {
+    external?: { verified: boolean; adapter: string; reason?: string };
+  };
 };
 
 export class ManagedRequestError extends Error {
@@ -56,6 +68,12 @@ export async function managedRequest<T>(
     },
   );
   const data = await response.json().catch(() => null);
+  if (response.status === 401 && session && typeof window !== "undefined")
+    window.dispatchEvent(
+      new CustomEvent("aquamux-auth-invalidated", {
+        detail: session.sessionId,
+      }),
+    );
   if (!response.ok)
     throw new ManagedRequestError(
       typeof data?.error === "string"

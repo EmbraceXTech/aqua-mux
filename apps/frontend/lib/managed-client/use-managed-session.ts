@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { authenticateWallet, managedRequest, type ManagedSession } from "./api";
 import { connectDevWallet, disconnectDevWallet } from "@/lib/dev-wallet";
 
@@ -7,8 +7,23 @@ export function useManagedSession() {
   const [session, setSession] = useState<ManagedSession>();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const generation = useRef(0);
+  const clear = useCallback((message = "") => {
+    generation.current += 1;
+    setSession(undefined);
+    setBusy(false);
+    setError(message);
+    try {
+      sessionStorage.removeItem(sessionKey);
+    } catch {
+      /* Optional session cache. */
+    }
+  }, []);
   useEffect(() => {
+    let active = true;
+    const initialGeneration = generation.current;
     Promise.resolve().then(() => {
+      if (!active || initialGeneration !== generation.current) return;
       try {
         const stored = sessionStorage.getItem(sessionKey);
         if (!stored) return;
@@ -16,27 +31,45 @@ export function useManagedSession() {
         if (
           typeof value.token === "string" &&
           /^0x[0-9a-fA-F]{40}$/.test(value.owner) &&
+          typeof value.sessionId === "string" &&
           value.expiresAt > Date.now() &&
           ["external", "local-development"].includes(value.mode)
         )
           setSession(value);
-        else sessionStorage.removeItem(sessionKey);
+        else clear("Your session expired. Authenticate your wallet again.");
       } catch {
-        /* Session storage is optional; authenticate again if unavailable. */
+        /* Authenticate again when the session cache is unavailable. */
       }
     });
-    const changed = () => {
-      setSession(undefined);
-      try {
-        sessionStorage.removeItem(sessionKey);
-      } catch {
-        /* Optional session cache. */
-      }
-    };
+    const changed = () =>
+      clear("Wallet account changed. Authenticate the selected wallet again.");
     window.ethereum?.on?.("accountsChanged", changed);
-    return () => window.ethereum?.removeListener?.("accountsChanged", changed);
-  }, []);
+    return () => {
+      active = false;
+      generation.current += 1;
+      window.ethereum?.removeListener?.("accountsChanged", changed);
+    };
+  }, [clear]);
+  useEffect(() => {
+    if (!session) return;
+    const timer = setTimeout(
+      () => clear("Your session expired. Authenticate your wallet again."),
+      Math.max(0, session.expiresAt - Date.now()),
+    );
+    const invalidated = (event: Event) => {
+      if ((event as CustomEvent<string>).detail === session.sessionId)
+        clear(
+          "Authentication expired or was revoked. Connect your wallet again.",
+        );
+    };
+    window.addEventListener("aquamux-auth-invalidated", invalidated);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("aquamux-auth-invalidated", invalidated);
+    };
+  }, [session, clear]);
   async function connect(mode: "external" | "local-development") {
+    const requestGeneration = ++generation.current;
     setBusy(true);
     setError("");
     try {
@@ -49,8 +82,10 @@ export function useManagedSession() {
           expiresAt: result.expiresAt,
           sessionId: crypto.randomUUID(),
           mode,
+          maxFeeWei: result.maxFeeWei,
         };
       } else value = await authenticateWallet(42161);
+      if (requestGeneration !== generation.current) return;
       setSession(value);
       try {
         sessionStorage.setItem(sessionKey, JSON.stringify(value));
@@ -58,36 +93,27 @@ export function useManagedSession() {
         /* Authentication remains valid in memory. */
       }
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Wallet authentication failed.",
-      );
+      if (requestGeneration === generation.current)
+        setError(
+          cause instanceof Error
+            ? cause.message
+            : "Wallet authentication failed.",
+        );
     } finally {
-      setBusy(false);
+      if (requestGeneration === generation.current) setBusy(false);
     }
   }
   async function disconnect() {
-    setBusy(true);
-    setError("");
+    const previous = session;
+    clear();
     try {
-      if (session?.mode === "local-development")
-        await disconnectDevWallet(session.token);
-      else if (session) await managedRequest("/api/auth/logout", session, {});
-      setSession(undefined);
-      try {
-        sessionStorage.removeItem(sessionKey);
-      } catch {
-        /* Optional session cache. */
-      }
-    } catch (cause) {
+      if (previous?.mode === "local-development")
+        await disconnectDevWallet(previous.token);
+      else if (previous) await managedRequest("/api/auth/logout", previous, {});
+    } catch {
       setError(
-        cause instanceof Error
-          ? cause.message
-          : "Could not disconnect development wallet.",
+        "Disconnected locally. Server session revocation could not be confirmed.",
       );
-    } finally {
-      setBusy(false);
     }
   }
   return { session, error, busy, connect, disconnect };

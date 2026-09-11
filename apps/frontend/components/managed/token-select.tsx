@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { managedRequest } from "@/lib/managed-client/api";
+import { useState } from "react";
+import { useTokenSearch } from "@/lib/managed-client/use-token-search";
 import type { Address } from "viem";
 
 export type SelectedToken = {
@@ -7,18 +7,6 @@ export type SelectedToken = {
   symbol: string;
   decimals: number;
   name?: string;
-};
-type RegistryItem = SelectedToken & {
-  selectable: boolean;
-  risk: string;
-  routeStatus: string;
-};
-type RegistryResponse = {
-  items: RegistryItem[];
-  stale: boolean;
-  degraded: boolean;
-  fetchedAt: number;
-  total: number;
 };
 
 export function TokenSelect({
@@ -33,40 +21,8 @@ export function TokenSelect({
   onChange: (token: SelectedToken) => void;
 }) {
   const [query, setQuery] = useState("");
-  const [result, setResult] = useState<RegistryResponse>();
-  const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
-  useEffect(() => {
-    if (!open) return;
-    const controller = new AbortController();
-    const timer = setTimeout(() => {
-      managedRequest<RegistryResponse>(
-        `/api/tokens?chainId=${chainId}&q=${encodeURIComponent(query)}&limit=30`,
-        undefined,
-        undefined,
-        undefined,
-        controller.signal,
-      )
-        .then((data) => {
-          setResult(data);
-          setError("");
-        })
-        .catch((cause) => {
-          if (!controller.signal.aborted) {
-            setResult(undefined);
-            setError(
-              cause instanceof Error
-                ? cause.message
-                : "Token registry unavailable.",
-            );
-          }
-        });
-    }, 200);
-    return () => {
-      controller.abort();
-      clearTimeout(timer);
-    };
-  }, [chainId, query, open]);
+  const { result, error } = useTokenSearch(chainId, query, open);
   return (
     <div className="managed-field">
       <span>{label}</span>
@@ -100,6 +56,12 @@ export function TokenSelect({
                   ? "Cached metadata. Fresh verification required."
                   : "Registry metadata only. Routes have not been checked."}
               </p>
+              {result.total > result.items.length && (
+                <p className="managed-footnote">
+                  Showing {result.items.length} of {result.total} matches.
+                  Search a symbol or full address to narrow the results.
+                </p>
+              )}
               <div className="managed-token-list">
                 {result.items.map((item) => (
                   <button
@@ -115,8 +77,7 @@ export function TokenSelect({
                     <span>{item.name}</span>
                     <small>{item.address}</small>
                     <small>
-                      {item.risk === "normal" ? "Listed" : item.risk} / route
-                      not checked
+                      {item.risk.replaceAll("_", " ")} / route not checked
                     </small>
                   </button>
                 ))}

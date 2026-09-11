@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type {
   LifecyclePlan,
   LPStrategyConfig,
   ReviewRecord,
 } from "@/lib/managed";
-import { submitPlan } from "@/lib/wallet";
+import { submitExternalManaged } from "./external-execution";
+import { recoverWalletBatches } from "./wallet-recovery";
 import {
   prepareDevWalletLifecyclePlan,
   submitDevWalletPlan,
@@ -26,6 +27,15 @@ export function useManagedActions(
     plan: LifecyclePlan;
     digest: string;
   }>();
+  const scope = useRef({ active: true, revision: 0 });
+  useEffect(() => {
+    scope.current.active = true;
+    const current = scope.current;
+    return () => {
+      current.active = false;
+      current.revision += 1;
+    };
+  }, []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -49,7 +59,7 @@ export function useManagedActions(
   async function save(config: LPStrategyConfig) {
     if (!session || !detail) return;
     await perform(async () => {
-      await managedRequest(
+      const saved = await managedRequest<GroupDetail>(
         `/groups/${detail.group.id}`,
         session,
         { config },
@@ -58,7 +68,9 @@ export function useManagedActions(
       setPendingPlan(undefined);
       await refresh();
       setNotice(
-        "Configuration saved. Previous plans are invalid. Generate a fresh review.",
+        saved.bot.runGeneration === detail.bot.runGeneration
+          ? "Configuration unchanged. Existing reviews remain subject to their original expiry."
+          : "Configuration saved. Previous plans are invalid. Generate a fresh review.",
       );
     });
   }
@@ -76,10 +88,11 @@ export function useManagedActions(
   }
   async function plan(action: LifecyclePlan["kind"], targetToken?: string) {
     if (!session || !detail) return;
+    const revision = scope.current.revision;
     await perform(async () => {
-      const review = detail.reviews
-        ?.toSorted((a, b) => b.createdAt - a.createdAt)
-        .find((item) => item.status === "succeeded");
+      const review = detail.reviews?.toSorted(
+        (a, b) => b.createdAt - a.createdAt,
+      )[0];
       const response = await managedRequest<{
         plan: LifecyclePlan;
         digest: string;
@@ -87,14 +100,31 @@ export function useManagedActions(
         action,
         ...(review ? { reviewId: review.id } : {}),
         ...(targetToken ? { targetToken } : {}),
+        sessionId: tabSession,
+        generation: detail.bot.runGeneration,
       });
-      setPendingPlan(response);
+      if (scope.current.active && revision === scope.current.revision)
+        setPendingPlan(response);
     });
   }
   async function confirm() {
     if (!session || !detail || !pendingPlan) return;
     await perform(async () => {
+      if (
+        session.mode === "external" &&
+        !detail.executionCapabilities?.external?.verified
+      )
+        throw new Error(
+          "Managed execution is unavailable for this external wallet until its account adapter and receipt recovery are verified.",
+        );
       const reviewed = pendingPlan;
+      const revision = scope.current.revision;
+      const assertCurrent = () => {
+        if (!scope.current.active || revision !== scope.current.revision)
+          throw new Error(
+            "Wallet or workspace changed. Review the action again.",
+          );
+      };
       await managedRequest(
         `/groups/${detail.group.id}/plans/${reviewed.plan.id}/confirm`,
         session,
@@ -104,48 +134,48 @@ export function useManagedActions(
           generation: reviewed.plan.runGeneration,
         },
       );
-      const idempotencyKey = requestKey();
-      await managedRequest(`/groups/${detail.group.id}/attempts`, session, {
-        planId: reviewed.plan.id,
-        idempotencyKey,
-      });
-      let submitted: { walletBatchId?: string; transactionHash?: string };
+      assertCurrent();
       if (session.mode === "local-development") {
         const approved = await prepareDevWalletLifecyclePlan(
           session.token,
           reviewed.plan.id,
+          { sessionId: tabSession, generation: reviewed.plan.runGeneration },
         );
+        assertCurrent();
+        if (!session.maxFeeWei || approved.maxFeeWei !== session.maxFeeWei)
+          throw new Error(
+            "Development signer fee cap changed. Reconnect and review the updated cap before signing.",
+          );
         const outcome = await submitDevWalletPlan(
           session.token,
           approved,
           true,
         );
-        submitted = {
-          walletBatchId: outcome.id,
-          transactionHash: outcome.transactionHash,
-        };
+        setPendingPlan(undefined);
+        setNotice(
+          `Development signer returned ${outcome.state}. Reconcile to verify the position and remaining inventory.`,
+        );
       } else {
-        const walletBatchId = await submitPlan({
-          chainId: reviewed.plan.chainId,
-          account: reviewed.plan.maker,
-          mode: "liquidity",
-          calls: reviewed.plan.calls,
-          createdAt: reviewed.plan.createdAt,
-          expiresAt: reviewed.plan.expiresAt,
-          summary: reviewed.plan.expectedEffects,
-          strategies: [],
-        });
-        submitted = { walletBatchId };
+        const walletBatchId = await submitExternalManaged(
+          session,
+          reviewed.plan,
+          tabSession,
+          assertCurrent,
+        );
+        setPendingPlan(undefined);
+        setNotice(
+          `Wallet batch submitted: ${walletBatchId}. Reconcile before taking another action.`,
+        );
       }
-      setPendingPlan(undefined);
-      setNotice(
-        "Submission returned. Reconciliation must confirm the on-chain result before the position is shown as active.",
+      const current = await managedRequest<GroupDetail>(
+        `/groups/${detail.group.id}`,
+        session,
       );
-      await managedRequest(`/groups/${detail.group.id}/attempts`, session, {
-        planId: reviewed.plan.id,
-        idempotencyKey,
-        ...submitted,
-      });
+      await recoverWalletBatches(
+        session,
+        detail.group.id,
+        current.transactions ?? [],
+      );
       await managedRequest(`/groups/${detail.group.id}/reconcile`, session, {});
       await refresh();
     });
@@ -159,6 +189,9 @@ export function useManagedActions(
     review,
     plan,
     confirm,
-    dismissPlan: () => setPendingPlan(undefined),
+    dismissPlan: () => {
+      scope.current.revision += 1;
+      setPendingPlan(undefined);
+    },
   };
 }

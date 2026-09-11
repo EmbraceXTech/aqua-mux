@@ -17,5 +17,7 @@ export function priceLabel(value: DenominatedPrice) {
 export function titleLabel(value: string) {
   return value
     .replaceAll("-", " ")
+    .replace(/\blp\b/g, "LP")
+    .replace(/\bmm\b/g, "MM")
     .replace(/^./, (letter) => letter.toUpperCase());
 }

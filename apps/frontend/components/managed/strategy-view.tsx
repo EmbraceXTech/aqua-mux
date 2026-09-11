@@ -123,6 +123,45 @@ export function StrategyView({ detail }: { detail: GroupDetail }) {
         <h2>Management limits</h2>
         <dl className="managed-facts">
           <div>
+            <dt>Spend budgets</dt>
+            <dd>
+              {group.config.policy.spendBudgets.value.length
+                ? group.config.policy.spendBudgets.value
+                    .map(amountLabel)
+                    .join(", ")
+                : "No token spend budget recorded"}{" "}
+              / {group.config.policy.spendBudgets.enforcedBy}
+            </dd>
+          </div>
+          <div>
+            <dt>Gas budget, raw native units</dt>
+            <dd>
+              {group.config.policy.gasBudgetWei.value} /{" "}
+              {group.config.policy.gasBudgetWei.enforcedBy}
+            </dd>
+          </div>
+          <div>
+            <dt>Maximum reference age</dt>
+            <dd>
+              {group.config.policy.maxReferenceAgeMs.value / 1000} seconds /{" "}
+              {group.config.policy.maxReferenceAgeMs.enforcedBy}
+            </dd>
+          </div>
+          <div>
+            <dt>Review triggers</dt>
+            <dd>
+              Range exit:{" "}
+              {group.config.policy.triggers.value.rangeExit
+                ? "enabled"
+                : "disabled"}
+              . Inventory drift:{" "}
+              {group.config.policy.triggers.value.inventoryDriftBps / 100}%.
+              Upward-only:{" "}
+              {group.config.policy.triggers.value.upwardOnly ? "yes" : "no"}. /{" "}
+              {group.config.policy.triggers.enforcedBy}
+            </dd>
+          </div>
+          <div>
             <dt>Allowed actions</dt>
             <dd>
               {group.config.policy.allowedActions.value
@@ -152,6 +191,25 @@ export function StrategyView({ detail }: { detail: GroupDetail }) {
             </dd>
           </div>
         </dl>
+        <details className="managed-footnote">
+          <summary>Permitted token and route addresses</summary>
+          <p>Assets / {group.config.policy.allowedAssets.enforcedBy}</p>
+          {group.config.policy.allowedAssets.value.map((address) => (
+            <p className="managed-address" key={address}>
+              {address}
+            </p>
+          ))}
+          <p>Routes / {group.config.policy.allowedRoutes.enforcedBy}</p>
+          {group.config.policy.allowedRoutes.value.length ? (
+            group.config.policy.allowedRoutes.value.map((address) => (
+              <p className="managed-address" key={address}>
+                {address}
+              </p>
+            ))
+          ) : (
+            <p>No routes recorded.</p>
+          )}
+        </details>
       </section>
     </div>
   );
