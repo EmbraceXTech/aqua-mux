@@ -1,3 +1,4 @@
+import { verifyDevSignerExecution } from "./fixtures/dev-signer-execution";
 import { rejectAlteredSignedPlans } from "./fixtures/external-adversarial";
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
@@ -245,6 +246,18 @@ for (const chainId of [42161, 56, 4663]) {
       /not delegated/,
     );
     assert.equal(store.list("transaction", maker, groupId).length, 0);
+    const localSigner = await verifyDevSignerExecution(
+      fork,
+      opened.plan,
+      store,
+    );
+    process.env[setting.env] = "http://127.0.0.1:1";
+    await assert.rejects(prepareExternalExecution(input, store), {
+      code: "external_preflight_unavailable",
+      status: 409,
+    });
+    assert.equal(store.list("transaction", maker, groupId).length, 0);
+    process.env[setting.env] = fork.url;
     await fork.request("anvil_setCode", [maker, delegatedAccountCode]);
     const methods: string[] = [];
     const provider = {
@@ -488,6 +501,8 @@ for (const chainId of [42161, 56, 4663]) {
       evidence: "controlled EIP1193 provider on isolated fork",
       publicBroadcasts: 0,
       registrations: opened.plan.registrations.length,
+      localSigner,
+      unavailableRpcRefusedBeforeJournaling: true,
       openHash: openReceipt.transactionHash,
       closeHash: closeReceipt.transactionHash,
       callDigest: digest(opened.plan.calls),

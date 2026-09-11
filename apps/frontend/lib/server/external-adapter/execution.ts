@@ -12,7 +12,7 @@ import {
   type ExecutionInput,
 } from "../managed-service/execution";
 import { externalAdapterId } from "./account";
-import { externalPreflight } from "./preflight";
+import { checkedExternalPreflight } from "./preflight";
 import { verifyExternalSignature } from "./signature";
 import type { ExternalAttempt } from "./types";
 
@@ -21,7 +21,7 @@ export async function prepareExternalExecution(
   store = openManagedStore(),
 ) {
   const plan = currentPlan(store, input);
-  const reviewed = await externalPreflight(plan, store, client(plan.chainId));
+  const reviewed = await checkedExternalPreflight(plan, store);
   return store.transaction(() => {
     if (planDigest(currentPlan(store, input)) !== planDigest(plan))
       throw new ManagedError(
@@ -91,8 +91,8 @@ export async function relayExternalExecution(
   const plan = assertManagedExecutionCurrent(guard, store);
   if (planDigest(plan) !== record.planDigest)
     throw new ManagedError("stale_plan", "The signed plan digest changed.");
+  await checkedExternalPreflight(plan, store, record.transaction, rpcOverride);
   const rpc = rpcOverride ?? client(plan.chainId);
-  await externalPreflight(plan, store, rpc, record.transaction);
   assertManagedExecutionCurrent(guard, store);
   // Record before transport. A connection error must never make this safe to retry.
   recordManagedSubmission(

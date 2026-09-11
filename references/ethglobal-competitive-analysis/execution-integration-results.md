@@ -54,7 +54,7 @@ It does not use Playwright or claim a wallet extension was tested.
 
 Arbitrum, BNB and Robinhood passed native-funded entry into two LP pairs and close-and-convert back to wrapped native with explicit unwrap.
 All three runs refused an unsupported account before journaling, refused altered signed calldata, recovered a transaction after a deliberately lost transport response and proved rollback of a deposit preceding a failed child call.
-The successful close left zero USDC and USDT balances.
+The successful Arbitrum and BNB closes left zero USDC and USDT balances.
 Small wrapped-native surplus remained because conversion unwraps conservative receipts; exact residual amounts are retained rather than reported as zero.
 The fixture transaction hashes, call digests and residuals are in `external-adapter-fork.json` beside this report.
 These hashes belong to isolated forks and are not public-network receipts.
@@ -77,8 +77,20 @@ No real wallet brand has passed this adapter yet.
 Robinhood direct-pool funding now passes with WETH/USDG and WETH/PONS and zero residual token balances; its unknown aggregation router remains unapproved.
 Privy delegated execution, market making and Hedera payments remain later milestones.
 
-
 The final receipt proof also checks each called deployment's runtime and each called proxy's implementation slot and code in the transaction prestate.
 This extends dependency checks beyond the pre-broadcast observation to the code and proxy slots actually used during execution.
 Expired approval results, mutated direct-route minimums, receivers, input amounts, callback programs and extra calls were refused through the real signing-relay flow on a controlled fork.
 The direct source replay passed for all eight Robinhood dependencies.
+
+
+## Final account and transport guards
+
+The local signer rereads the chain, implementation runtime, owner delegation and pending nonce before signing and again immediately before its broadcast callback.
+The controlled fork exercises its initial self-authorized EIP-7702 transaction on every target chain, including Robinhood, and verifies its exact transaction, authorization, call trace and prestate proof.
+Changing account implementation code or the pending nonce after signing refuses broadcast before the journal callback.
+Each local-signing check runs inside an isolated fork snapshot and restores that snapshot before the external adapter workflow.
+
+Unavailable external RPC or verification now returns the named `external_preflight_unavailable` conflict without creating an attempt.
+Existing precise account, policy and expiry errors remain intact.
+The fork flow temporarily points only its process-local endpoint to a closed loopback port and verifies the named refusal and zero journal entries before continuing.
+No upstream error text, credential, signed transaction or real private key is included in this evidence.

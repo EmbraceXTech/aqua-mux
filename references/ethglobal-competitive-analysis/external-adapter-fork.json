@@ -4,13 +4,19 @@
     "evidence": "controlled EIP1193 provider on isolated fork",
     "publicBroadcasts": 0,
     "registrations": 2,
-    "openHash": "0x3b0912705aee9d6ce03166c10fd387df45fded2dca4c3d8c4e5b774c399d8e49",
-    "closeHash": "0xc82f7643ed810889cd2c64cd692f0f0ceb619bda035af579546c750e9488513a",
-    "callDigest": "0xe38c9eb07ec397136128ed0c81c992738d55a0128b47e9e060b8aafb0e30c95b",
+    "localSigner": {
+      "hash": "0x531ab724e0d939c749b931fe0f9fcaa60d0a5bdf4dfbcfa5b77b6648704a79ad",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0x93092829c3fbb63e477280dd7da8bd14b9667898a9d4e6860c6e1809f12269e3",
+    "closeHash": "0x4dacec01faeb3fc834720e57f6f30fb9ad9db9ee4a3a901f24f644104d46b053",
+    "callDigest": "0xeede510f700b70a545b8857ee6db35516cb54ffb046d62151cb704f83ca33a43",
     "residual": [
       {
         "symbol": "WETH",
-        "amount": "19979998966384"
+        "amount": "19979992896449"
       },
       {
         "symbol": "USDC",
@@ -27,20 +33,26 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
-    "atomicRollbackHash": "0x6059c556432e13a1ad0f644ae9e9263a7421eefc7de3077dad1bf2a0130abd67"
+    "atomicRollbackHash": "0xd9c2f8c3b4fffde91260985c602fa7b6d7f872d2338e3bd3a2ff7b1fcde4c5a8"
   },
   {
     "chainId": 56,
     "evidence": "controlled EIP1193 provider on isolated fork",
     "publicBroadcasts": 0,
     "registrations": 2,
-    "openHash": "0x4029c403daba2d4aa9325510cc5f86c438f56f1fe676b5bc72a39a6f00f1c1ac",
-    "closeHash": "0xf97362d5e8c729c2548107a7d851a5fb9fe2e128bd7f8f5b780216b8fb2aa363",
-    "callDigest": "0xc1038ce5acb5b061f190b9519827d1eccbae0d8ac8e43ec8c3dcaf3e72a47272",
+    "localSigner": {
+      "hash": "0x463ba4bf0c1517f9fa86d6840b2483b558883bf73d16f25c2f0b11a0bfe40522",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0x1a1df44478a9efbcff809f0e86982cb81f72977ee955482730b70e3deb531d7f",
+    "closeHash": "0x0ef41868ccabc39fe0a74170e3ae7e0c40e4846b06f9edcba74a67962475be49",
+    "callDigest": "0xcf7dc891cde1de24673053e37127e776bf9197f7432fcf7cf44da78ff8105ba9",
     "residual": [
       {
         "symbol": "WBNB",
-        "amount": "19980031451147"
+        "amount": "19980031451156"
       },
       {
         "symbol": "USDC",
@@ -64,9 +76,15 @@
     "evidence": "controlled EIP1193 provider on isolated fork",
     "publicBroadcasts": 0,
     "registrations": 2,
-    "openHash": "0xad80279d2876741c1408828bca089b9608eed90a41661ba4443243f50b5c06ee",
-    "closeHash": "0x9f3e0c13131812c6752f0e0a652d7667fb9d068bfbff352b7899bdc31a5e7356",
-    "callDigest": "0xf960da5037a385edb80b1bdf88b72b4f6efbe9058fd9e90a11c415dd1d00967d",
+    "localSigner": {
+      "hash": "0x51d1b78790d2a820e27eed5dfb2820e3a4694710b91179c99d0b0be8f834d132",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0xaac9ac4751d112852a598c8ae4080e967ab42c1db715cf37e9c8eb278d48ef09",
+    "closeHash": "0x549d20059cbfcc077a5c8a155d076a354b57e4a183bc8ebe81c1d4851e1e7dbb",
+    "callDigest": "0xdfc2407b7ff3a433d51acc1316ebc4a1974e2bf77ef364bff401864c72ac576d",
     "residual": [
       {
         "symbol": "WETH",
@@ -87,6 +105,6 @@
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
     "expiryAfterWalletApprovalRefused": true,
     "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": true,
-    "atomicRollbackHash": "0x8f33b0d1ed8cc34952cc939a9e385a524b8619de1d016f36b0bdfd6d7f371e70"
+    "atomicRollbackHash": "0x4a6143abeebd12d3239df46af56ed956094d9b7f45b8c5d46cd1e322b6d41d48"
   }
 ]

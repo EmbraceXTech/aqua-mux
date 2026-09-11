@@ -132,6 +132,27 @@ export async function signDevBatch(
       throw new DevWalletError(
         "Transaction fees changed. Review a fresh plan.",
       );
+    const [freshChain, freshCode, freshOwnerCode, freshNonce] =
+      await Promise.all([
+        rpc.getChainId(),
+        rpc.getCode({ address: implementation }),
+        rpc.getCode({ address: account.address }),
+        rpc.getTransactionCount({
+          address: account.address,
+          blockTag: "pending",
+        }),
+      ]);
+    if (
+      freshChain !== plan.chainId ||
+      !freshCode ||
+      keccak256(freshCode) !== implementationHash ||
+      (freshOwnerCode ?? "0x").toLowerCase() !==
+        (ownerCode ?? "0x").toLowerCase() ||
+      freshNonce !== nonce
+    )
+      throw new DevWalletError(
+        "The local account code or nonce changed. Review a fresh plan.",
+      );
     await assertCurrent();
     validateDevPlan(plan, account.address);
   };

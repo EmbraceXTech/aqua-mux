@@ -6,6 +6,7 @@ import { validateDevPlan } from "../dev-wallet/policy";
 import { verifyDevAssets } from "../dev-wallet/assets";
 import { verifyDevRoutes } from "../dev-wallet/routes";
 import { encodeDevBatch } from "../dev-wallet/batch";
+import { client } from "../rpc";
 import { ManagedError } from "../managed-service/errors";
 import { verifyExternalAccount } from "./account";
 import type { ExternalTransaction } from "./types";
@@ -78,4 +79,27 @@ export async function externalPreflight(
   await verifyDevRoutes(batch);
   validateDevPlan(batch, plan.maker);
   return { transaction: envelope, feeLimit: feeLimit.toString() };
+}
+
+/** Public adapter boundary: transport failures must not become journaled attempts. */
+export async function checkedExternalPreflight(
+  plan: LifecyclePlan,
+  store: ManagedStore,
+  expected?: ExternalTransaction,
+  rpcOverride?: PublicClient,
+) {
+  try {
+    return await externalPreflight(
+      plan,
+      store,
+      rpcOverride ?? client(plan.chainId),
+      expected,
+    );
+  } catch (error) {
+    if (error instanceof ManagedError) throw error;
+    throw new ManagedError(
+      "external_preflight_unavailable",
+      "The external account or reviewed transaction could not be verified. Refresh the plan and account status.",
+    );
+  }
 }
