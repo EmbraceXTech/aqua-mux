@@ -25,6 +25,7 @@ import {
 import { formatUnits, type Address } from "viem";
 import { Button } from "./ui/button";
 import { Modal } from "./ui/modal";
+import { ManagedWorkspace } from "./managed/managed-workspace";
 import {
   networks,
   network,
@@ -230,7 +231,7 @@ export function AquaMux() {
       range,
     };
   const serialized = JSON.stringify(basket);
-  const portfolio = `https://1inch.com/portfolio/overview/address/${account ?? "0xCDBDE4F92af8Be2117AFAE94F4eF3F5d3B3b39d8"}`;
+  const [managedOpen, setManagedOpen] = useState(false);
   useEffect(() => {
     if (healthRequested.current) return;
     healthRequested.current = true;
@@ -576,25 +577,24 @@ export function AquaMux() {
         </Link>
         <nav className="main-nav" aria-label="Main navigation">
           <button
-            className={mode === "swap" ? "active" : ""}
+            className={!managedOpen && mode === "swap" ? "active" : ""}
             onClick={() => {
               change();
               setMode("swap");
+              setManagedOpen(false);
             }}
           >
             Swap
           </button>
           <button
-            className={mode === "liquidity" ? "active" : ""}
-            onClick={selectLiquidity}
+            className={!managedOpen && mode === "liquidity" ? "active" : ""}
+            onClick={() => { setManagedOpen(false); selectLiquidity(); }}
           >
             Liquidity
           </button>
-          <a href={portfolio} target="_blank" rel="noreferrer">
-            Portfolio <ArrowUpRight size={13} />
-          </a>
+          <button className={managedOpen ? "active" : ""} onClick={() => setManagedOpen(true)}>Strategies</button>
         </nav>
-        <div className="header-actions">
+        <div className={`header-actions${managedOpen ? " managed-header-hidden" : ""}`}>
           <div className="activity-popover">
             <button
               className="activity-button"
@@ -688,7 +688,7 @@ export function AquaMux() {
           </Button>
         </div>
       </header>
-      <main className="app-main">
+      {managedOpen ? <ManagedWorkspace /> : <main className="app-main">
         <div className="intro">
           <h1>
             One token.
@@ -1190,7 +1190,7 @@ export function AquaMux() {
             </button>
           </aside>
         </div>
-      </main>
+      </main>}
       <footer className="app-footer">
         <span>
           <span className="muted">© AquaMux 2026</span>
@@ -1321,14 +1321,7 @@ export function AquaMux() {
         {account ? (
           <>
             <div className="address-box">{account}</div>
-            <a
-              className="primary-link"
-              href={portfolio}
-              target="_blank"
-              rel="noreferrer"
-            >
-              View portfolio on 1inch <ArrowUpRight size={16} />
-            </a>
+            <Button variant="outline" onClick={() => { setWalletOpen(false); setManagedOpen(true); }}>Open managed liquidity</Button>
             <Button
               variant="outline"
               onClick={() => {
@@ -1423,7 +1416,7 @@ export function AquaMux() {
         }
         description={
           status?.status === 200
-            ? "View the transaction receipt or open your portfolio."
+            ? "Review the transaction receipt and its confirmation status."
             : status?.status === 100
               ? "Your transaction is submitted. Waiting for confirmation."
               : "Check your wallet activity and transaction receipt."
@@ -1472,14 +1465,7 @@ export function AquaMux() {
                 View transaction <ExternalLink size={14} />
               </a>
             ))}
-            <a
-              className="primary-link"
-              href={`https://1inch.com/portfolio/overview/address/${batch.account}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Track on 1inch <ArrowUpRight size={15} />
-            </a>
+            <Button variant="outline" onClick={() => { setReceiptOpen(false); setManagedOpen(true); }}>Open managed liquidity</Button>
           </>
         )}
       </Modal>
@@ -1514,7 +1500,7 @@ export function AquaMux() {
             AquaMux checks EIP-5792 atomic capability before sending. Wallets
             without it cannot execute this batch. Strategies use 1inch&apos;s
             resolver access check. Registration does not guarantee routing,
-            fills, fees, or immediate portfolio indexing.
+            fills, fees, or resolver discovery.
           </p>
         </div>
       </Modal>
