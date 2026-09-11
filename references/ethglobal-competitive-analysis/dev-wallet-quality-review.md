@@ -52,6 +52,8 @@ If that check fails, the catch path treats the attempt as an ambiguous broadcast
 An absent receipt cannot settle that hash, and the unresolved lock prevents later owner close actions.
 Preserve conservative handling when a send may have occurred, but distinguish a proven pre-send refusal and document crash recovery for a signed hash that never reached the network.
 Never release a truly ambiguous lock merely because a receipt is missing.
+The independent `/tmp/aquamux-dev-wallet-review-recovery.mts` fixture reproduced this through `DevBasketService.execute` and `status` with a revoked guard before the injected network side effect.
+It observed zero broadcasts, an unknown outcome, and refusal of a subsequent owner-close lock.
 
 ### P2: standard tests omit the signer security suite
 
