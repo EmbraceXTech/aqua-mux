@@ -123,10 +123,12 @@ Focused ESLint completed with zero warnings.
 The generator completed for all four chains and produced fallback counts of 11, 8, 10, and 6.
 The read-only live verification script confirmed contract decimals and one positive quote per supported chain.
 An end-to-end request against the existing Next.js development server returned both Robinhood `HOOD` addresses as separate exact-symbol results, and the validation endpoint independently returned verified USDG metadata and an available point-in-time route.
+The full frontend test command passed 99 tests, skipped one environment-dependent test, and reported no failures.
+The full frontend lint command completed with zero warnings.
 
 The repository-wide TypeScript check was also attempted while other Orca workers were editing shared files.
-That run failed in `test/lifecycle.test.ts` because another in-progress managed-lifecycle type no longer exposed `openingPrice` on every union member.
-No token registry file appeared in the TypeScript error output, and an isolated strict TypeScript check for the registry modules and tests passed before the API routes were added.
+The latest run failed in `test/managed-auth-next.test.ts` because an in-progress header fixture did not satisfy `HeadersInit`.
+No token registry file appeared in the TypeScript error output, and an isolated strict TypeScript check for the registry modules and tests passed.
 
 ## Ownership and integration boundary
 
