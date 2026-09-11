@@ -1,4 +1,5 @@
 import { openManagedStore } from "../store";
+import { isLocalOriginAlias } from "./request-origin";
 import { AuthError, WalletAuth } from "./wallet-auth";
 export { AuthError, WalletAuth } from "./wallet-auth";
 export type { OwnerSession, VerifiedSession } from "./wallet-auth";
@@ -15,7 +16,10 @@ export function requireOwner(request: Request) {
   if (!["GET", "HEAD"].includes(request.method)) auth.assertOrigin(origin);
   else if (origin) auth.assertOrigin(origin);
   // The URL is also checked when Origin is absent on same-origin GET requests.
-  if (new URL(request.url).origin !== auth.origin)
+  if (
+    new URL(request.url).origin !== auth.origin &&
+    !isLocalOriginAlias(request, auth.origin)
+  )
     throw new AuthError(403, "Request URL origin is not allowed.");
   const authorization = request.headers.get("authorization");
   if (!authorization?.startsWith("Bearer "))
