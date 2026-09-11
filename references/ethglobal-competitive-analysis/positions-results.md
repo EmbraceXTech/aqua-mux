@@ -73,6 +73,7 @@ The focused suite passed 18 tests.
 It covers an installed Aqua SDK ABI fixture, both fill directions, docking, exact movement signs, duplicate logs, bounded backfill, reorg recovery, a reorg during chunk acquisition, unavailable RPC, wrong chain, partial backing, sibling shared reads, receipt recovery, owner isolation, SQLite reopen, stale revision refusal, and cross-fork accounting refusal.
 Scoped ESLint passed.
 The full frontend typecheck passed after the concurrent lifecycle test owner corrected its union narrowing.
+At the later independent review checkpoint, concurrent dev-wallet changes produced `maxFeeWei` typing failures in `baskets.ts:52` and `managed.ts:81`; the reviewer routed these to the coordinator.
 
 The read-only live command uses existing public transaction fixtures from `verification/live-execution.json` and RPC credentials from the configured environment.
 It prints no endpoint, credential, or signed transaction.
@@ -99,6 +100,8 @@ This demonstrates active registration with constrained backing and does not esta
 The coordinator assigned a separate code-quality reviewer, `ctx_d339c0f7239e`.
 The reviewer identified a retained-prefix reorg race, insufficient accounting provenance checks, and the need for reconciliation at an explicitly finalized cursor.
 The implementation now addresses these findings with focused regression tests.
+The reviewer accepted `1ea39a2` for the bounded observer library scope with no unresolved critical findings on 2026-09-11 at 20:16:16 UTC.
+Independent verification passed all 18 tests, scoped lint, retained-prefix reorg refusal followed by clean replay, the 4 MiB capacity refusal, live chain reads, SQLite concurrency, and owner isolation.
 The initial focused implementation commit is `2f3704a`.
 Persistence, bounded history, provenance hardening, and live evidence are in `1ea39a2`.
 
