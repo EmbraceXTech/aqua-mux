@@ -156,3 +156,46 @@ for (const ignoresTerm of [false, true]) {
     assert.throws(() => process.kill(pid, 0), { code: "ESRCH" });
   });
 }
+
+test("local wallet requires explicit opt-in, fee cap and override key", async (t) => {
+  assert.throws(
+    () => settings(["up", "--dev-wallet"]),
+    /private_env_and_fee_cap/,
+  );
+  assert.throws(
+    () => settings(["up", "--dev-wallet-max-fee-wei", "1"]),
+    /opt_in/,
+  );
+  const path = join(await directory(t), "wallet.env");
+  await writeFile(path, `PRIVATE_KEY=${"1".repeat(64)}\n`, { mode: 0o600 });
+  const config = settings([
+    "frontend",
+    "--frontend-env",
+    path,
+    "--dev-wallet",
+    "--dev-wallet-max-fee-wei",
+    "1000",
+  ]);
+  const enabled = await frontendEnvironment(config, "token", {});
+  assert.equal(enabled.AQUAMUX_DEV_WALLET, "true");
+  assert.equal(enabled.AQUAMUX_DEV_WALLET_MAX_FEE_WEI, "1000");
+  assert.equal(
+    "PRIVATE_KEY" in runnerEnvironment(config, "token", enabled),
+    false,
+  );
+  assert.equal(
+    "AQUAMUX_DEV_WALLET" in runnerEnvironment(config, "token", enabled),
+    false,
+  );
+  const disabled = await frontendEnvironment(
+    settings(["frontend"]),
+    "token",
+    enabled,
+  );
+  assert.equal(disabled.AQUAMUX_DEV_WALLET, "false");
+  await writeFile(path, "ANOTHER_SETTING=value\n");
+  await assert.rejects(
+    frontendEnvironment(config, "token", enabled),
+    /override_key/,
+  );
+});

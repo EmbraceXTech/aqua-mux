@@ -19,10 +19,16 @@ export function settings(args) {
     frontendPort: 33127,
     provider: "codex",
     frontendEnv: undefined,
+    devWallet: false,
+    devWalletMaxFeeWei: undefined,
   };
   while (args.length) {
-    const key = args.shift(),
-      value = args.shift();
+    const key = args.shift();
+    if (key === "--dev-wallet") {
+      values.devWallet = true;
+      continue;
+    }
+    const value = args.shift();
     if (!value) throw new Error("missing_option_value");
     if (key === "--runner-port" || key === "--frontend-port") {
       const port = Number(value);
@@ -32,10 +38,19 @@ export function settings(args) {
     } else if (key === "--provider" && ["codex", "claude"].includes(value))
       values.provider = value;
     else if (key === "--frontend-env") values.frontendEnv = resolve(value);
+    else if (
+      key === "--dev-wallet-max-fee-wei" &&
+      /^[1-9]\d{0,29}$/.test(value)
+    )
+      values.devWalletMaxFeeWei = value;
     else throw new Error("invalid_option");
   }
   if (values.runnerPort === values.frontendPort)
     throw new Error("ports_must_differ");
+  if (values.devWallet && (!values.frontendEnv || !values.devWalletMaxFeeWei))
+    throw new Error("dev_wallet_requires_private_env_and_fee_cap");
+  if (values.devWalletMaxFeeWei && !values.devWallet)
+    throw new Error("dev_wallet_opt_in_required");
   return values;
 }
 
@@ -143,11 +158,18 @@ export async function frontendEnvironment(
     if (Object.keys(overrides).some((k) => k.startsWith("NEXT_PUBLIC_")))
       throw new Error("frontend_env_must_be_server_only");
   }
+  if (
+    config.devWallet &&
+    !/^(0x)?[a-fA-F0-9]{64}$/.test(overrides.PRIVATE_KEY ?? "")
+  )
+    throw new Error("dev_wallet_requires_override_key");
   const origin = `http://127.0.0.1:${config.frontendPort}`;
   return {
     ...inherited,
     ...overrides,
     NODE_ENV: "development",
+    AQUAMUX_DEV_WALLET: config.devWallet ? "true" : "false",
+    AQUAMUX_DEV_WALLET_MAX_FEE_WEI: config.devWalletMaxFeeWei ?? "",
     AQUAMUX_AUTH_ORIGIN: origin,
     AQUAMUX_DEV_WALLET_ORIGIN: origin,
     AQUAMUX_AGENT_RUNNER_URL: `http://127.0.0.1:${config.runnerPort}`,

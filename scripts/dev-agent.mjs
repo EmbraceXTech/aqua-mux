@@ -121,6 +121,9 @@ void main().catch(async (error) => {
     "startup_timeout",
     "authenticated_runner_unavailable",
     "cleanup_unconfirmed",
+    "dev_wallet_requires_private_env_and_fee_cap",
+    "dev_wallet_opt_in_required",
+    "dev_wallet_requires_override_key",
   ]);
   if (!controller.signal.aborted) {
     emit({
