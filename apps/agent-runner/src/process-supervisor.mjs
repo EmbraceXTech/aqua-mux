@@ -30,11 +30,16 @@ process.stdin.on('end', () => {
     process.exit(code ?? 1);
   });
 });`;
-const terminateGroup = `
-const fs = require('fs');
-fs.writeFileSync(process.argv[1] + '.cancel', '');
-try { process.kill(-Number(fs.readFileSync(process.argv[1], 'utf8')), 'SIGKILL'); } catch {}
-`;
+export async function retireContainer(id) {
+  try {
+    let info = JSON.parse((await docker(['inspect', id], undefined, { timeoutMs: 5000 })).toString())[0];
+    if (info.State.Running) await docker(['kill', id], undefined, { timeoutMs: 5000 });
+    info = JSON.parse((await docker(['inspect', id], undefined, { timeoutMs: 5000 })).toString())[0];
+    if (info.State.Running) throw new Error();
+  } catch {
+    throw new DockerOperationError('sandbox-process-cleanup-unconfirmed');
+  }
+}
 
 export async function spawnSandboxProcess(id, { command, workingDirectory = '/home/node/workspace', env = {}, abortSignal }) {
   abortSignal?.throwIfAborted();
@@ -42,15 +47,13 @@ export async function spawnSandboxProcess(id, { command, workingDirectory = '/ho
   const child = spawn('docker', ['exec', '-i', '-u', 'node', id, 'node', '-e', launcher], {
     env: dockerEnvironment(), stdio: ['pipe', 'pipe', 'pipe'],
   });
-  let finished = false;
   let killPromise;
   const kill = () => {
     if (!killPromise) killPromise = (async () => {
-      if (finished) return; // The supervisor already killed its remaining group.
-      try { await docker(['exec', id, 'node', '-e', terminateGroup, pidFile], undefined, { timeoutMs: 5000 }); }
-      catch { // Fall back to the whole container when process cleanup is uncertain.
-        await docker(['kill', id], undefined, { timeoutMs: 5000 });
-      } finally { child.kill('SIGKILL'); }
+      // An escaped process can survive its parent and process group.
+      // Only the dedicated container's termination is a complete boundary.
+      try { await retireContainer(id); }
+      finally { child.kill('SIGKILL'); }
     })();
     return killPromise;
   };
@@ -59,7 +62,6 @@ export async function spawnSandboxProcess(id, { command, workingDirectory = '/ho
   const exit = new Promise((resolve, reject) => {
     child.once('error', () => reject(new DockerOperationError('sandbox-process-start-failed')));
     child.once('close', async code => {
-      finished = true;
       abortSignal?.removeEventListener('abort', abort);
       if (killPromise) {
         try { await killPromise; }

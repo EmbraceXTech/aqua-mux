@@ -18,12 +18,12 @@ test('every post-creation acquisition failure attempts bounded owned cleanup', a
       calls.push({ args, options });
       if (args[0] === 'image') return Buffer.from(JSON.stringify([{ Id: `sha256:${'a'.repeat(64)}` }]));
       if (args[0] === failureAt) throw new DockerOperationError('docker-timeout');
-      return Buffer.from('');
+      return Buffer.from(args[0] === 'run' ? 'b'.repeat(64) : '');
     };
     await assert.rejects(acquireContainer(execute), { code: 'docker-timeout' });
     const cleanup = calls.at(-1);
     assert.equal(cleanup.args[0], 'rm');
-    assert.match(cleanup.args[2], /^aquamux-runtime-/);
+    assert.ok(/^aquamux-runtime-/.test(cleanup.args[2]) || /^[a-f0-9]{64}$/.test(cleanup.args[2]));
     assert.equal(cleanup.options.timeoutMs, 10000);
   }
 });

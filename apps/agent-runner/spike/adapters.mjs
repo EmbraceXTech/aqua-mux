@@ -22,7 +22,7 @@ let retain = false;
 const log = message => console.log(JSON.stringify({ provider, phase, message }));
 try {
   previous = phase === 'resume' ? JSON.parse(await readFile(statePath, 'utf8')) : null;
-  sandbox = await createDockerSandbox({ identity: previous?.containerIdentity, abortSignal: AbortSignal.timeout(45000) });
+  sandbox = await createDockerSandbox({ identity: previous?.containerIdentity, restartStopped: phase === 'resume', abortSignal: AbortSignal.timeout(45000) });
   evidence.imageId = sandbox.identity.imageId;
   log('container ready');
   let agent = createAgent(provider);
@@ -47,15 +47,19 @@ try {
     evidence.checks.restartRecovery = { ...turnEvidence(result), markerMatched: true, hostPid: process.pid };
     await session.destroy();
     session = null;
+    await sandbox.destroy();
+    sandbox = await createDockerSandbox();
     agent = createAgent(provider, { structured: true });
-    session = await agent.createSession({ sandboxSession: sandbox, abortSignal: AbortSignal.timeout(60000) });
+    session = await agent.createSession({ sandboxSession: sandbox, abortSignal: AbortSignal.timeout(180000) });
     const structured = await collectTurn(agent, session, 'Return status hold and marker schema-proof. Do not call tools.', AbortSignal.timeout(90000));
     if (structured.output.marker !== 'schema-proof') throw new Error('Unexpected schema marker');
     evidence.checks.structured = { ...turnEvidence(structured), schemaMatched: true };
     await session.destroy();
     session = null;
+    await sandbox.destroy();
+    sandbox = await createDockerSandbox();
     agent = createAgent(provider);
-    session = await agent.createSession({ sandboxSession: sandbox, abortSignal: AbortSignal.timeout(60000) });
+    session = await agent.createSession({ sandboxSession: sandbox, abortSignal: AbortSignal.timeout(180000) });
     for (const kind of ['timeout', 'cancellation']) {
       const controller = new AbortController();
       const signal = kind === 'timeout' ? AbortSignal.timeout(1500) : controller.signal;
@@ -74,8 +78,10 @@ try {
       // Never reuse that bridge for a new review.
       await session.destroy();
       session = null;
-      session = await agent.createSession({ sandboxSession: sandbox, abortSignal: AbortSignal.timeout(60000) });
-      evidence.checks[kind].recoveryPolicy = 'retire-interrupted-session';
+      await sandbox.destroy();
+      sandbox = await createDockerSandbox();
+      session = await agent.createSession({ sandboxSession: sandbox, abortSignal: AbortSignal.timeout(180000) });
+      evidence.checks[kind].recoveryPolicy = 'destroy-container-create-fresh';
       const recovery = await collectTurn(agent, session, 'Return only RECOVERED. Do not call tools.', AbortSignal.timeout(90000));
       if (recovery.text.trim() !== 'RECOVERED') throw new Error(`Session failed after ${kind}`);
       evidence.checks[`${kind}Recovery`] = { ...turnEvidence(recovery), responseMatched: true };

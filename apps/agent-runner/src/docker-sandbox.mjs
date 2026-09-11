@@ -14,14 +14,14 @@ export async function createDockerSandbox(options = {}) {
     async getPortUrl() { return (await this.getPortEndpoint()).url; },
     async stop() {
       if (stopped) return;
-      await docker(['stop', '-t', '2', id], undefined, { timeoutMs: 10000 });
+      await docker(['stop', '-t', '2', identity.instanceId], undefined, { timeoutMs: 10000 });
       stopped = true;
     },
     async destroy() {
-      await docker(['rm', '-f', id], undefined, { timeoutMs: 10000 });
+      await docker(['rm', '-f', identity.instanceId], undefined, { timeoutMs: 10000 });
       stopped = true;
     },
-    spawn(options) { return spawnSandboxProcess(id, options); },
+    spawn(options) { return spawnSandboxProcess(identity.instanceId, options); },
     async run(options) {
       const proc = await this.spawn(options);
       const [stdout, stderr, { exitCode }] = await Promise.all([new Response(proc.stdout).text(), new Response(proc.stderr).text(), proc.wait()]);
