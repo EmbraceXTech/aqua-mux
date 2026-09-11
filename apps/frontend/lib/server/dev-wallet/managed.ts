@@ -8,7 +8,7 @@ import {
   recordManagedSubmission,
   failManagedExecution,
 } from "../managed-service/execution";
-import { lifecycleBatch } from "./batch";
+import { managedSigningBatch } from "./managed-plan";
 import { DevWalletError } from "./config";
 import { validateDevPlan } from "./policy";
 import { maxFeeBudget, signDevBatch } from "./signer";
@@ -41,7 +41,7 @@ export function prepareDevManagedPlan(
     throw new DevWalletError(
       "Confirm the current managed plan before preparing local wallet execution.",
     );
-  const batch = lifecycleBatch(plan);
+  const batch = managedSigningBatch(plan, store);
   validateDevPlan(batch, session.owner);
   const group = store.get("group", plan.groupId, session.owner);
   if (!group) throw new DevWalletError("Managed group is unavailable.");
@@ -162,7 +162,7 @@ export async function executeDevManagedPlan(
         throw new DevWalletError("The reviewed managed plan changed.");
     };
     const signed = await signDevBatch(
-      lifecycleBatch(prepared.plan),
+      managedSigningBatch(prepared.plan, store),
       assertCurrent,
       BigInt(review.maxFeeWei),
     );

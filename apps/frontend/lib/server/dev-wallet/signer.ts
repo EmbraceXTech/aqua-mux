@@ -9,6 +9,7 @@ import { client } from "../rpc";
 import { devAccount, assertDevChain, DevWalletError } from "./config";
 import { validateDevPlan } from "./policy";
 import { verifyDevAssets } from "./assets";
+import { verifyDevRoutes } from "./routes";
 
 import {
   encodeDevBatch,
@@ -120,6 +121,7 @@ export async function signDevBatch(
   if (reserve < 0n) throw new DevWalletError("Invalid native gas reserve.");
   const assertReady = async () => {
     await verifyDevAssets(plan, rpc);
+    await verifyDevRoutes(plan);
     const balance = await rpc.getBalance({ address: account.address });
     const freshPrice = await rpc.getGasPrice();
     if (balance < value + gas * maxFeePerGas + reserve)

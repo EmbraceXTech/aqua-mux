@@ -1,6 +1,7 @@
 import { encodeFunctionData, parseAbi } from "viem";
-import type { LifecyclePlan, Token } from "../../managed";
+import type { LifecyclePlan, Token, TokenAmount } from "../../managed";
 import type { Plan } from "../../model";
+import type { RoutePolicyRequest, VerifiedRoute } from "../route-policy/types";
 
 export const implementation = "0xe6Cae83BdE06E4c305530e199D7217f42808555B";
 export const implementationHash =
@@ -25,7 +26,9 @@ export function encodeDevBatch(calls: Plan["calls"]) {
 
 export type DevBatchPlan = Plan & {
   gasReserveWei?: string;
-  verifiedTokens?: Token[];
+  assetMetadata?: Token[];
+  minimumReceipts?: TokenAmount[];
+  verifiedRoutes?: { request: RoutePolicyRequest; route: VerifiedRoute }[];
 };
 
 export function lifecycleBatch(plan: LifecyclePlan): DevBatchPlan {
@@ -39,7 +42,8 @@ export function lifecycleBatch(plan: LifecyclePlan): DevBatchPlan {
     strategies: [],
     summary: plan.expectedEffects,
     gasReserveWei: plan.gasReserveWei,
-    verifiedTokens: [
+    minimumReceipts: plan.minimumReceipts,
+    assetMetadata: [
       ...plan.inventoryBefore,
       ...plan.conservativeInventoryAfter,
       ...plan.minimumReceipts,

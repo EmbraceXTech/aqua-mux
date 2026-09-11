@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { DevWalletOutcome, DevWalletReview } from "../../dev-wallet";
-import { buildPlan } from "../plan";
+import { buildDevBasketPlan } from "./compile";
 import {
   openManagedStore,
   type ExecutionLock,
@@ -25,7 +25,7 @@ type Operation = DevWalletOutcome & {
 export class DevBasketService {
   constructor(
     private readonly store: ManagedStore = openManagedStore(),
-    private readonly compile = buildPlan,
+    private readonly compile = buildDevBasketPlan,
     private readonly sign = signDevBatch,
     private readonly receipt = devReceipt,
     private readonly feeBudget = maxFeeBudget,

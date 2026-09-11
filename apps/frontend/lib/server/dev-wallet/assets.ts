@@ -11,6 +11,7 @@ export function devPlanAssets(plan: DevBatchPlan): Token[] {
   for (const input of [
     ...tokens(plan.chainId),
     ...(plan.verifiedTokens ?? []),
+    ...(plan.assetMetadata ?? []),
   ]) {
     const token = tokenSchema.parse({
       address: input.address,
@@ -33,7 +34,9 @@ export async function verifyDevAssets(
 ) {
   const approved = devPlanAssets(plan);
   const selected = new Set(
-    (plan.verifiedTokens ?? []).map((token) => token.address.toLowerCase()),
+    [...(plan.verifiedTokens ?? []), ...(plan.assetMetadata ?? [])].map(
+      (token) => token.address.toLowerCase(),
+    ),
   );
   for (const token of approved.filter((token) => selected.has(token.address))) {
     if (token.address === NATIVE) {

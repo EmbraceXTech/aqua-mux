@@ -20,7 +20,7 @@ const fixture = (): DevBatchPlan => ({
   expiresAt: Date.now() + 30_000,
   strategies: [],
   summary: [],
-  verifiedTokens: [token],
+  assetMetadata: [token],
   calls: [
     {
       to: token.address,
@@ -39,14 +39,14 @@ test("stored dynamic token metadata permits only verified assets and rejects con
   const plan = fixture();
   validateDevPlan(plan, maker);
   assert.throws(
-    () => validateDevPlan({ ...plan, verifiedTokens: [] }, maker),
+    () => validateDevPlan({ ...plan, assetMetadata: [] }, maker),
     /Unapproved call target/,
   );
   assert.throws(
     () =>
       devPlanAssets({
         ...plan,
-        verifiedTokens: [token, { ...token, decimals: 18 }],
+        assetMetadata: [token, { ...token, decimals: 18 }],
       }),
     /Conflicting/,
   );

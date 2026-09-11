@@ -6,6 +6,7 @@ import { canonicalJson } from "../../managed";
 import { assertDevChain, DevWalletError } from "./config";
 import type { DevBatchPlan } from "./batch";
 import { devPlanAssets } from "./assets";
+import { validateDevRoutes } from "./routes";
 
 const aquaAbi = parseAbi([
   "function ship(address app,bytes strategy,address[] tokens,uint256[] amounts) returns(bytes32)",
@@ -57,6 +58,7 @@ export function validateDevPlan(
   now = Date.now(),
 ) {
   validateBatchEnvelope(plan, maker, now);
+  validateDevRoutes(plan, now);
   const router = classicRouter(plan.chainId).toLowerCase();
   const assets = new Set(
     devPlanAssets(plan).map((asset) => asset.address.toLowerCase()),
@@ -77,11 +79,8 @@ export function validateDevPlan(
       continue;
     }
     if (target === router) {
-      // An approved router address does not constrain its nested executor program.
-      // Keep swaps unavailable until a decoder and authority policy are verified.
-      throw new DevWalletError(
-        "Local wallet swaps require a verified executor policy. Use an already-funded LP plan or close-only action.",
-      );
+      // validateDevRoutes has already checked the complete call and its authority.
+      continue;
     }
     if (!assets.has(target))
       throw new DevWalletError("Unapproved call target.");
