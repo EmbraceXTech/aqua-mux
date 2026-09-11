@@ -30,7 +30,9 @@ export async function attemptApi(
         generation: z.number().int().nonnegative().optional(),
       })
       .parse(await body(request));
-    return ok(await prepareExternalExecution({ owner, groupId: id, ...input }));
+    return ok(
+      await prepareExternalExecution({ owner, groupId: id, ...input }, store),
+    );
   }
   if (segments.length === 5 && segments[4] === "signed") {
     const input = z
@@ -55,14 +57,17 @@ export async function attemptApi(
         404,
       );
     return ok({
-      attempt: await relayExternalExecution({
-        owner,
-        groupId: id,
-        planId: attempt.planId,
-        attemptId: attempt.id,
-        ...input,
-        serializedTransaction: input.serializedTransaction as `0x${string}`,
-      }),
+      attempt: await relayExternalExecution(
+        {
+          owner,
+          groupId: id,
+          planId: attempt.planId,
+          attemptId: attempt.id,
+          ...input,
+          serializedTransaction: input.serializedTransaction as `0x${string}`,
+        },
+        store,
+      ),
     });
   }
   if (segments.length === 5 && segments[4] === "submitted") {

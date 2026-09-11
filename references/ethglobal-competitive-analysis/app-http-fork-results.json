@@ -3,18 +3,30 @@
   "chainId": 42161,
   "publicTransactions": 0,
   "open": {
-    "hash": "0xbaa70d076794081bf90756b127b3b7d1be5790cec8cd6a6e031acbbfe17dba0f",
-    "attemptId": "4d45223c-76dc-4065-997d-806d293ec84e"
+    "hash": "0x399ce72dbcd93fcd6eb460cc87df3b00e86736dffb571563b95b138cf25e56bc",
+    "attemptId": "61c051e0-7e50-48a2-befe-a1dd548e9c6f"
   },
   "cooldownRefused": "cooldown_active",
+  "replacement": {
+    "hash": "0x093ad17525bc48f33b813d9b4124b56b21d8f61edca96015e1720982ca603d71",
+    "attemptId": "5234450d-bec9-4a06-a7e1-993d09d35881"
+  },
+  "upwardOnly": {
+    "policyAuthorizationRefused": "policy_authorization_required",
+    "downwardRefused": "direction_refused",
+    "upwardReplacement": {
+      "hash": "0x8e343a90b69153413677231959501db13b8aaf3611564d7caa91c306d4a43433",
+      "attemptId": "610df1d2-8c48-4f66-ad72-86f29323fc68"
+    }
+  },
   "unreviewedInventoryRefused": "inventory_review_required",
   "closeOnly": {
-    "hash": "0xfa26c626cca04b47d80e00f76f8cb59540c8a212734d6187fd151945af292ead",
-    "attemptId": "e4301e3d-f259-4149-a8ac-f867f47c5e0b"
+    "hash": "0x440e3680a4bcebf39645ef6fb4512cd406101aedaefa42ef4cd6292a3d12d8a4",
+    "attemptId": "80e07315-1925-4448-a046-4239f988fdb9"
   },
   "closedGroupConversion": {
-    "hash": "0xf39ddb267901d6d34ecaa2adc521ab205e6fb45ad5e7e3e3376202bc396efbb6",
-    "attemptId": "cc2e8076-f3d7-47ab-9a8f-59da250faf8b"
+    "hash": "0xd71f791949019afee524d6c6bd2ee10068918b7774b3ecee1899cd0d64027038",
+    "attemptId": "6456a898-dacd-488b-a486-9f5194de07e6"
   },
   "providerMethods": [
     "eth_accounts",
@@ -23,5 +35,5 @@
   ],
   "inventoryAttribution": "explicit quantities, no estimated attribution",
   "productionReceiptRecovery": true,
-  "generatedAt": "2026-09-11T23:32:17.782Z"
+  "generatedAt": "2026-09-11T23:48:47.355Z"
 }

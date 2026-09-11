@@ -1,3 +1,4 @@
+import { NATIVE, wrapped } from "@/lib/config";
 import { useEffect, useRef, useState } from "react";
 import type {
   LifecyclePlan,
@@ -104,11 +105,19 @@ export function useManagedActions(
       }>(`/groups/${detail.group.id}/plans`, session, {
         action,
         ...(review ? { reviewId: review.id } : {}),
-        ...(targetToken ? { targetToken } : {}),
+        ...(targetToken
+          ? targetToken === NATIVE
+            ? {
+                targetToken: wrapped(detail.group.chainId).address,
+                unwrap: true,
+              }
+            : { targetToken }
+          : {}),
         ...(inventory ? { inventory } : {}),
         sessionId: tabSession,
         generation: detail.bot.runGeneration,
       });
+      await refresh();
       if (scope.current.active && revision === scope.current.revision)
         setPendingPlan(response);
     });

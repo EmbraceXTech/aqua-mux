@@ -1,3 +1,4 @@
+import { verifyUpwardOnly } from "./fixtures/management-rule-checks";
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { parseEther, toHex, type Address } from "viem";
@@ -196,6 +197,42 @@ try {
   });
   assert.equal(replacement.data.code, "cooldown_active");
   evidence.cooldownRefused = replacement.data.code;
+  const baseline = store.getDocument<{
+    config: typeof preview.config;
+    confirmedAt: number;
+  }>("active-configuration", group.id, maker)!.data;
+  store.putDocument("active-configuration", group.id, maker, {
+    ...baseline,
+    confirmedAt: Date.now() - 60001,
+  });
+  const replacementReview = {
+    ...review,
+    id: "controlled-replacement-review",
+    result: { ...review.result, decision: "replace" as const },
+  };
+  store.put("review", replacementReview, maker);
+  const replacePlan = await api.send(`${path}/plans`, {
+    action: "replace",
+    reviewId: replacementReview.id,
+  });
+  if (replacePlan.status !== 200) {
+    const { createManagedPlan } =
+      await import("../lib/server/managed-service/plans");
+    await createManagedPlan(maker, group.id, {
+      action: "replace",
+      reviewId: replacementReview.id,
+    });
+  }
+  assert.equal(replacePlan.status, 200, JSON.stringify(replacePlan.data));
+  evidence.replacement = await execute(replacePlan.data);
+  evidence.upwardOnly = await verifyUpwardOnly({
+    store,
+    owner: maker,
+    groupId: group.id,
+    api,
+    review,
+    execute,
+  });
   const noQuantities = await api.send(`${path}/plans`, {
     action: "close-and-convert",
     targetToken: wrapped(chainId).address,
@@ -215,9 +252,8 @@ try {
   assert.ok(quantities.length);
   const convert = await api.send(`${path}/plans`, {
     action: "close-and-convert",
-    targetToken: wrapped(chainId).address,
+    targetToken: NATIVE,
     inventory: quantities,
-    unwrap: true,
   });
   if (convert.status !== 200) {
     const { createManagedPlan } =

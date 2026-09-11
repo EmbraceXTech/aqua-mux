@@ -75,3 +75,25 @@ No unit-test coverage was added after the user prohibited new or expanded unit t
 Browser work after the user's restriction uses only Orca's embedded browser commands.
 Historical Playwright evidence predates that restriction and is not presented as a new run.
 Build, final full-suite rerun, final fork artifact and the remaining Orca interaction evidence are still in progress.
+
+## Independent review corrections
+
+The reviewer's real client and authenticated HTTP fork probes reproduced unsupported signing methods leaving a prepared attempt and late signatures being relayed after workspace changes.
+The client now releases failures known to precede signing, explicit unsupported-method failures and signed results that have not been relayed when the workspace, provider, account, chain or expiry changes.
+It rechecks those facts after signing and before relay.
+Ambiguous failures after signing starts remain unresolved.
+[Correction evidence](app-review-corrections.json) records failed hashless attempts for unsupported signing and stale signed results, with no public transactions.
+
+The same probes confirmed that native conversion required an explicit wrapped-native target and unwrap instruction, and that resume previously did not require indexed fill coverage.
+Native destination selection now maps to those exact semantics in both client and service.
+Resume establishes indexing from recorded registration blocks when no start-block environment setting exists, preserves an earlier indexed start and requires current, fresh coverage through the finality target.
+The corrected probes return success with current indexed fill coverage and prepare the native conversion successfully.
+
+The full authenticated HTTP fork now includes ordinary replacement and upward-only replacement.
+It refuses an unauthorized policy edit and a downward price change, then executes an upward replacement with exact rational prices and nondecreasing bounds.
+The initial funding budget is only used for fund-and-open, so replacement uses the current reviewed reserve quantities without replaying the opening purchase budget.
+The subsequent close-only and native conversion after closing also confirm through production reconciliation.
+
+[Actual app plan review](app-plan-review.png) shows the native-funded five-call WETH/USDC plan with a fresh simulation and untouched confirmation checkbox.
+The original overlay remains separate from committed implementation.
+The last shared-workspace run passed 160 tests with one skip; the reviewer confirmed the committed snapshot plus `a424311` has 156 passing tests with one skip because it excludes the user's four additional chart cases.

@@ -39,6 +39,8 @@ export async function managedHttp(account: PrivateKeyAccount, chainId: number) {
     origin,
   );
   return {
+    origin,
+    session,
     async send(
       path: string,
       value?: unknown,

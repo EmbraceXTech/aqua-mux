@@ -32,6 +32,21 @@ export function groupBot(
 ): BotRun {
   const bot = store.list("bot", owner, groupId)[0];
   if (!bot) throw new ManagedError("not_found", "Managed bot not found.", 404);
+  if (bot.state === "running") {
+    const now = Date.now();
+    const policyExpired =
+      ownedGroup(store, owner, groupId).config.policy.expiresAt.value <= now;
+    if (!bot.lease || bot.lease.expiresAt <= now || policyExpired) {
+      const paused = pauseBot(
+        bot,
+        policyExpired
+          ? "The management policy expired. Review permissions before resuming."
+          : "Browser lease expired. Reconcile current positions before resuming.",
+      );
+      store.put("bot", paused, owner);
+      return paused;
+    }
+  }
   return bot;
 }
 export function createGroup(

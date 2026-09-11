@@ -159,12 +159,31 @@ export async function observeManagedGroup(owner: string, groupId: string) {
   const store = openManagedStore(),
     group = ownedGroup(store, owner, groupId),
     rpc = createPositionRpc(client(group.chainId));
-  const refs = store
-    .list("strategy", owner, groupId)
-    .map((s) => toPositionRef(group, s));
+  const strategies = store.list("strategy", owner, groupId);
+  const refs = strategies.map((s) => toPositionRef(group, s));
   const positions = await reconcilePositions(rpc, refs, AQUA);
   const repository = createObservationRepository(store, owner);
-  const start = process.env[`AQUAMUX_START_BLOCK_${group.chainId}`];
+  const configuredStart = process.env[`AQUAMUX_START_BLOCK_${group.chainId}`];
+  const registrationBlocks = strategies.map(
+    (strategy) => strategy.registrationBlock,
+  );
+  const knownStart =
+    registrationBlocks.length &&
+    registrationBlocks.every((block) => block && /^\d+$/.test(block))
+      ? registrationBlocks.reduce((earliest, block) =>
+          BigInt(block!) < BigInt(earliest!) ? block : earliest,
+        )!
+      : undefined;
+  const candidates = [configuredStart, knownStart].filter(
+    (block): block is string => !!block && /^\d+$/.test(block),
+  );
+  const start = candidates.reduce<string | undefined>(
+    (earliest, block) =>
+      earliest === undefined || BigInt(block) < BigInt(earliest)
+        ? block
+        : earliest,
+    undefined,
+  );
   const confirmations = Number(
     process.env[`AQUAMUX_CONFIRMATIONS_${group.chainId}`] ?? 1,
   );
@@ -178,6 +197,12 @@ export async function observeManagedGroup(owner: string, groupId: string) {
       confirmations,
       chunkSize: 2000,
     };
+    const existing = repository.read(observationKey(config));
+    if (
+      existing &&
+      BigInt(existing.value.config.startBlock) < BigInt(config.startBlock)
+    )
+      config.startBlock = existing.value.config.startBlock;
     await observeChain(rpc, repository, config);
     observation = repository.read(observationKey(config))?.value ?? null;
   }

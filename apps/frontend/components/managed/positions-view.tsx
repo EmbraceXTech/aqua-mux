@@ -1,3 +1,4 @@
+import { ObservedFlows } from "./observed-flows";
 import type { GroupDetail } from "@/lib/managed-client/api";
 import { amountLabel, titleLabel } from "./format";
 import { ObservationView } from "./observation-view";
@@ -6,6 +7,7 @@ export function PositionsView({ detail }: { detail: GroupDetail }) {
   return (
     <div className="managed-stack">
       <ObservationView detail={detail} />
+      <ObservedFlows detail={detail} />
       <section className="managed-panel">
         <h2>Managed inventory</h2>
         {detail.group.inventory.length ? (

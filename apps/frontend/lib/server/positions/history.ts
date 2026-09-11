@@ -42,6 +42,15 @@ export function getPositionHistory(
   const events = (observation?.events ?? []).filter((event) =>
     selected.some((position) => matchesPosition(event, position)),
   );
+  const movements = new Map<Address, bigint>();
+  for (const event of events) {
+    const delta = movementDelta(event);
+    if (delta)
+      movements.set(
+        delta.token,
+        (movements.get(delta.token) ?? 0n) + BigInt(delta.amount),
+      );
+  }
   return {
     coverage: observation
       ? {
@@ -86,6 +95,12 @@ export function getPositionHistory(
       delta: movementDelta(event),
       feeAccounting: "unknown" as const,
     })),
+    netTokenMovements: observation
+      ? [...movements].map(([token, amount]) => ({
+          token,
+          amount: amount.toString(),
+        }))
+      : null,
     performance: {
       realized: null,
       unrealized: null,

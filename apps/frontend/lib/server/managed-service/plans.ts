@@ -1,3 +1,4 @@
+import { NATIVE, wrapped } from "../../config";
 import { ensureManagedTokens } from "./tokens";
 import { pairInventory, availableInventory, planFunding } from "./funding";
 import { randomUUID } from "node:crypto";
@@ -46,6 +47,10 @@ export async function createManagedPlan(
     store = openManagedStore(),
     group = ownedGroup(store, owner, groupId),
     bot = groupBot(store, owner, groupId);
+  if (input.action === "close-and-convert" && input.targetToken === NATIVE) {
+    input.targetToken = wrapped(group.chainId).address;
+    input.unwrap = true;
+  }
   const close =
     input.action === "close" || input.action === "close-and-convert";
   assertManagementAction(store, group, input.action);
@@ -179,7 +184,7 @@ export async function createManagedPlan(
       owner,
     )?.data.intent;
     const funding =
-      !close && intent
+      input.action === "fund-and-open" && intent
         ? await planFunding(config, inventory, intent, snapshot.tokenMetadata)
         : undefined;
     const gasReserveWei =

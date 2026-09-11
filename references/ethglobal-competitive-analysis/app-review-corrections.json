@@ -1,0 +1,64 @@
+{
+  "source": "Independent reviewer reproduction scripts rerun against corrected app source",
+  "records": [
+    {
+      "probe": "unsupported sign method through production client and authenticated HTTP",
+      "publicTransactions": 0,
+      "methodCalls": [
+        "eth_chainId",
+        "eth_accounts",
+        "eth_chainId",
+        "eth_signTransaction"
+      ],
+      "before": [
+        {
+          "status": "failed",
+          "hasHash": false
+        }
+      ],
+      "reconcileStatus": 200,
+      "after": [
+        {
+          "status": "failed",
+          "hasHash": false
+        }
+      ]
+    },
+    {
+      "probe": "workspace became stale while wallet signed",
+      "publicTransactions": 0,
+      "stale": true,
+      "outcome": "failed",
+      "hasTransactionHash": false,
+      "methodCalls": [
+        "eth_chainId",
+        "eth_accounts",
+        "eth_chainId",
+        "eth_signTransaction"
+      ]
+    },
+    {
+      "probe": "resume without configured fill coverage",
+      "publicTransactions": 0,
+      "status": 200,
+      "botState": "running",
+      "positionHealth": "current",
+      "fillCoverage": {
+        "checkedAt": "2026-09-11T23:47:36.499Z",
+        "confirmations": 1,
+        "health": "current",
+        "indexedThrough": {
+          "hash": "0xf6b877523e2e13ccc034ac28ecefa50ea54971918be407be047c5cb9d233d989",
+          "number": "504212365"
+        },
+        "startBlock": "504212363",
+        "targetBlock": "504212365"
+      }
+    },
+    {
+      "probe": "native destination payload sent by current UI",
+      "publicTransactions": 0,
+      "status": 200
+    }
+  ]
+}

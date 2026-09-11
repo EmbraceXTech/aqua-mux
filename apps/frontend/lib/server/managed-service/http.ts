@@ -182,7 +182,23 @@ export async function managedApi(
         const observed = hasStrategies
           ? await observeManagedGroup(owner, id)
           : null;
-        if (observed && observed.positions.health !== "current")
+        const coverage = observed?.history.coverage;
+        const checkedAt =
+          typeof coverage?.checkedAt === "string"
+            ? Date.parse(coverage.checkedAt)
+            : NaN;
+        if (
+          observed &&
+          (observed.positions.health !== "current" ||
+            !coverage ||
+            coverage.health !== "current" ||
+            !coverage.indexedThrough ||
+            coverage.indexedThrough.number !== coverage.targetBlock ||
+            !Number.isFinite(checkedAt) ||
+            checkedAt > Date.now() + 10000 ||
+            Date.now() - checkedAt >
+              group.config.policy.maxReferenceAgeMs.value)
+        )
           throw new ManagedError(
             "reconciliation_required",
             "Fresh position and fill reconciliation is required before resuming.",

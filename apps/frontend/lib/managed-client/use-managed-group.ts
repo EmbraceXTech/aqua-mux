@@ -47,6 +47,32 @@ export function useManagedGroup(
     return () => controller.abort();
   }, [session, groupId]);
   useEffect(() => {
+    if (!session || !groupId) return;
+    let active = true;
+    const reloadVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      void refresh().catch((cause) => {
+        if (active)
+          setError(
+            cause instanceof Error
+              ? cause.message
+              : "Group recovery unavailable.",
+          );
+      });
+    };
+    document.addEventListener("visibilitychange", reloadVisible);
+    window.addEventListener("pageshow", reloadVisible);
+    const timer = setInterval(() => {
+      if (detail?.bot.lease?.sessionId !== tabSession) reloadVisible();
+    }, 5000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+      document.removeEventListener("visibilitychange", reloadVisible);
+      window.removeEventListener("pageshow", reloadVisible);
+    };
+  }, [session, groupId, detail?.bot.lease?.sessionId, tabSession, refresh]);
+  useEffect(() => {
     if (
       !session ||
       !groupId ||
