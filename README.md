@@ -35,16 +35,22 @@ Each Aqua strategy references real inventory in the maker wallet, so a fill in o
 
 The managed LP workflow is designed for one managed group per execution wallet on one chain.
 
-The manual mode uses an external browser wallet and requires the owner to review and sign each supported transaction.
+The manual mode is designed for an external browser wallet and requires the owner to review and sign each supported transaction.
+Managed external-wallet execution remains unavailable until its account adapter and receipt recovery have been verified.
 
 The local review runner can analyze a managed group and return a validated hold, fund-and-open, replace, close, or propose-conversion result, but model output is never transaction authorization.
 
-Explicit owner confirmation can submit transactions through the external-wallet path or the optional local development signer.
+Explicit owner confirmation can submit supported original basket transactions through the external-wallet path or the optional local development signer.
+The managed workflow exposes review and close planning for external wallets while its execution adapter remains gated.
 Starting the app and running read-only verification do not submit transactions by themselves.
 The local development signer can use real funds when explicitly configured, and its setup and evidence are separate from external-wallet compatibility and local-fork fixtures.
 
 Recurring reviews require an active browser lease and pause when the browser heartbeat expires.
 The current lease timeout is 45 seconds.
+The visible lease-owning tab sends a heartbeat every ten seconds while the bot runs.
+Passive transaction reconciliation is a separate eight-second visible-tab loop that runs only while a submitted or unknown transaction attempt needs recovery.
+It does not provide continuous observation of passive positions.
+Use the explicit Reconcile action to refresh positions when no unresolved transaction triggers that recovery loop.
 Stopping the bot or losing the browser lease pauses management, does not dock existing Aqua strategies, and cannot cancel a transaction that was already submitted.
 Existing passive positions can continue filling after a pause until they are closed or their configured program expiry makes them inactive.
 Confirmed Close retires the selected positions.
@@ -72,7 +78,8 @@ Network support does not by itself prove a successful LP registration, resolver 
 
 ## Quick start
 
-Required local tools are Node.js 22.13 or newer, npm, and Docker.
+Required local tools are Node.js 22.13 or newer and npm.
+Docker is required for ReviewService inference and runner checks, but not for starting the frontend.
 Node.js 22.23.2 and a local OrbStack Docker engine were used for the recorded runner checks.
 
 From the repository root, install and start the frontend:
@@ -103,10 +110,29 @@ PRIVATE_KEY=
 Starting the frontend and running read-only verification do not submit transactions by themselves.
 Explicit owner confirmation can submit through the connected external wallet, and the optional development-wallet adapter can sign real transactions when configured.
 
+The optional local development wallet is a real-funds server-side signer for explicit local testing.
+Enable it only on a loopback development server by adding these server-only settings to `apps/frontend/.env`:
+
+```dotenv
+AQUAMUX_DEV_WALLET=true
+AQUAMUX_DEV_WALLET_ORIGIN=http://127.0.0.1:3100
+AQUAMUX_AUTH_ORIGIN=http://127.0.0.1:3100
+AQUAMUX_DEV_WALLET_MAX_FEE_WEI=300000000000000
+```
+
+The development wallet requires `NODE_ENV=development`, an exact origin matching the browser URL, and the existing server-only `PRIVATE_KEY` and RPC settings.
+The fee cap is 0.0003 native units, and managed plans also apply their configured gas budget.
+Keep this server bound to loopback and require explicit owner confirmation for every submission.
+The adapter supports Arbitrum, BNB Chain, and Robinhood Chain in the recorded evidence.
+This opt-in does not establish Ethereum support or general external-wallet compatibility.
+See the [development-wallet results](references/ethglobal-competitive-analysis/dev-wallet-results.md) for the setup boundary and evidence.
+
 ## Local ReviewService runner
 
 The ReviewService is a private local prototype that uses the developer's existing Codex or Claude subscription through the installed HarnessAgent adapters.
 It does not use an API key or a hosted multi-user inference service for the recorded subscription checks.
+Before starting the runner, log in to the selected provider locally and confirm that its subscription-backed CLI session is available to the current user.
+The runner does not inherit a login automatically from another account or silently fall back to an API key.
 
 Start the runner from a second terminal while Docker is running:
 
@@ -140,6 +166,12 @@ npm run test:e2e
 npm run build
 ```
 
+The default Playwright configuration starts or reuses a frontend at `http://127.0.0.1:3100` and discovers the ordinary E2E suite.
+Run `npm run test:e2e -- --list` to inspect discovery without running the suite.
+The managed suite uses `apps/frontend/e2e/managed.config.ts`, targets `MANAGED_E2E_URL` or `http://127.0.0.1:33127`, and expects a separately started server.
+Use the managed suite only after that server has the fixture or explicitly configured development-wallet prerequisites required by its tests.
+Ordinary frontend startup does not enable the local development wallet.
+
 Run the runner's local and service checks from `apps/agent-runner`:
 
 ```sh
@@ -164,21 +196,28 @@ The checks retain only the provider-owned stopped container between those comman
 
 ## Verification and live signing
 
-The frontend fork verifier is intended to run against an isolated local Arbitrum Anvil fork:
+Run the following verification commands from `apps/frontend`.
+The fork verifier is intended to run against an isolated local Arbitrum Anvil fork and requires `ARBITRUM_RPC_URL`:
 
 ```sh
 npm run verify:fork
 ```
 
+The verifier uses port 18547 by default.
+Set `AQUAMUX_TEST_PORT` to an unused port when that port is occupied.
+
 The September 12, 2026 lifecycle run passed 15 isolated Arbitrum fork checks after correcting the fixture path, range schema, and transparent-route integration.
 The [lifecycle results](references/ethglobal-competitive-analysis/lifecycle-results.md) and [lifecycle quality review](references/ethglobal-competitive-analysis/lifecycle-quality-review.md) record the fixture boundary and verification details.
 This fork evidence does not establish present live execution, public resolver discovery, or complete application E2E acceptance.
 
-Read-only receipt and position checks use:
+Read-only receipt and position checks use the recorded `verification/live-execution.json` input:
 
 ```sh
 npm run verify:live
 ```
+
+This command checks the receipts and positions recorded in that file.
+It does not perform fresh live execution or prove a current LP lifecycle.
 
 The only documented command that can submit bounded live verification transactions is:
 
