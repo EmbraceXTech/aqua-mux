@@ -115,5 +115,6 @@ It is an HTTP integration test, not a claim of browser-extension wallet compatib
 
 The coordinator assigned separate reviewer dispatch `ctx_7a7b93b6775b`.
 That reviewer confirmed the focused store composition and persistence tests, and requested the metadata/vector and login-availability fixes included in `1b63154`.
-Final review acceptance is recorded by the coordinator after checking the corrected commit.
+The coordinator confirmed independent acceptance of `1b63154` after the reviewer reran all 17 tests, scoped lint, and full frontend typechecking.
+The accepted scope is the private local prototype.
 Downstream UI, lifecycle, observation, automation, and signing workers received the exact contract and storage/auth imports through Orca before integration.
