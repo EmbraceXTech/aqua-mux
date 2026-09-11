@@ -3,6 +3,7 @@ import { NATIVE } from "../../config";
 import { basketSchema, splitAmount, units, type Call } from "../../model";
 import { resolveLegacyBasket } from "../legacy-token-resolution";
 import { buildPlan } from "../plan";
+import { verifiedRouteCalls } from "../route-policy/route-calls";
 import { quoteVerifiedRoute } from "../route-policy/quote";
 import { validateCompiledRoute } from "../route-policy/validate";
 import type { RoutePolicyRequest } from "../route-policy/types";
@@ -80,11 +81,15 @@ export async function buildDevBasketPlan(
       ...request,
     });
     validateCompiledRoute(request, route);
-    if (spender && spender !== route.spender)
+    if (
+      route.approvalRequired !== false &&
+      spender &&
+      spender !== route.spender
+    )
       throw new DevWalletError("The basket routes use different spenders.");
-    spender = route.spender;
+    if (route.approvalRequired !== false) spender = route.spender;
     plan.verifiedRoutes!.push({ request, route });
-    plan.calls.push(route.call);
+    plan.calls.push(...verifiedRouteCalls(route));
     plan.minimumReceipts!.push({
       token: {
         address: destination.address,

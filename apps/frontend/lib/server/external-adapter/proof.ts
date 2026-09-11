@@ -72,3 +72,48 @@ export function accountPrestateProvesExecution(
     keccak256(code) === implementationHash
   );
 }
+
+export function prestateProvesPlanDependencies(
+  prestate: unknown,
+  plan: LifecyclePlan,
+) {
+  if (!plan.deploymentEvidence?.length) return false;
+  if (!prestate || typeof prestate !== "object") return false;
+  const accounts = Object.fromEntries(
+    Object.entries(prestate).map(([address, account]) => [
+      address.toLowerCase(),
+      account as { code?: Hex; storage?: Record<string, string> },
+    ]),
+  );
+  for (const target of new Set(plan.calls.map((call) => call.to))) {
+    const dependency = plan.deploymentEvidence.find(
+      (entry) => entry.address === target,
+    );
+    const actual = accounts[target];
+    if (
+      !dependency ||
+      !actual?.code ||
+      keccak256(actual.code) !== dependency.codeHash
+    )
+      return false;
+    if (dependency.implementation) {
+      const implementationEvidence = plan.deploymentEvidence.find(
+        (entry) => entry.address === dependency.implementation,
+      );
+      const implementationCode = accounts[dependency.implementation]?.code;
+      const slot =
+        actual.storage?.[
+          "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
+        ];
+      if (
+        !slot ||
+        BigInt(slot) !== BigInt(dependency.implementation) ||
+        !implementationEvidence ||
+        !implementationCode ||
+        keccak256(implementationCode) !== implementationEvidence.codeHash
+      )
+        return false;
+    }
+  }
+  return true;
+}

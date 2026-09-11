@@ -1,3 +1,4 @@
+import { rejectAlteredSignedPlans } from "./fixtures/external-adversarial";
 import assert from "node:assert/strict";
 import { writeFileSync } from "node:fs";
 import { erc20Abi, parseEther, toHex, type Address } from "viem";
@@ -20,6 +21,7 @@ import {
   digest,
   type LifecycleRequest,
 } from "../lib/server/lifecycle";
+import { routePolicyTargets } from "../lib/server/route-policy/route-calls";
 import { quoteLifecycleRoute } from "../lib/server/lifecycle/routes";
 import { readLifecycleSnapshot } from "../lib/server/lifecycle/snapshot";
 import { simulateLifecyclePlan } from "../lib/server/dev-wallet/simulation";
@@ -36,7 +38,7 @@ import { signExternalTransaction } from "../lib/external-adapter/sign";
 
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
 const results: unknown[] = [];
-for (const chainId of [42161, 56]) {
+for (const chainId of [42161, 56, 4663]) {
   const setting = networks.find((network) => network.id === chainId)!;
   const upstream = process.env[setting.env]!;
   const fork = await controlledFork(chainId, upstream);
@@ -71,13 +73,19 @@ for (const chainId of [42161, 56]) {
             },
           ]
         : tokens(chainId)
-            .filter((token) => ["USDC", "USDT"].includes(token.symbol))
+            .filter((token) =>
+              (chainId === 4663 ? ["USDG", "PONS"] : ["USDC", "USDT"]).includes(
+                token.symbol,
+              ),
+            )
             .map(({ address, decimals, symbol }) => ({
               address,
               decimals,
               symbol,
             }));
-    const amountIn = parseEther("0.001").toString();
+    const amountIn = parseEther(
+      chainId === 4663 ? "0.00005" : "0.001",
+    ).toString();
     const initial = [];
     for (const destination of quotes)
       initial.push(
@@ -131,7 +139,7 @@ for (const chainId of [42161, 56]) {
           base.address,
           ...quotes.map((t) => t.address),
         ]),
-        allowedRoutes: broker([classicRouter(chainId)]),
+        allowedRoutes: broker(routePolicyTargets(chainId)),
         maxSlippageBps: broker(100),
         maxReferenceAgeMs: broker(30000),
         expiresAt: broker(Date.now() + 3600000),
@@ -279,17 +287,48 @@ for (const chainId of [42161, 56]) {
         plan.expiresAt,
         () => {},
       );
-      const badSigned = await fork.account.signTransaction({
-        type: "eip1559",
-        chainId,
-        to: maker,
-        data: "0xdeadbeef",
-        value: 0n,
-        nonce: Number(BigInt(prepared.transaction.nonce)),
-        gas: BigInt(prepared.transaction.gas),
-        maxFeePerGas: BigInt(prepared.transaction.maxFeePerGas),
-        maxPriorityFeePerGas: BigInt(prepared.transaction.maxPriorityFeePerGas),
-      });
+      await rejectAlteredSignedPlans(
+        plan,
+        (data) =>
+          fork.account.signTransaction({
+            type: "eip1559",
+            chainId,
+            to: maker,
+            data,
+            value: 0n,
+            nonce: Number(BigInt(prepared.transaction.nonce)),
+            gas: BigInt(prepared.transaction.gas),
+            maxFeePerGas: BigInt(prepared.transaction.maxFeePerGas),
+            maxPriorityFeePerGas: BigInt(
+              prepared.transaction.maxPriorityFeePerGas,
+            ),
+          }),
+        (serializedTransaction) =>
+          relayExternalExecution(
+            {
+              owner: maker,
+              groupId,
+              planId,
+              attemptId: prepared.attempt.id,
+              serializedTransaction,
+            },
+            store,
+          ),
+      );
+      assert.equal(
+        store.get("transaction", prepared.attempt.id, maker)!.transactionHash,
+        null,
+      );
+      const originalPlan = store.get("plan", planId, maker)!;
+      store.put(
+        "plan",
+        {
+          ...originalPlan,
+          createdAt: Date.now() - 60000,
+          expiresAt: Date.now() - 1,
+        },
+        maker,
+      );
       await assert.rejects(
         relayExternalExecution(
           {
@@ -297,16 +336,17 @@ for (const chainId of [42161, 56]) {
             groupId,
             planId,
             attemptId: prepared.attempt.id,
-            serializedTransaction: badSigned,
+            serializedTransaction: signed,
           },
           store,
         ),
-        /differs/,
+        /expired/,
       );
       assert.equal(
         store.get("transaction", prepared.attempt.id, maker)!.transactionHash,
         null,
       );
+      store.put("plan", originalPlan, maker);
       const attempt = await relayExternalExecution(
         {
           owner: maker,
@@ -456,6 +496,9 @@ for (const chainId of [42161, 56]) {
       exactTransactionAndPrestateProof: true,
       ambiguousRelayRecovered: true,
       alteredSignedCalldataRejectedBeforeBroadcast: true,
+      expiryAfterWalletApprovalRefused: true,
+      directRouteMinimumReceiverAmountCallbackAndExtraCallRefused:
+        chainId === 4663,
       atomicRollbackHash: failedReceipt.transactionHash,
     });
     console.log(JSON.stringify(results.at(-1)));

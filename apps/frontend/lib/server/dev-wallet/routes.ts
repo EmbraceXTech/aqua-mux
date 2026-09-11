@@ -1,4 +1,8 @@
 import { classicRouter } from "../../config";
+import {
+  routePolicyTargets,
+  verifiedRouteCalls,
+} from "../route-policy/route-calls";
 import { validateCompiledRoute } from "../route-policy/validate";
 import { verifyRouteProvenance } from "../route-policy/provenance";
 import type { DevBatchPlan } from "./batch";
@@ -7,18 +11,24 @@ import { devPlanAssets } from "./assets";
 
 /** Bind the server's independent request, quote, actual batch calls and displayed receipts. */
 export function validateDevRoutes(plan: DevBatchPlan, now = Date.now()) {
-  const calls = plan.calls.filter(
-    (call) => call.to.toLowerCase() === classicRouter(plan.chainId),
-  );
+  const covered = new Set<number>();
+  const targets = new Set([
+    ...routePolicyTargets(plan.chainId),
+    classicRouter(plan.chainId),
+  ]);
   const records = plan.verifiedRoutes ?? [];
-  if (!calls.length && !records.length) return;
-  if (!records.length || calls.length !== records.length)
+  const routeIndexes = plan.calls.flatMap((call, index) =>
+    targets.has(call.to.toLowerCase() as typeof call.to) ? [index] : [],
+  );
+  if (!routeIndexes.length && !records.length) return covered;
+  if (!records.length)
     throw new DevWalletError(
       "Local wallet swaps require a verified executor policy and exact route records.",
     );
+  let cursor = 0;
   const minimums = new Map<string, bigint>();
   const assets = devPlanAssets(plan);
-  for (const [index, record] of records.entries()) {
+  for (const record of records) {
     const { request, route } = record;
     if (
       ![request.source, request.destination].every((address) =>
@@ -37,21 +47,34 @@ export function validateDevRoutes(plan: DevBatchPlan, now = Date.now()) {
         "Verified route does not match the reviewed maker, chain or expiry.",
       );
     validateCompiledRoute(request, route, now);
-    const call = calls[index];
-    if (
-      call.to.toLowerCase() !== route.call.to.toLowerCase() ||
-      call.data.toLowerCase() !== route.call.data.toLowerCase() ||
-      BigInt(call.value) !== BigInt(route.call.value)
-    )
+    const expected = verifiedRouteCalls(route);
+    const matches = (start: number) =>
+      expected.every((call, offset) => {
+        const actual = plan.calls[start + offset];
+        return (
+          actual &&
+          actual.to.toLowerCase() === call.to.toLowerCase() &&
+          actual.data.toLowerCase() === call.data.toLowerCase() &&
+          BigInt(actual.value) === BigInt(call.value)
+        );
+      });
+    let start = cursor;
+    while (start < plan.calls.length && !matches(start)) start++;
+    if (start === plan.calls.length)
       throw new DevWalletError(
-        "The batch call differs from its verified route.",
+        "The batch calls differ from their verified route.",
       );
+    for (let offset = 0; offset < expected.length; offset++)
+      covered.add(start + offset);
+    cursor = start + expected.length;
     const destination = request.destination.toLowerCase();
     minimums.set(
       destination,
       (minimums.get(destination) ?? 0n) + BigInt(route.minimumAmountOut),
     );
   }
+  if (routeIndexes.some((index) => !covered.has(index)))
+    throw new DevWalletError("An unverified extra route call is present.");
   const receipts = plan.minimumReceipts;
   if (
     !receipts ||
@@ -78,6 +101,7 @@ export function validateDevRoutes(plan: DevBatchPlan, now = Date.now()) {
         "Reviewed minimum receipts do not match the encoded output minimums.",
       );
   }
+  return covered;
 }
 
 export async function verifyDevRoutes(plan: DevBatchPlan) {

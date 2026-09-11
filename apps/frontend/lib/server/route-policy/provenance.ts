@@ -1,3 +1,5 @@
+import { verifyDirectProvenance } from "./direct/provenance";
+import { directChainId } from "./direct/deployments";
 import { keccak256, type Address, type Hex } from "viem";
 import { client } from "../rpc";
 import { canonicalRequest, selectPool } from "./calldata";
@@ -28,6 +30,11 @@ export async function verifyRouteProvenance(
   try {
     if ((await rpc.getChainId()) !== request.chainId)
       throw new Error("Route RPC chain mismatch.");
+    if (request.chainId === directChainId) {
+      await verifyDirectProvenance(request, rpc);
+      validateCompiledRoute(route.request, route);
+      return;
+    }
     const router = routerDeployments[request.chainId],
       pool = selectPool(request);
     if (router.wrappedImplementation) {

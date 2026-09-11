@@ -52,8 +52,8 @@ The script starts isolated forks on dynamically selected loopback ports, uses a 
 It invokes the production lifecycle compiler, account preparation, provider signing helper, backend signed-transaction relay and receipt verifier.
 It does not use Playwright or claim a wallet extension was tested.
 
-Both Arbitrum and BNB passed native-funded entry into two LP pairs and close-and-convert back to wrapped native with explicit unwrap.
-Both runs refused an unsupported account before journaling, refused altered signed calldata, recovered a transaction after a deliberately lost transport response and proved rollback of a deposit preceding a failed child call.
+Arbitrum, BNB and Robinhood passed native-funded entry into two LP pairs and close-and-convert back to wrapped native with explicit unwrap.
+All three runs refused an unsupported account before journaling, refused altered signed calldata, recovered a transaction after a deliberately lost transport response and proved rollback of a deposit preceding a failed child call.
 The successful close left zero USDC and USDT balances.
 Small wrapped-native surplus remained because conversion unwraps conservative receipts; exact residual amounts are retained rather than reported as zero.
 The fixture transaction hashes, call digests and residuals are in `external-adapter-fork.json` beside this report.
@@ -74,5 +74,11 @@ Lifecycle snapshot and development signer asset checks carry deployment evidence
 Independent code-quality review of this external adapter milestone is required before acceptance.
 The application owner must complete authenticated HTTP and Orca browser wiring, including unsupported-provider messaging and unknown-attempt recovery.
 No real wallet brand has passed this adapter yet.
-Robinhood direct-pool funding and its token/proxy dependencies remain in progress; its unknown aggregation router is not approved.
+Robinhood direct-pool funding now passes with WETH/USDG and WETH/PONS and zero residual token balances; its unknown aggregation router remains unapproved.
 Privy delegated execution, market making and Hedera payments remain later milestones.
+
+
+The final receipt proof also checks each called deployment's runtime and each called proxy's implementation slot and code in the transaction prestate.
+This extends dependency checks beyond the pre-broadcast observation to the code and proxy slots actually used during execution.
+Expired approval results, mutated direct-route minimums, receivers, input amounts, callback programs and extra calls were refused through the real signing-relay flow on a controlled fork.
+The direct source replay passed for all eight Robinhood dependencies.

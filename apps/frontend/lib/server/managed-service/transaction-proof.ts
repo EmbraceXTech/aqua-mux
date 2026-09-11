@@ -5,6 +5,7 @@ import { encodeDevBatch, implementation } from "../dev-wallet/batch";
 import {
   accountPrestateProvesExecution,
   exactBatchTrace,
+  prestateProvesPlanDependencies,
 } from "../external-adapter/proof";
 
 export const traceProvesPlan = exactBatchTrace;
@@ -65,10 +66,13 @@ export async function verifyManagedTransactionProof(
         { tracer: "prestateTracer", tracerConfig: { diffMode: false } },
       ],
     } as never);
-    return accountPrestateProvesExecution(
-      prestate,
-      plan.maker,
-      initializedByTransaction,
+    return (
+      prestateProvesPlanDependencies(prestate, plan) &&
+      accountPrestateProvesExecution(
+        prestate,
+        plan.maker,
+        initializedByTransaction,
+      )
     );
   } catch {
     return false;

@@ -6,8 +6,8 @@ Independent review and adapter integration remain required before accepting the 
 
 ## Ownership and integration
 
-This worker owns `apps/frontend/lib/server/route-policy/`, `apps/frontend/test/route-policy.test.ts`, and this report.
-The signer and lifecycle workers own their adapters, stored review records, batch accounting, and submission checks.
+The consolidated chain-execution worker owns the route policy, local signer, external adapter, lifecycle compiler integration and their retained execution evidence.
+The app worker owns HTTP and browser integration, managed product state and proposal controls.
 
 `quoteVerifiedRoute(request)` returns a serializable `VerifiedRoute` with its original request, exact call, spender, expected output, enforced minimum, expiry, and pinned pool identifier.
 Requests contain chain ID, maker, source and destination addresses, input amount, minimum output floor, and slippage basis points.
@@ -20,7 +20,8 @@ The enclosing batch still requires whole-batch simulation and signer policy chec
 
 ## Policy
 
-Only locally constructed `unoswapTo` and `ethUnoswapTo` calls over one pinned pool are supported.
+Policy version 1 supports locally constructed `unoswapTo` and `ethUnoswapTo` calls over one pinned pool.
+Policy version 2 adds the Robinhood direct-pool program described below.
 The compiler constructs every flag and address bit, and the validator compares the entire calldata to this canonical encoding.
 Receiver, source token, input amount, native value, pool address, pool direction, destination token, output minimum, and spender are bound to the request and manifest.
 The destination follows the verified pool's immutable tokens and the explicit native unwrap flag.
@@ -56,7 +57,7 @@ The enabled deployment is additionally pinned by its complete runtime hash, incl
 | --- | --- | --- | --- |
 | Arbitrum 42161 | Verified source, recompiled router match, pinned pool runtime | Two live RPC `eth_call` simulations with synthetic caller balance | ETH/WETH to or from USDC and USDT |
 | BNB 56 | Recompiled router, pools, quoter and WBNB with semantic immutable checks | Two live RPC eth_call simulations with synthetic caller balance | BNB/WBNB to or from USDC and USDT |
-| Robinhood 4663 | Runtime and spender observed; source unavailable | No accepted transparent route | Disabled |
+| Robinhood 4663 | Eight direct-pool dependencies recompiled with pinned code, proxy and token bindings | Controlled-provider native-funded two-pair entry and close-convert on a real-code fork | WETH/USDG and WETH/PONS direct pools; aggregation router disabled |
 
 Arbitrum's router runtime hash is `0xaae25d52ea3e7bbb8cc826b589060f063c7f6ca2c2da88bc9b3b0e0a57bd8fb6`.
 Pool addresses, runtime hashes, and verified source endpoints are in `deployments.ts`.
@@ -84,15 +85,15 @@ No exemption was added.
 
 ## Validation and remaining work
 
-`npx tsx --test test/route-policy.test.ts` passes five tests using real calldata and deployed runtime fixtures.
+The initial `npx tsx --test test/route-policy.test.ts` checkpoint passed five tests using real calldata and deployed runtime fixtures.
 Tests reject manipulated amount, minimum, receiver, spender, value, source/destination metadata, unknown pool/program/flags, trailing second-call bytes, stale routes, wrong RPC chain, and changed or absent deployment code.
 TypeScript, focused ESLint, and focused Prettier checks pass.
 The signer must separately demonstrate harmful second batch-call refusal and complete minimum receipt accounting.
 
 BNB pool source verification and native-input read-only route proofs are complete.
-Resolve Robinhood source provenance before enabling routes there.
+The Robinhood milestone below supplies the required source provenance for direct-pool execution.
 Obtain independent code-quality and security review, address required refactors, and verify signer/lifecycle adapters.
-The requested usable funded lifecycle across all three chains is not yet complete.
+The later direct-pool milestone below adds controlled-provider funded entry and conversion evidence on all three chains; public-wallet browser integration remains a separate acceptance gate.
 
 ## Resumed source attestation and expiry corrections
 
@@ -122,3 +123,48 @@ The calls returned 72483725222404458 USDC base units and 72408738639154274 USDT 
 These are historical quote observations, not current prices or funded lifecycle receipts.
 Nine focused route tests, seven compiler replays and the frontend TypeScript check passed at this checkpoint.
 Final independent review and full entry/close-convert fork execution remain integration gates.
+
+## Robinhood direct-pool milestone
+
+Robinhood no longer depends on recovering the unknown aggregation router to fund LP inventory.
+The direct-pool policy supports WETH/USDG and WETH/PONS through verified Uniswap V2 pair code.
+The existing registry identifies those assets; no USDC or USDT identity was invented for this chain.
+This is executable route support, not an endorsement of an asset or a claim about token value.
+
+Policy version 2 constructs an exact contiguous program inside the verified atomic account batch.
+Native input first wraps the exact amount, then transfers that input to the pinned pool.
+The pool swap specifies an exact output, the reviewed maker receiver and empty callback bytes.
+An optional final unwrap uses only that exact wrapped-native output.
+The source token transfer, pool address, output side, amount, receiver, native value and program length are bound to the canonical request.
+No allowance is needed for the direct transfer.
+The validator rejects an altered transfer, changed output, callback program, unknown pool or extra pool call.
+The signer requires the complete sequence to occur once at its expected order in the reviewed batch.
+Unmatched token transfers and extra pool/router calls remain forbidden.
+
+Direct-pool quotes intentionally fix the output to the on-chain reserve quote rather than requesting the lower slippage floor.
+This avoids donating the slippage allowance to pool liquidity providers.
+An unfavorable price move causes the whole batch to revert.
+The deterministic route limit rejects input above one percent of the source reserve.
+This is a configured execution bound, not an estimate of liquidity quality.
+The PONS pool has much less liquidity than the USDG pool, so a larger funding request may be unavailable.
+The proved Robinhood run used 50000000000000 wei of native input for each purchase.
+
+The manifest pins wrapped-native and USDG proxy shells, both implementations, PONS, the V2 factory and both pairs.
+Provenance rereads their bytecode, proxy implementation slots, selected pair token and factory getters, and the current block relative to PONS's immutable launch restriction end.
+PONS source has fixed supply and applies launch buy restrictions only before that immutable end block.
+Those restrictions were already expired at the retained block.
+USDG transfer source preserves exact base token balances and can reject paused or frozen accounts; the policy does not bypass those controls.
+
+Eight standard JSON source inputs and pinned compiler hashes are retained under `lib/server/route-policy/direct/fixtures/`.
+The replay script verifies source hashes, compiler binaries, runtime lengths, immutable substitutions and executable bytes.
+The V2 factory source comes from the [official Uniswap repository](https://github.com/Uniswap/v2-core/blob/master/contracts/UniswapV2Factory.sol) combined with the retained verified pair source.
+Its runtime matches after substituting only the explicit bzzr1 digest in the embedded pair creation metadata and the factory's final metadata.
+Both substitution offsets require the expected CBOR digest prefix.
+No executable instructions are excluded.
+The remaining sources were recovered through Sourcify's verified contract API; exact URLs are retained per deployment in the attestation.
+
+`external-adapter-fork.json` records successful native-funded two-pair entry and close-and-convert on Robinhood, Arbitrum and BNB through the production external signing adapter.
+Robinhood close left zero WETH, USDG and PONS residuals.
+The controlled-provider flow refused manipulated direct output, receiver, source amount, callback bytes and an extra pool call before broadcasting.
+It also refused a signed transaction after plan expiry, recovered a deliberately lost RPC send response and proved whole-batch rollback after a failing nested call.
+All receipts in this artifact belong to isolated forks, and public broadcasts remain zero.

@@ -15,13 +15,15 @@ export type RoutePolicyRequest = {
 export type VerifiedRoute = {
   request: RoutePolicyRequest;
   call: Call;
+  calls?: Call[];
+  approvalRequired?: false;
   spender: Address;
   amountIn: string;
   amountOut: string;
   minimumAmountOut: string;
   quotedAt: number;
   expiresAt: number;
-  policy: { version: 1; poolId: string };
+  policy: { version: 1 | 2; poolId: string };
 };
 
 export type PoolDeployment = {

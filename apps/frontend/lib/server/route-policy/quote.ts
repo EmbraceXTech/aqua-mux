@@ -1,3 +1,5 @@
+import { quoteDirectRoute } from "./direct/quote";
+import { directChainId } from "./direct/deployments";
 import { keccak256, parseAbi } from "viem";
 import { NATIVE } from "../../config";
 import { client } from "../rpc";
@@ -25,6 +27,7 @@ const reservesAbi = parseAbi([
 export async function quoteVerifiedRoute(
   input: RoutePolicyRequest,
 ): Promise<VerifiedRoute> {
+  if (input.chainId === directChainId) return quoteDirectRoute(input);
   const request = canonicalRequest(input);
   const pool = selectPool(request),
     router = routerDeployments[request.chainId];

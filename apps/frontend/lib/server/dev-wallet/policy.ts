@@ -58,12 +58,13 @@ export function validateDevPlan(
   now = Date.now(),
 ) {
   validateBatchEnvelope(plan, maker, now);
-  validateDevRoutes(plan, now);
+  const routeCalls = validateDevRoutes(plan, now);
   const router = classicRouter(plan.chainId).toLowerCase();
   const assets = new Set(
     devPlanAssets(plan).map((asset) => asset.address.toLowerCase()),
   );
-  for (const call of plan.calls) {
+  for (const [index, call] of plan.calls.entries()) {
+    if (routeCalls.has(index)) continue;
     const target = call.to.toLowerCase();
     if (target === AQUA) {
       try {

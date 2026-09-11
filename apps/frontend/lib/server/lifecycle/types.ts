@@ -47,6 +47,8 @@ export type RouteRequest = {
 };
 export type LifecycleRoute = {
   call: Call;
+  calls?: Call[];
+  approvalRequired?: false;
   spender: Address;
   amountOut: string;
   minimumAmountOut: string;

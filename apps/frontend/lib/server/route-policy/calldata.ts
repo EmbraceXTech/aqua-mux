@@ -1,6 +1,7 @@
 import { encodeFunctionData, parseAbi, type Address } from "viem";
 import { NATIVE } from "../../config";
 import type { Call } from "../../model";
+import { directChainId } from "./direct/deployments";
 import { poolDeployments, routerDeployments } from "./deployments";
 import type { PoolDeployment, RoutePolicyRequest } from "./types";
 
@@ -30,7 +31,7 @@ export function canonicalRequest(
 ): RoutePolicyRequest {
   if (
     !Number.isSafeInteger(request.chainId) ||
-    !routerDeployments[request.chainId]
+    (!routerDeployments[request.chainId] && request.chainId !== directChainId)
   )
     throw new Error(
       "No verified transparent router deployment for this chain.",

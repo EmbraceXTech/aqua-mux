@@ -1,3 +1,5 @@
+import { compileDirectCalls, selectDirectPool } from "./direct/calldata";
+import { directChainId } from "./direct/deployments";
 import {
   canonicalRequest,
   compileTransparentCall,
@@ -17,8 +19,12 @@ export function validateCompiledRoute(
   const stored = canonicalRequest(route.request);
   if (JSON.stringify(canonical) !== JSON.stringify(stored))
     throw new Error("Route request differs from the canonical plan.");
-  const pool = selectPool(canonical);
-  if (route.policy?.version !== 1 || route.policy.poolId !== pool.id)
+  const direct = canonical.chainId === directChainId;
+  const pool = direct ? selectDirectPool(canonical) : selectPool(canonical);
+  if (
+    route.policy?.version !== (direct ? 2 : 1) ||
+    route.policy.poolId !== pool.id
+  )
     throw new Error("Unknown route policy or pool.");
   if (
     ![route.quotedAt, route.expiresAt, now].every(Number.isSafeInteger) ||
@@ -43,6 +49,29 @@ export function validateCompiledRoute(
     throw new Error(
       "Route amounts differ from the reviewed amount or minimum.",
     );
+  if (direct) {
+    const calls = compileDirectCalls(canonical, route.minimumAmountOut);
+    const expectedCall = calls.find((call) => call.to === pool.address)!;
+    const same = (a: typeof expectedCall, b: typeof expectedCall) =>
+      a.to.toLowerCase() === b.to.toLowerCase() &&
+      a.data.toLowerCase() === b.data.toLowerCase() &&
+      a.value === b.value;
+    if (
+      route.approvalRequired !== false ||
+      route.spender !== pool.address ||
+      minimum !== expected ||
+      !route.calls ||
+      route.calls.length !== calls.length ||
+      !route.calls.every((call, index) => same(call, calls[index])) ||
+      !same(route.call, expectedCall)
+    )
+      throw new Error(
+        "Direct route calls do not exactly enforce the reviewed authority.",
+      );
+    return;
+  }
+  if (route.calls || route.approvalRequired !== undefined)
+    throw new Error("Unknown router call program.");
   const compiled = compileTransparentCall(canonical, route.minimumAmountOut);
   if (
     route.spender.toLowerCase() !==

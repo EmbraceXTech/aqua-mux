@@ -4,13 +4,13 @@
     "evidence": "controlled EIP1193 provider on isolated fork",
     "publicBroadcasts": 0,
     "registrations": 2,
-    "openHash": "0xb7ca4f7f05f37c56aee668d34277a75b28592cfb6842ddd4c97c4eb2618a9fea",
-    "closeHash": "0xdc1a62f1163cd2518eb44fd284134f2fce7027c0dca84cbdb12bab0cb6a48118",
-    "callDigest": "0x8c04b7291d0af6f44b89d1d07135c438285e234d5c3aa2067f287e90eab6132e",
+    "openHash": "0x3b0912705aee9d6ce03166c10fd387df45fded2dca4c3d8c4e5b774c399d8e49",
+    "closeHash": "0xc82f7643ed810889cd2c64cd692f0f0ceb619bda035af579546c750e9488513a",
+    "callDigest": "0xe38c9eb07ec397136128ed0c81c992738d55a0128b47e9e060b8aafb0e30c95b",
     "residual": [
       {
         "symbol": "WETH",
-        "amount": "19979998648309"
+        "amount": "19979998966384"
       },
       {
         "symbol": "USDC",
@@ -25,20 +25,22 @@
     "exactTransactionAndPrestateProof": true,
     "ambiguousRelayRecovered": true,
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
-    "atomicRollbackHash": "0x825f0319df85b5117ff4d6fb8caa94a071c574fd738fbc7f1cb759f121a4800c"
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
+    "atomicRollbackHash": "0x6059c556432e13a1ad0f644ae9e9263a7421eefc7de3077dad1bf2a0130abd67"
   },
   {
     "chainId": 56,
     "evidence": "controlled EIP1193 provider on isolated fork",
     "publicBroadcasts": 0,
     "registrations": 2,
-    "openHash": "0xaffbe84335d4aafce62ddadac67bc0645c757ef92225f3cd1ff6a9a5e314231a",
-    "closeHash": "0x5430ecec6483834abda7778e7dd2f37cf42bb9cf921ea940eedd4aea5611027a",
-    "callDigest": "0x97e560d0a1da4b41b9e3bfc444f1f5aa966a68fe58cedccd8f2d227aac8a2e90",
+    "openHash": "0x4029c403daba2d4aa9325510cc5f86c438f56f1fe676b5bc72a39a6f00f1c1ac",
+    "closeHash": "0xf97362d5e8c729c2548107a7d851a5fb9fe2e128bd7f8f5b780216b8fb2aa363",
+    "callDigest": "0xc1038ce5acb5b061f190b9519827d1eccbae0d8ac8e43ec8c3dcaf3e72a47272",
     "residual": [
       {
         "symbol": "WBNB",
-        "amount": "19980031430133"
+        "amount": "19980031451147"
       },
       {
         "symbol": "USDC",
@@ -53,6 +55,38 @@
     "exactTransactionAndPrestateProof": true,
     "ambiguousRelayRecovered": true,
     "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
     "atomicRollbackHash": "0xd8f6a7f5cbf9e5a786342cdc09a9d7d88cbf72b656acff3b4103f557912e34b1"
+  },
+  {
+    "chainId": 4663,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "openHash": "0xad80279d2876741c1408828bca089b9608eed90a41661ba4443243f50b5c06ee",
+    "closeHash": "0x9f3e0c13131812c6752f0e0a652d7667fb9d068bfbff352b7899bdc31a5e7356",
+    "callDigest": "0xf960da5037a385edb80b1bdf88b72b4f6efbe9058fd9e90a11c415dd1d00967d",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDG",
+        "amount": "0"
+      },
+      {
+        "symbol": "PONS",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": true,
+    "atomicRollbackHash": "0x8f33b0d1ed8cc34952cc939a9e385a524b8619de1d016f36b0bdfd6d7f371e70"
   }
 ]

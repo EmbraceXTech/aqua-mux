@@ -1,5 +1,6 @@
 import { erc20Abi, keccak256, type Address } from "viem";
-import { AQUA, SWAP_VM, NATIVE, classicRouter } from "../../config";
+import { routePolicyTargets } from "../route-policy/route-calls";
+import { AQUA, SWAP_VM, NATIVE } from "../../config";
 import { client } from "../rpc";
 import { implementationSlot } from "../route-policy/provenance";
 import { aquaLifecycleAbi } from "./calls";
@@ -35,16 +36,14 @@ export async function readLifecycleSnapshot(
   await Promise.all(
     selectedTokens.map((t) => verifyLifecycleToken(t, rpc, blockNumber)),
   );
-  const router = classicRouter(chainId),
-    needsRoute =
-      !!request.funding?.purchases.length ||
-      request.kind === "close-and-convert";
+  const needsRoute =
+    !!request.funding?.purchases.length || request.kind === "close-and-convert";
   const contracts = await Promise.all(
     [
       ...new Set([
         AQUA,
         SWAP_VM,
-        ...(needsRoute ? [router] : []),
+        ...(needsRoute ? routePolicyTargets(chainId) : []),
         ...selectedTokens
           .map((token) => token.address)
           .filter((address) => address !== NATIVE),
@@ -103,19 +102,21 @@ export async function readLifecycleSnapshot(
     [...addresses]
       .filter((a) => a !== NATIVE)
       .flatMap((address) =>
-        [AQUA, ...(needsRoute ? [router] : [])].map(async (spender) => ({
-          token: address,
-          spender,
-          amount: String(
-            await rpc.readContract({
-              address,
-              abi: erc20Abi,
-              functionName: "allowance",
-              args: [maker, spender],
-              blockNumber,
-            }),
-          ),
-        })),
+        [AQUA, ...(needsRoute ? routePolicyTargets(chainId) : [])].map(
+          async (spender) => ({
+            token: address,
+            spender,
+            amount: String(
+              await rpc.readContract({
+                address,
+                abi: erc20Abi,
+                functionName: "allowance",
+                args: [maker, spender],
+                blockNumber,
+              }),
+            ),
+          }),
+        ),
       ),
   );
   const strategies = [];

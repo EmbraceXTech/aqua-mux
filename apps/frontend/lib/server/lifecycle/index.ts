@@ -1,6 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Hex } from "viem";
-import { NATIVE, classicRouter } from "../../config";
+import { verifiedRouteCalls } from "../route-policy/route-calls";
+import { NATIVE } from "../../config";
 import { strategyConfigSchema } from "../../managed/config";
 import {
   lifecyclePlanSchema,
@@ -93,18 +94,14 @@ export async function buildLifecyclePlanWithRoutes(
     validate(structuredClone(routeRequest), structuredClone(route), now());
     await provenance(structuredClone(routeRequest), structuredClone(route));
     routes.push(structuredClone({ request: routeRequest, route }));
-    if (
-      !request.config.policy.allowedRoutes.value.includes(
-        classicRouter(request.config.chainId),
-      )
-    )
+    if (!request.config.policy.allowedRoutes.value.includes(route.call.to))
       throw new Error("Swap router is outside the reviewed policy.");
     if (!snapshot.contracts.some((c) => c.address === route.call.to))
       throw new Error("Swap deployment provenance is unavailable.");
-    if (source.address !== NATIVE)
+    if (source.address !== NATIVE && route.approvalRequired !== false)
       approve(source.address, route.spender, amountIn);
-    calls.push({ ...route.call });
-    if (source.address !== NATIVE)
+    calls.push(...verifiedRouteCalls(route).map((call) => ({ ...call })));
+    if (source.address !== NATIVE && route.approvalRequired !== false)
       approve.consume(source.address, route.spender, amountIn);
     const output = uint(route.minimumAmountOut);
     inventory.credit(destination, output);

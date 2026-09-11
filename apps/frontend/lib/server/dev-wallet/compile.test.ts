@@ -36,7 +36,7 @@ const input = {
   amount: "1",
   slippageBps: 100,
   feeBps: 30,
-  range: "full",
+  range: basketSchema.shape.range.safeParse("full").success ? "full" : 0,
   legs: [
     { address: usdc.address, bps: 5000, amount: "1" },
     { address: usdt.address, bps: 5000, amount: "1" },
