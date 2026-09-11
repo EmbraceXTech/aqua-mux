@@ -27,8 +27,9 @@ type Attempt = {
   maxPriorityFeePerGas: string;
   sourceCodeBefore: Hex;
   sourceBalanceBefore: string;
-  state: "journaled-before-broadcast" | "confirmed";
+  state: "journaled-before-broadcast" | "receipt-observed" | "confirmed";
   receipt?: {
+    status: "success" | "reverted";
     block: string;
     blockHash: Hex;
     gasUsed: string;
@@ -158,10 +159,37 @@ async function main() {
       hash,
       timeout: 120_000,
     });
+    attempt.state = "receipt-observed";
+    attempt.receipt = {
+      status: receipt.status,
+      block: String(receipt.blockNumber),
+      blockHash: receipt.blockHash,
+      gasUsed: String(receipt.gasUsed),
+      effectiveGasPrice: String(receipt.effectiveGasPrice),
+      explorer: `${network(chainId).explorer}/tx/${hash}`,
+    };
+    // Preserve mined evidence even when a later read fails or a postcondition refuses.
+    save();
     assert.equal(receipt.status, "success");
-    const after = await rpc.getBalance({ address: SOURCE });
-    const destinationAfter = await rpc.getBalance({ address: DESTINATION });
-    const sourceCodeAfter = (await rpc.getCode({ address: SOURCE })) ?? "0x";
+    const blockNumber = receipt.blockNumber;
+    const after = await rpc.getBalance({ address: SOURCE, blockNumber });
+    const destinationAfter = await rpc.getBalance({
+      address: DESTINATION,
+      blockNumber,
+    });
+    const sourceCodeAfter =
+      (await rpc.getCode({ address: SOURCE, blockNumber })) ?? "0x";
+    Object.assign(attempt, {
+      sourceBalanceAfter: String(after),
+      destinationBalanceAfter: String(destinationAfter),
+      sourceCodeAfter,
+    });
+    save();
+    assert.equal(
+      (await rpc.getBlock({ blockNumber })).hash,
+      receipt.blockHash,
+      "Receipt block changed during readback.",
+    );
     assert.equal(
       sourceCodeAfter,
       sourceCodeBefore,
@@ -169,19 +197,7 @@ async function main() {
     );
     assert.equal(destinationAfter, VALUE);
     assert.ok(after >= SOURCE_RESERVE);
-    Object.assign(attempt, {
-      state: "confirmed",
-      receipt: {
-        block: String(receipt.blockNumber),
-        blockHash: receipt.blockHash,
-        gasUsed: String(receipt.gasUsed),
-        effectiveGasPrice: String(receipt.effectiveGasPrice),
-        explorer: `${network(chainId).explorer}/tx/${hash}`,
-      },
-      sourceBalanceAfter: String(after),
-      destinationBalanceAfter: String(destinationAfter),
-      sourceCodeAfter,
-    });
+    attempt.state = "confirmed";
     save();
     console.log(
       JSON.stringify({

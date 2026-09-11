@@ -9,12 +9,15 @@ The complete managed LP workflow remains pending the coordinator's signing, life
 This worker owns only the new `apps/frontend/scripts/managed-e2e-*.ts` verification scripts and `references/ethglobal-competitive-analysis/final-e2e-*` evidence.
 Feature fixes belong to their assigned implementation workers.
 All existing dirty work is preserved.
-Each script has one purpose: pinned historical wallet inventory, quote feasibility, or isolated-wallet funding preflight.
-The scripts derive public addresses where needed and never construct a signing client.
-They write new evidence files exclusively and suppress provider errors that could contain credentials.
+The three preflight scripts separate pinned historical inventory, quote feasibility and funding estimates.
+They derive public addresses where needed and never construct a signing client.
+The separate transfer script implements only the coordinator's bounded native funding gate.
+It fixes the source and destination, checks fresh balances and settled nonces, records a public transaction hash before broadcast, and refuses to rerun an existing journal.
+All scripts suppress provider errors that could contain credentials.
 
 The baseline includes its source revision and dirty file list.
-The quote run used source revision `9ce6fc2ee48fc83a09cb0af4a47d8516bdda36cd` in the shared working tree.
+The quote run recorded source revision `64bc2ae26f0d98c0aec410fcd8c7f6c550ff818b` in the shared working tree.
+That revision was sampled when the run finished and does not freeze concurrent file edits during requests.
 Independent code-quality review is required before integration acceptance.
 
 ## Original wallet baseline
@@ -39,6 +42,8 @@ BNB and Robinhood account code is empty at their pinned blocks.
 
 The coordinator directed an isolated new execution wallet to avoid changing historical registrations, allowances and shared backing.
 The original wallet may only fund that wallet through separately gated plain native transfers.
+Coordinator message `msg_21ac15722687` released the exact funding step below, while all managed transactions remain gated.
+The executor is awaiting independent review before the first transfer.
 
 ## Proposed isolated funding
 
@@ -64,7 +69,7 @@ They are a proposed bounded test allocation, not an estimate of investment retur
 
 ## Entry route feasibility
 
-[Read-only route evidence](final-e2e-routes.json) records six accepted entry quotes from the current lifecycle route validator.
+[Read-only route evidence](final-e2e-routes.json) records six accepted entry quotes from the lifecycle route validator loaded by that historical run.
 The candidates are native ETH to USDC and WBTC on Arbitrum, native BNB to USDC and ETH on BNB, and native ETH to USDG and PONS on Robinhood.
 Per-leg input is 0.00005 ETH or 0.000125 BNB, leaving half of the proposed managed budget for shared wrapped-native backing.
 Each quote used a 100 basis point slippage limit and returned a positive minimum output.
@@ -94,3 +99,5 @@ The funding script completed all three read-only funding estimates.
 Scoped ESLint passed for all three scripts.
 Frontend TypeScript passed after all three scripts were added.
 The scripts and this report still await independent review.
+The funding executor passed scoped ESLint.
+A later full TypeScript run found unrelated concurrent test errors in `legacy-token-integration.test.ts` and `route-policy.test.ts`, which were routed to their owners.
