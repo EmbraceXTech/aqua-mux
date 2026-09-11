@@ -170,7 +170,7 @@ The frontend fork verifier is intended to run against an isolated local Arbitrum
 npm run verify:fork
 ```
 
-The September 12, 2026 lifecycle run passed 13 isolated Arbitrum fork checks after correcting the fixture path and range schema.
+The September 12, 2026 lifecycle run passed 15 isolated Arbitrum fork checks after correcting the fixture path, range schema, and transparent-route integration.
 The [lifecycle results](references/ethglobal-competitive-analysis/lifecycle-results.md) and [lifecycle quality review](references/ethglobal-competitive-analysis/lifecycle-quality-review.md) record the fixture boundary and verification details.
 This fork evidence does not establish present live execution, public resolver discovery, or complete application E2E acceptance.
 
