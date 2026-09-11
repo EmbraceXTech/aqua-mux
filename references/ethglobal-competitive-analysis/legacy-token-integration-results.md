@@ -55,14 +55,15 @@ Only the authenticated server performs registry and on-chain token admission.
 `node --import tsx --test test/legacy-token-integration.test.ts` passed seven tests.
 The tests cover the real non-fallback USDC.e fixture, matching on-chain decimals, blocked risk, decimals mismatch, provider quote failure, verified metadata precedence, frozen propagation, authentication before resolution, body bounds, admission before resolution, plan owner binding, and dynamic-token LP plan output.
 
-`npm test` passed 156 tests and skipped one environment-dependent test.
-`npm run lint` completed with zero warnings.
+The focused ESLint command over the nine implementation files completed with zero warnings.
+`npm run typecheck` completed successfully after the route factories moved into `lib/server/legacy-handlers.ts`, which keeps the Next.js route modules limited to supported exports.
 `git diff --check` passed.
 
-The repository TypeScript check found two integration errors in separately owned files.
-`components/aquamux.tsx` still passes a browser token array to `validateBasket` and must adopt the client contract above.
-`test/managed-token-snapshot.test.ts` reads `openingPrice` from a union member that does not define it.
-Both findings were routed to the coordinator and were left untouched by this worker.
+An earlier complete test run passed 156 tests and skipped one environment-dependent test before concurrent managed-token work added new cases.
+The latest complete run passed 158 tests, failed one separately owned in-progress managed-token metadata test, and skipped one environment-dependent test.
+The failing test is `display label drift uses the contract symbol only after matching decimals` in `test/managed-token-resolution.test.ts`.
+The latest full lint run also found seven CommonJS import violations in the separately owned untracked `lib/server/route-policy/fixtures/provenance/recompile.cjs` fixture.
+These concurrent failures were routed to the coordinator and left untouched by this worker.
 
 ## Read-only live checks
 
@@ -73,7 +74,7 @@ It does not authorize execution or prove that a later quote will remain availabl
 
 ## Ownership and review
 
-This worker owns the focused legacy quote and plan routes, token resolver boundary, legacy HTTP admission helper, planner and swap resolver propagation, model resolver contract, legacy integration tests, and this report.
+This worker owns the focused legacy quote and plan routes, route handler module, token resolver boundary, legacy HTTP admission helper, planner and swap resolver propagation, model resolver contract, legacy integration tests, and this report.
 The UI worker owns the client session wiring and picker integration.
 The registry worker owns registry ingestion, search, metadata checks, generated catalog files, and generated token images.
 No generated file, changelog, secret, real transaction path, or unrelated dirty UI file was modified for this deliverable.

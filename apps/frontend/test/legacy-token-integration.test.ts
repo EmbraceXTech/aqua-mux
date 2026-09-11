@@ -1,10 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { toHex, type Address } from "viem";
-import { createPlanPost } from "../app/api/plan/route";
-import { createQuotePost } from "../app/api/quote/route";
 import { NATIVE, tokens } from "../lib/config";
 import { AuthError, type OwnerSession } from "../lib/server/auth";
+import { createPlanPost, createQuotePost } from "../lib/server/legacy-handlers";
 import { resolveLegacyBasket } from "../lib/server/legacy-token-resolution";
 import { buildPlan } from "../lib/server/plan";
 import { TokenValidationLimitError } from "../lib/server/token-validation-limit";
