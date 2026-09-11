@@ -1,7 +1,8 @@
 import { AQUA, SWAP_VM } from "../../config";
 import { openManagedStore, type ExecutionLock } from "../store";
 import { client } from "../rpc";
-import { directBatchProvesPlan, traceProvesPlan } from "./transaction-proof";
+import { verifyManagedTransactionProof } from "./transaction-proof";
+import type { StrategyConfig } from "../../managed";
 import {
   createPositionRpc,
   recoverSubmittedTransactions,
@@ -44,13 +45,8 @@ export async function reconcileManagedTransactions(
       // Only this verified batch format can prove that the recorded plan executed.
       try {
         const tx = await rpc.getTransaction({ hash: result.hash });
-        if (!directBatchProvesPlan(tx, plan)) {
-          const trace = await rpc.request({
-            method: "debug_traceTransaction" as never,
-            params: [result.hash, { tracer: "callTracer" }] as never,
-          });
-          if (!traceProvesPlan(trace, plan)) result.status = "unknown";
-        }
+        if (!(await verifyManagedTransactionProof(rpc, tx, plan)))
+          result.status = "unknown";
       } catch {
         result.status = "unknown";
       }
@@ -113,13 +109,24 @@ export async function reconcileManagedTransactions(
             );
         }
         const currentGroup = ownedGroup(store, owner, groupId);
+        const config = store.getDocument<StrategyConfig>(
+          "plan-configuration",
+          plan.id,
+          owner,
+        )?.data;
+        if (config && plan.registrations.length)
+          store.putDocument("active-configuration", groupId, owner, {
+            config,
+            confirmedAt: Date.now(),
+          });
         const closed =
           plan.kind === "close" || plan.kind === "close-and-convert";
         store.put(
           "group",
           {
             ...currentGroup,
-            inventory: plan.conservativeInventoryAfter,
+            // Estimates do not establish inventory attribution after execution or fills.
+            inventory: [],
             state: closed ? "closed" : "active",
             updatedAt: Date.now(),
           },

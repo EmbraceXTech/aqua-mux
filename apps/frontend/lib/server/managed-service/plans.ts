@@ -26,6 +26,7 @@ import { walletSnapshot, verifiedToken } from "./snapshot";
 import { ManagedError } from "./errors";
 import type { ProposalIntent } from "./inputs";
 import type { PlanContext } from "./execution";
+import { assertManagementAction } from "./management-rules";
 
 export const planInputSchema = z.strictObject({
   reviewId: idSchema.optional(),
@@ -47,6 +48,7 @@ export async function createManagedPlan(
     bot = groupBot(store, owner, groupId);
   const close =
     input.action === "close" || input.action === "close-and-convert";
+  assertManagementAction(store, group, input.action);
   const review = input.reviewId
     ? store.get("review", input.reviewId, owner)
     : null;
@@ -117,8 +119,49 @@ export async function createManagedPlan(
       ? await ensureManagedTokens(group.chainId, [input.targetToken])
       : undefined;
     let inventory: TokenAmount[] = input.inventory ?? group.inventory;
-    if (!inventory.length) inventory = pairInventory(config);
-    inventory = availableInventory(inventory, snapshot);
+    if (input.action === "close-and-convert") {
+      if (!input.inventory?.length)
+        throw new ManagedError(
+          "inventory_review_required",
+          "Choose and review exact token quantities from a fresh wallet snapshot before conversion.",
+          400,
+        );
+      const seen = new Set<string>();
+      inventory = input.inventory.map((item) => {
+        const known = verifiedToken(
+          group.chainId,
+          item.token.address,
+          snapshot.tokenMetadata,
+        );
+        if (
+          seen.has(known.address) ||
+          canonicalDigest(item.token) !== canonicalDigest(known)
+        )
+          throw new ManagedError(
+            "invalid_inventory",
+            "Conversion inventory must contain unique verified group tokens.",
+            400,
+          );
+        seen.add(known.address);
+        const available =
+          snapshot.balances.find(
+            (balance) => balance.token.address === known.address,
+          )?.amount ?? "0";
+        if (
+          BigInt(item.amount) <= 0n ||
+          BigInt(item.amount) > BigInt(available)
+        )
+          throw new ManagedError(
+            "inventory_changed",
+            "The selected conversion quantity exceeds the fresh wallet balance. Review the amount again.",
+            400,
+          );
+        return { token: known, amount: item.amount };
+      });
+    } else {
+      if (!close && !inventory.length) inventory = pairInventory(config);
+      inventory = close ? [] : availableInventory(inventory, snapshot);
+    }
     const previous =
       close || input.action === "replace"
         ? store
@@ -202,6 +245,7 @@ export async function createManagedPlan(
           Date.now(),
         );
       store.put("plan", plan, owner);
+      store.putDocument("plan-configuration", plan.id, owner, config);
       const context: PlanContext = {
         requiresLease,
         sessionId: input.sessionId ?? null,
