@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
 import { decodeFunctionData, erc20Abi, parseAbi, type Address } from "viem";
-import { AQUA, SWAP_VM, classicRouter, tokens, wrapped } from "../../config";
+import { AQUA, SWAP_VM, classicRouter, wrapped } from "../../config";
 import type { Plan } from "../../model";
 import { canonicalJson } from "../../managed";
 import { assertDevChain, DevWalletError } from "./config";
+import type { DevBatchPlan } from "./batch";
+import { devPlanAssets } from "./assets";
 
 const aquaAbi = parseAbi([
   "function ship(address app,bytes strategy,address[] tokens,uint256[] amounts) returns(bytes32)",
@@ -49,11 +51,15 @@ export function validateBatchEnvelope(
 }
 
 // Only trusted server compiler output can reach this authority check.
-export function validateDevPlan(plan: Plan, maker: Address, now = Date.now()) {
+export function validateDevPlan(
+  plan: DevBatchPlan,
+  maker: Address,
+  now = Date.now(),
+) {
   validateBatchEnvelope(plan, maker, now);
   const router = classicRouter(plan.chainId).toLowerCase();
   const assets = new Set(
-    tokens(plan.chainId).map((asset) => asset.address.toLowerCase()),
+    devPlanAssets(plan).map((asset) => asset.address.toLowerCase()),
   );
   for (const call of plan.calls) {
     const target = call.to.toLowerCase();

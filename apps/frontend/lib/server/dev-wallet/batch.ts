@@ -1,5 +1,5 @@
 import { encodeFunctionData, parseAbi } from "viem";
-import type { LifecyclePlan } from "../../managed";
+import type { LifecyclePlan, Token } from "../../managed";
 import type { Plan } from "../../model";
 
 export const implementation = "0xe6Cae83BdE06E4c305530e199D7217f42808555B";
@@ -23,7 +23,10 @@ export function encodeDevBatch(calls: Plan["calls"]) {
   });
 }
 
-export type DevBatchPlan = Plan & { gasReserveWei?: string };
+export type DevBatchPlan = Plan & {
+  gasReserveWei?: string;
+  verifiedTokens?: Token[];
+};
 
 export function lifecycleBatch(plan: LifecyclePlan): DevBatchPlan {
   return {
@@ -36,5 +39,10 @@ export function lifecycleBatch(plan: LifecyclePlan): DevBatchPlan {
     strategies: [],
     summary: plan.expectedEffects,
     gasReserveWei: plan.gasReserveWei,
+    verifiedTokens: [
+      ...plan.inventoryBefore,
+      ...plan.conservativeInventoryAfter,
+      ...plan.minimumReceipts,
+    ].map((entry) => entry.token),
   };
 }
