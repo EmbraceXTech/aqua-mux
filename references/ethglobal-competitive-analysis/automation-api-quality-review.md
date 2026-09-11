@@ -38,6 +38,19 @@ Acceptance requires the owner's exact final commit and verification of the repai
 5. Formatting fails for `automation/liveness.ts`, `automation/reviews.ts`, `test/automation-review.test.ts`, and `test/managed-runner-http.test.ts`.
    Run the repository formatter on owned files and repeat the scoped check.
 
+6. An expired pending review remains pending indefinitely on an identical request retry.
+   `runGroupReview` returns an existing idempotency record before inspecting the age of a pending review.
+   The temporary authenticated API harness seeded a crash-equivalent pending record older than its deadline and confirmed that the identical key still returns pending.
+   Terminalize the expired record without repeating inference and test durable restart recovery.
+
+7. Stop acknowledgments omit already-submitted attempts.
+   The initial `updateBot` response contains the group and bot but no submitted or unknown transaction list.
+   Include outstanding attempts in the acknowledgment as required by the implementation plan.
+
+8. Group creation does not enforce the initial one-group-per-execution-wallet boundary.
+   Multiple nonclosed groups can share a chain and maker without an implemented attribution rule between groups.
+   Enforce the planned scope or obtain a separately reviewed shared-attribution design.
+
 ## Module organization
 
 The separation between lease transitions, review orchestration, the authenticated runner client, entitlement checks, group mutations, planning, execution journaling, and reconciliation is appropriate.
@@ -59,6 +72,9 @@ npx tsx --test test/automation-lease.test.ts test/automation-review.test.ts test
 ```
 
 The tests exercise lease takeover, expiry, due coalescing, persisted review results, idempotent retries, owner isolation, Stop during inference, stale data, quota refusal, wallet proof replay, authentication persistence, runner response validation, and durable lock fencing.
+An additional 17 tests passed across `test/lifecycle.test.ts`, `lib/server/dev-wallet/policy.test.ts`, and `lib/server/dev-wallet/signer.test.ts`.
+These cover deterministic inventory arithmetic, conservative minimum receipts, simulation refusal, close-only independence from routes, token approvals, signing guards, and journal-before-broadcast behavior under test fixtures.
+The frontend typecheck passed with `npx tsc --noEmit --incremental false`.
 Scoped ESLint passed.
 Scoped Prettier reported the four files listed above.
 
