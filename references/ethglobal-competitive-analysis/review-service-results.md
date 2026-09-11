@@ -13,7 +13,7 @@ The service imports the frontend's actual managed configuration, result, usage, 
 It imports the API worker's proposal-intent validator rather than copying that contract.
 
 Core HTTP and persistence work was committed as `d5d69cc`.
-The subsequent integration adds the real providers, derived output schema, restart resource ownership, bounded output validation, and opt-in HTTP verification executable.
+Integration commit `64bc2ae` adds the real providers, derived output schema, restart resource ownership, bounded output validation, and opt-in HTTP verification executable.
 
 | Module | Responsibility |
 | --- | --- |
@@ -138,4 +138,7 @@ No fake fallback result is returned after a provider error or schema rejection.
 
 Independent reviewer dispatch `ctx_4b875f6c6f84` identified the acquisition registration gap and the unbounded provider envelope.
 Both findings have regression tests and implementation fixes in the integration revision.
-Final acceptance remains with that reviewer and the coordinating worker after they inspect the exact revision.
+The reviewer accepted `d5d69cc` and `64bc2ae` with runtime dependencies `d0401aa` and `aa718ef`.
+The independent report is [ReviewService quality review](review-service-quality-review.md), committed as `da144ef`.
+The reviewer reran all 16 service tests, the strict typecheck, default tests, and adversarial HTTP and subprocess checks, and inspected both saved real-provider evidence files.
+No additional service refactors were required.
