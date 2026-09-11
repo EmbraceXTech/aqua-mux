@@ -361,3 +361,17 @@ Resume returned HTTP 200 with the bot running and direct position health current
 The handler checks only positions.health after observation and therefore does not establish the required fresh-fill reconciliation before Resume.
 The app owner received the exact review-resume-coverage.ts reproduction and must either establish verified registration-based coverage or refuse absent, stale or degraded fill coverage.
 This finding remains open alongside the two signing findings.
+
+
+## Native destination and fixture checkpoints
+
+The exact decimals-fixture correction at `a424311433a57ccacbe8680e2b0c289aec0547d1` passes the full existing committed frontend suite when overlaid on `4a7b1e1`: 156 passes, zero failures and one intentional skip.
+The correction changes only the decimal-response mock and preserves the original dirty range overlay outside the reviewed commit.
+The earlier router-fixture failure is closed.
+
+A fourth app E2E probe follows successful entry and close with the actual conversion payload produced by the current native-token UI selection.
+The UI passes targetToken NATIVE directly and does not send unwrap, while convertInventory requires the wrapped-native target and an explicit unwrap request.
+The authenticated endpoint returns HTTP 500 with request_failed for that payload.
+The successful owner fixture uses wrapped-native plus unwrap true and therefore did not cover the UI payload.
+The app owner received review-native-conversion.ts and must preserve explicit native-destination semantics through the client and reviewed plan.
+This mismatch remains open together with the signing and fresh-fill resume findings.
