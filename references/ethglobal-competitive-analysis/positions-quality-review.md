@@ -1,9 +1,11 @@
 # Positions observer quality review
 
-Reviewed September 12, 2026 against implementation commit `2f3704aac23c31f78ad446c66c12c43ef7216de6`.
+Reviewed September 12, 2026 against initial implementation `2f3704aac23c31f78ad446c66c12c43ef7216de6` and final code commit `1ea39a23f803d8a44784c0883f32d842ed07d41d`.
+Final disposition: accepted for the bounded local observer library, with no unresolved critical findings in that scope.
+Documentation follow-up `a214b23` was also inspected.
 The reviewer owns only this report and made no implementation changes, live transactions, browser changes, or server changes.
-The store adapter and read-only verifier were still uncommitted when first inspected.
-Final acceptance requires the coordinator to identify the follow-up commit and route the fixes through this review.
+The store adapter and read-only verifier were initially uncommitted and are included in the reviewed final code commit.
+The initial findings below remain as a record of the reproductions and acceptance criteria; the final verification section records their resolution.
 
 ## Initial verdict
 
@@ -110,4 +112,48 @@ That temporary script is diagnostic evidence, not a committed implementation art
 
 Browser testing was not used because this deliverable exposes library entry points and the task forbids modifying the active browser/server.
 No live transaction was submitted.
-Live read evidence and final follow-up commit review remain pending.
+The following final verification supersedes the initial pending status.
+
+
+## Final verification and acceptance
+
+The reviewer inspected code commit `1ea39a23f803d8a44784c0883f32d842ed07d41d` and documentation commit `a214b23`.
+The reviewed position modules and tests matched the committed code when the final checks ran.
+All initial findings are resolved within the bounded local-library scope.
+
+The observer now rechecks the retained checkpoint before publishing the new chunk.
+An independent regression reproduced the original race, verified unavailable health with no checkpoint advance, then verified that the next canonical replay removed the orphaned event.
+Attribution requires matching observation and reconciliation chain and block hash, validates baseline maker and chain, and checks transfer-audit interval identities and hashes.
+Reconciliation checks the baseline's canonical hash before and after the snapshot reads.
+Missing or mismatched audit evidence prevents known attribution.
+The documentation explicitly requires trusted server-side audit evidence and rejects a client assertion of completeness as sufficient evidence.
+The optional atBlock reconciliation mode produces matching finalized snapshots while default reads remain at head.
+
+The observer enforces 10,000 input logs and retained events and a 4 MiB serialized event-history limit.
+These are implementation capacity limits, not measured production throughput claims.
+Exceeding capacity returns limited health and history_limit without advancing the cursor or persisting partial history.
+The committed event-count regression passed.
+An independent oversized Shipped fixture also verified byte-limit refusal with no history or checkpoint publication.
+Paged storage remains necessary for larger histories; the current implementation makes that boundary explicit and fails closed.
+The added checks preserve focused modules and do not require another file split.
+
+The final focused suite passed all 18 tests, and scoped ESLint passed.
+The reviewer independently exercised simultaneous observeChain calls against the actual ManagedStore adapter.
+One writer succeeded, the other received a revision conflict, a fresh retry succeeded, and another owner's read remained empty.
+The API caller remains responsible for bounded conflict retry or request coalescing.
+
+The reviewer independently ran the read-only live command on September 11, 2026 at 20:12:53-55 UTC.
+All three chains decoded two existing Shipped events, returned current backing reads for both positions, and recovered confirmed registration receipts.
+The current read blocks were 504161059 on Arbitrum, 121323879 on BNB Chain, and 60530077 on Robinhood Chain.
+Historical coverage correctly remained backfilling because the command intentionally indexed only the registration block.
+This evidence supports deployed registration decoding and current backing reads, not complete fill history or resolver participation.
+
+Full frontend `npx tsc --noEmit` was also run during final review.
+It reported `maxFeeWei` missing from DevWalletReview at `lib/server/dev-wallet/baskets.ts:52` and `lib/server/dev-wallet/managed.ts:81` in concurrently edited files outside this ownership.
+The reviewer sent those failures to the coordinator for the dev-wallet owner to fix.
+No position-module type errors were reported by that run.
+This scoped acceptance is not a claim that the whole workspace typecheck passed.
+
+Product API authentication, UI behavior, production history storage, a real complete transfer-audit producer, and credential-fixtured fork fills remain integration acceptance work outside this library review.
+Until the server has verified external-activity coverage, attributable amounts must remain unknown or use explicitly reviewed user-selected amounts.
+No live transaction, browser session, or active server was changed during this review.
