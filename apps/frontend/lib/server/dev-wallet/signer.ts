@@ -154,8 +154,8 @@ export async function signDevBatch(
 
 export async function devReceipt(chainId: number, hash: Hex) {
   assertDevChain(chainId);
-  const rpc = client(chainId);
   try {
+    const rpc = client(chainId);
     if ((await rpc.getChainId()) !== chainId) return "unknown" as const;
     const receipt = await rpc.getTransactionReceipt({ hash });
     return receipt.status === "success"

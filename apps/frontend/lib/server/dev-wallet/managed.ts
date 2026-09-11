@@ -214,7 +214,11 @@ export async function devManagedStatus(
     throw new DevWalletError("Managed local wallet execution not found.");
   // The common managed reconciliation service owns receipt state and lock release.
   if (attempt.status === "submitted" || attempt.status === "unknown") {
-    await reconcileManagedTransactions(session.owner, attempt.groupId);
+    try {
+      await reconcileManagedTransactions(session.owner, attempt.groupId);
+    } catch {
+      return { ...outcome(id, attempt), state: "unknown" };
+    }
   }
   return outcome(id, store.get("transaction", attempt.id, session.owner)!);
 }

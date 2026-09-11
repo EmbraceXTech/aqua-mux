@@ -11,7 +11,7 @@ import {
 } from "viem";
 import { devAccount } from "./config";
 import { implementationCode } from "./implementation-fixture";
-import { implementation, signDevBatch } from "./signer";
+import { devReceipt, implementation, signDevBatch } from "./signer";
 import { AQUA, SWAP_VM } from "../../config";
 import type { Plan } from "../../model";
 
@@ -168,6 +168,8 @@ test("real local signing preserves atomic calls, self authorization nonce and du
     process.env.AQUAMUX_DEV_WALLET_MAX_FEE_WEI = "1";
     await assert.rejects(() => signDevBatch(plan, () => {}), /fee exceeds/);
     assert.equal(broadcasts.length, 1);
+    delete process.env.BNB_RPC_URL;
+    assert.equal(await devReceipt(56, signed.hash), "unknown");
   } finally {
     process.env = original;
     await new Promise<void>((resolve, reject) =>
