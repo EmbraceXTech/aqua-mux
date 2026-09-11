@@ -38,12 +38,20 @@ test("Robinhood ERC-20 approvals and swap calls target its verified router", asy
           : request.method === "eth_getCode"
             ? "0x1234"
             : request.method === "eth_call"
-              ? toHex(
-                  request.params[0].data.startsWith("0xdd62ed3e")
-                    ? 0n
-                    : 10n ** 18n,
-                  { size: 32 },
-                )
+              ? request.params[0].data.startsWith("0x313ce567")
+                ? toHex(
+                    String(request.params[0].to).toLowerCase() ===
+                      source.address
+                      ? 6n
+                      : 18n,
+                    { size: 32 },
+                  )
+                : toHex(
+                    request.params[0].data.startsWith("0xdd62ed3e")
+                      ? 0n
+                      : 10n ** 18n,
+                    { size: 32 },
+                  )
               : toHex(10n ** 18n);
       return Response.json({ jsonrpc: "2.0", id: request.id, result });
     }
