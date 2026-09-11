@@ -9,7 +9,7 @@ import {
   type BotRun,
 } from "../../managed";
 import { openManagedStore } from "../store";
-import { configuredRunner } from "./runner";
+import { configuredRunner, type ReviewRunner } from "./runner";
 import { DevelopmentReviewEntitlement } from "../payments/review-service";
 import { intentSchema, type ProposalIntent } from "./inputs";
 import {
@@ -36,6 +36,10 @@ export async function proposeIntent(
   owner: Address,
   key: string,
   raw: ProposalIntent,
+  dependencies: {
+    snapshot?: typeof intentSnapshot;
+    runner?: ReviewRunner;
+  } = {},
 ): Promise<ProposalResponse> {
   const intent = intentSchema.parse(raw),
     store = openManagedStore();
@@ -125,16 +129,17 @@ export async function proposeIntent(
         1 +
         store.list("review", owner).length,
     });
-    const snapshot = await intentSnapshot(intent);
+    const snapshot = await (dependencies.snapshot ?? intentSnapshot)(intent);
     review.snapshot = snapshot;
     review.coverage = snapshot.coverage;
     const policyTemplate = proposalPolicy(
       intent,
       `policy:${review.id}`,
       Date.now(),
+      snapshot.tokenMetadata,
     );
     store.putDocument("proposal-intents", id, owner, document);
-    const result = await configuredRunner().review(
+    const result = await (dependencies.runner ?? configuredRunner()).review(
       {
         requestId: review.id,
         owner,
@@ -170,7 +175,7 @@ export async function proposeIntent(
       : undefined;
     if (config) result.result.proposedConfig = config;
     if (config) {
-      validateConfigTokens(config);
+      validateConfigTokens(config, snapshot.tokenMetadata);
       if (
         config.chainId !== intent.chainId ||
         config.maker !== owner ||
@@ -192,11 +197,21 @@ export async function proposeIntent(
     });
     store.transaction(() => {
       if (config) {
-        const created = createGroup(owner, config, "manual", store);
+        const created = createGroup(
+          owner,
+          config,
+          "manual",
+          store,
+          snapshot.tokenMetadata,
+        );
         review.groupId = created.group.id;
         review.botId = created.bot.id;
         const funding = {
-          token: verifiedToken(intent.chainId, intent.fundingToken),
+          token: verifiedToken(
+            intent.chainId,
+            intent.fundingToken,
+            snapshot.tokenMetadata,
+          ),
           amount: intent.budget,
         };
         // Authoritative selected capital is the explicit funding budget, never every wallet asset.

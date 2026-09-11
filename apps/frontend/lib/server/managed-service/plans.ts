@@ -113,8 +113,9 @@ export async function createManagedPlan(
         ...group.inventory.map((i) => i.token),
       ],
     });
-    if (input.targetToken)
-      await ensureManagedTokens(group.chainId, [input.targetToken]);
+    const targetMetadata = input.targetToken
+      ? await ensureManagedTokens(group.chainId, [input.targetToken])
+      : undefined;
     let inventory: TokenAmount[] = input.inventory ?? group.inventory;
     if (!inventory.length) inventory = pairInventory(config);
     inventory = availableInventory(inventory, snapshot);
@@ -136,7 +137,7 @@ export async function createManagedPlan(
     )?.data.intent;
     const funding =
       !close && intent
-        ? await planFunding(config, inventory, intent)
+        ? await planFunding(config, inventory, intent, snapshot.tokenMetadata)
         : undefined;
     const gasReserveWei =
       intent?.gasReserveWei ?? config.policy.gasBudgetWei.value;
@@ -158,6 +159,7 @@ export async function createManagedPlan(
               targetToken: verifiedToken(
                 group.chainId,
                 input.targetToken ?? "",
+                targetMetadata,
               ),
               amounts: inventory,
               unwrap: input.unwrap ?? false,

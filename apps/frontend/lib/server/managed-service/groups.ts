@@ -12,6 +12,7 @@ import { openManagedStore, type ManagedStore } from "../store";
 import { transitionBot, pauseBot, type BotCommand } from "../automation/lease";
 import { ManagedError } from "./errors";
 import { validateConfigTokens } from "./snapshot";
+import type { ManagedTokenSnapshot } from "./tokens";
 
 export function ownedGroup(
   store: ManagedStore,
@@ -37,10 +38,11 @@ export function createGroup(
   configInput: StrategyConfig,
   mode: "manual" | "delegated" = "manual",
   store: ManagedStore = openManagedStore(),
+  tokens?: ManagedTokenSnapshot,
 ) {
   const config = strategyConfigSchema.parse(configInput);
   assertCapability(config, mode);
-  validateConfigTokens(config);
+  validateConfigTokens(config, tokens);
   if (config.maker !== owner)
     throw new ManagedError(
       "maker_ownership",
@@ -89,9 +91,10 @@ export function editGroup(
   id: string,
   input: StrategyConfig,
   store: ManagedStore = openManagedStore(),
+  tokens?: ManagedTokenSnapshot,
 ) {
   const config = strategyConfigSchema.parse(input);
-  validateConfigTokens(config);
+  validateConfigTokens(config, tokens);
   return store.transaction(() => {
     const group = ownedGroup(store, owner, id);
     const bot = groupBot(store, owner, id);

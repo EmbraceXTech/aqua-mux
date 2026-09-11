@@ -41,6 +41,13 @@ function fixture() {
     timeoutMs: 1000,
     entitlement: new DevelopmentReviewEntitlement(5),
     snapshot: async () => ({
+      tokenMetadata: {
+        chainId: group.chainId,
+        tokens: group.config.pairs.flatMap((pair) => [
+          pair.baseToken,
+          pair.quoteToken,
+        ]),
+      },
       observedAt: now,
       blockTimestamp: now,
       blockNumber: "1",

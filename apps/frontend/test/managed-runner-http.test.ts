@@ -13,6 +13,7 @@ const request: RunnerRequest = {
   purpose: "interval",
   deadline: Date.now() + 1000,
   snapshot: {
+    tokenMetadata: { chainId: 42161, tokens: [] },
     observedAt: Date.now(),
     blockTimestamp: Date.now(),
     blockNumber: "1",

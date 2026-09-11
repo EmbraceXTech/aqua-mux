@@ -9,7 +9,30 @@ import { client } from "../rpc";
 import { ManagedError } from "./errors";
 
 const verified = new VerifiedTokenCache();
-export function verifiedToken(chainId: number, address: string): Token {
+export type ManagedTokenSnapshot = Readonly<{
+  chainId: number;
+  tokens: readonly Readonly<Token>[];
+}>;
+export function verifiedToken(
+  chainId: number,
+  address: string,
+  snapshot?: ManagedTokenSnapshot,
+): Token {
+  if (snapshot) {
+    const token =
+      snapshot.chainId === chainId
+        ? snapshot.tokens.find(
+            (entry) => entry.address === address.toLowerCase(),
+          )
+        : undefined;
+    if (!token)
+      throw new ManagedError(
+        "invalid_token",
+        "Token is absent from this request's verified metadata.",
+        400,
+      );
+    return token;
+  }
   const saved = verified.get(`${chainId}:${address.toLowerCase()}`);
   if (saved) return saved;
   const token = catalogToken(chainId, address);
@@ -29,11 +52,11 @@ export async function ensureManagedTokens(
     metadata?: typeof checkTokenMetadata;
     storedDecimals?: (chainId: number, token: Token) => Promise<number>;
   } = {},
-) {
+): Promise<ManagedTokenSnapshot> {
+  const tokens: Readonly<Token>[] = [];
   const missing = [
     ...new Set(addresses.map((address) => address.toLowerCase())),
   ];
-  if (!missing.length) return;
   const registry = missing.some(
     (address) => !stored.some((token) => token.address === address),
   )
@@ -59,7 +82,7 @@ export async function ensureManagedTokens(
           "Stored token decimals no longer match the token contract.",
           400,
         );
-      token = saved;
+      token = { ...saved };
     } else {
       if (!registry || registry.stale)
         throw new ManagedError(
@@ -97,5 +120,7 @@ export async function ensureManagedTokens(
         400,
       );
     verified.set(`${chainId}:${address}`, token);
+    tokens.push(Object.freeze({ ...token }));
   }
+  return Object.freeze({ chainId, tokens: Object.freeze(tokens) });
 }

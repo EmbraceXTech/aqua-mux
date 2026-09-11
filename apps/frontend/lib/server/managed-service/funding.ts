@@ -5,6 +5,7 @@ import { swapApi } from "../swap";
 import type { ProposalIntent } from "./inputs";
 import { ManagedError } from "./errors";
 import { verifiedToken, type WalletSnapshot } from "./snapshot";
+import type { ManagedTokenSnapshot } from "./tokens";
 
 /** Shared pair claims use one real token inventory, not the sum of sibling allocations. */
 export function pairInventory(config: StrategyConfig): TokenAmount[] {
@@ -45,8 +46,9 @@ export async function planFunding(
   config: StrategyConfig,
   inventory: TokenAmount[],
   intent: ProposalIntent,
+  tokens: ManagedTokenSnapshot,
 ): Promise<LifecycleRequest["funding"]> {
-  const source = verifiedToken(config.chainId, intent.fundingToken),
+  const source = verifiedToken(config.chainId, intent.fundingToken, tokens),
     purchases = [];
   const required = pairInventory(config);
   for (const item of required) {

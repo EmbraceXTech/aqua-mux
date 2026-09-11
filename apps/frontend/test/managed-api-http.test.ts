@@ -33,7 +33,15 @@ test("authenticated managed HTTP creates a group, fences two tabs, stops and iso
       const response = await managedApi(
         request,
         incoming.url!.replace("/api/managed/", "").split("/"),
-        { ensureTokens: async () => {} },
+        {
+          ensureTokens: async (chainId) => ({
+            chainId,
+            tokens: [
+              lifecycleFixture().config.pairs[0].baseToken,
+              lifecycleFixture().config.pairs[0].quoteToken,
+            ],
+          }),
+        },
       );
       outgoing.writeHead(response.status, Object.fromEntries(response.headers));
       outgoing.end(await response.text());

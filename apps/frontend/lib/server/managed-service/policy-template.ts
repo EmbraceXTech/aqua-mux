@@ -2,12 +2,14 @@ import type { ManagementPolicy } from "../../managed/policy";
 import { classicRouter } from "../../config";
 import { verifiedToken } from "./snapshot";
 import type { ProposalIntent } from "./inputs";
+import type { ManagedTokenSnapshot } from "./tokens";
 
 /** This template is a manual proposal constraint, never a delegated signing grant. */
 export function proposalPolicy(
   intent: ProposalIntent,
   id: string,
   now: number,
+  tokens?: ManagedTokenSnapshot,
 ): ManagementPolicy {
   const rule = <T>(value: T) => ({
     value,
@@ -25,7 +27,7 @@ export function proposalPolicy(
     maxActions: advisory(1),
     spendBudgets: advisory([
       {
-        token: verifiedToken(intent.chainId, intent.fundingToken),
+        token: verifiedToken(intent.chainId, intent.fundingToken, tokens),
         amount: intent.budget,
       },
     ]),

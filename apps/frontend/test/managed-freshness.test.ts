@@ -5,6 +5,7 @@ import type { WalletSnapshot } from "../lib/server/managed-service/snapshot";
 import { base, quote } from "./lifecycle-fixtures";
 const now = Date.now();
 const snapshot: WalletSnapshot = {
+  tokenMetadata: { chainId: 42161, tokens: [base, quote] },
   observedAt: now,
   blockTimestamp: now,
   blockNumber: "1",

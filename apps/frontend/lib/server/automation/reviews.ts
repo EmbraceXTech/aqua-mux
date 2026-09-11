@@ -284,7 +284,7 @@ export async function runGroupReview(
         : undefined;
       if (config) result.result.proposedConfig = config;
       if (config) {
-        validateConfigTokens(config);
+        validateConfigTokens(config, snapshot.tokenMetadata);
         if (
           config.chainId !== group.chainId ||
           config.maker !== group.maker ||

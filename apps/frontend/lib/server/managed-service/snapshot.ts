@@ -1,6 +1,10 @@
 import { erc20Abi, type Address } from "viem";
 import { AQUA, NATIVE } from "../../config";
-import { ensureManagedTokens, verifiedToken } from "./tokens";
+import {
+  ensureManagedTokens,
+  verifiedToken,
+  type ManagedTokenSnapshot,
+} from "./tokens";
 export { verifiedToken } from "./tokens";
 import type { StrategyConfig } from "../../managed/config";
 import type { Token, TokenAmount } from "../../managed/primitives";
@@ -10,6 +14,7 @@ import { swapApi } from "../swap";
 import { ManagedError } from "./errors";
 
 export interface WalletSnapshot extends Record<string, unknown> {
+  tokenMetadata: ManagedTokenSnapshot;
   observedAt: number;
   blockNumber: string;
   blockHash: string;
@@ -35,10 +40,13 @@ export interface WalletSnapshot extends Record<string, unknown> {
     detail?: string;
   }[];
 }
-export function validateConfigTokens(config: StrategyConfig) {
+export function validateConfigTokens(
+  config: StrategyConfig,
+  tokens?: ManagedTokenSnapshot,
+) {
   for (const pair of config.pairs)
     for (const t of [pair.baseToken, pair.quoteToken]) {
-      const known = verifiedToken(config.chainId, t.address);
+      const known = verifiedToken(config.chainId, t.address, tokens);
       if (
         known.decimals !== t.decimals ||
         known.symbol !== t.symbol ||
@@ -51,15 +59,23 @@ export function validateConfigTokens(config: StrategyConfig) {
         );
     }
 }
-export async function walletSnapshot(input: {
-  chainId: number;
-  maker: Address;
-  assets: Address[];
-  maxAgeMs: number;
-  storedTokens?: Token[];
-}): Promise<WalletSnapshot> {
-  await ensureManagedTokens(input.chainId, input.assets, input.storedTokens);
-  const c = client(input.chainId);
+export async function walletSnapshot(
+  input: {
+    chainId: number;
+    maker: Address;
+    assets: Address[];
+    maxAgeMs: number;
+    storedTokens?: Token[];
+  },
+  dependencies: {
+    ensureTokens?: typeof ensureManagedTokens;
+    rpc?: typeof client;
+  } = {},
+): Promise<WalletSnapshot> {
+  const tokenMetadata = await (
+    dependencies.ensureTokens ?? ensureManagedTokens
+  )(input.chainId, input.assets, input.storedTokens);
+  const c = (dependencies.rpc ?? client)(input.chainId);
   const block = await c.getBlock();
   if ((await c.getChainId()) !== input.chainId)
     throw new ManagedError(
@@ -83,7 +99,7 @@ export async function walletSnapshot(input: {
   ).toString();
   const assets = [...new Set(input.assets)]
     .filter((a) => a !== NATIVE)
-    .map((a) => verifiedToken(input.chainId, a));
+    .map((a) => verifiedToken(input.chainId, a, tokenMetadata));
   const rows = await Promise.all(
     assets.map(async (token) => ({
       token,
@@ -108,6 +124,7 @@ export async function walletSnapshot(input: {
     })),
   );
   return {
+    tokenMetadata,
     observedAt,
     blockNumber: block.number.toString(),
     blockHash: block.hash,
@@ -173,8 +190,12 @@ export async function intentSnapshot(
         throw new Error("Invalid quote.");
       quotes.push({
         source: "1inch-route-quote",
-        fromToken: verifiedToken(intent.chainId, intent.fundingToken),
-        toToken: verifiedToken(intent.chainId, asset),
+        fromToken: verifiedToken(
+          intent.chainId,
+          intent.fundingToken,
+          snapshot.tokenMetadata,
+        ),
+        toToken: verifiedToken(intent.chainId, asset, snapshot.tokenMetadata),
         amountIn,
         amountOut: String(quote.dstAmount),
         observedAt: startedAt,

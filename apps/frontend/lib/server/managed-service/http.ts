@@ -115,11 +115,11 @@ export async function managedApi(
         });
       if (method === "POST") {
         const input = groupInputSchema.parse(await body(request));
-        await (dependencies.ensureTokens ?? ensureManagedTokens)(
+        const tokens = await (dependencies.ensureTokens ?? ensureManagedTokens)(
           input.config.chainId,
           input.config.policy.allowedAssets.value,
         );
-        return ok(createGroup(owner, input.config, input.mode));
+        return ok(createGroup(owner, input.config, input.mode, store, tokens));
       }
     }
     const id = idSchema.parse(segments[1]);
@@ -145,7 +145,7 @@ export async function managedApi(
         const input = z
           .strictObject({ config: strategyConfigSchema })
           .parse(await body(request));
-        await (dependencies.ensureTokens ?? ensureManagedTokens)(
+        const tokens = await (dependencies.ensureTokens ?? ensureManagedTokens)(
           input.config.chainId,
           input.config.policy.allowedAssets.value,
           group.config.pairs.flatMap((pair) => [
@@ -153,7 +153,7 @@ export async function managedApi(
             pair.quoteToken,
           ]),
         );
-        const result = editGroup(owner, id, input.config);
+        const result = editGroup(owner, id, input.config, store, tokens);
         cancelGroupReview(id);
         return ok(result);
       }
