@@ -34,7 +34,7 @@ Manual Orca navigation used the actual local application without those intercept
 Installed versions include Node.js `22.23.2`, npm `10.9.8`, Next.js `16.3.4`, React `19.2.8`, Aqua SDK `0.3.1` and SwapVM SDK `0.4.1`.
 The local Next.js CLI guide was read from `node_modules/next/dist/docs/01-app/03-api-reference/06-cli/next.md`.
 
-The new `apps/frontend/playwright.baseline.config.ts` uses `AQUAMUX_DEV_PORT`, defaulting to 33127, and rejects invalid ports.
+The new `apps/frontend/playwright.baseline.config.ts` uses `AQUAMUX_DEV_PORT`, defaulting to 33128, and rejects invalid ports.
 It explicitly binds to `127.0.0.1`, disables existing-server reuse and retains failure screenshots and traces.
 An occupied port causes failure rather than silently testing another process.
 The existing Playwright configuration and package scripts remain untouched.
@@ -43,13 +43,15 @@ Do not merge configurations with two `webServer` entries, because Playwright can
 Run from `apps/frontend`:
 
 ```sh
-npm install
+npm ci
 AQUAMUX_DEV_PORT=33128 npx playwright test --config playwright.baseline.config.ts
 npx next dev --webpack --hostname 127.0.0.1 --port 33127
 ```
 
 Check availability before selecting a port.
 Use a distinct free port for tests while the persistent dev server is running.
+The corrected baseline launcher copies frontend source into a temporary directory, so each server owns a separate Next build directory and generated files.
+See [B1 correction evidence](baseline-isolation-results.md) for parallel startup, collision rejection, environment handling, and review status.
 The test process owns and shuts down its server; do not rely on that short-lived server for subsequent manual browser work.
 
 The persistent server runs in Orca terminal `term_39794535-9977-4304-bfef-40a9aa32ab67` at `http://127.0.0.1:33127`.

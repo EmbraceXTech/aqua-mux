@@ -1,0 +1,30 @@
+[WebServer] (node:73215) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:73216) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 5 workers
+
+(node:73322) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73321) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73324) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73323) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:73325) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  5 e2e/app.spec.ts:66:1 › mobile has no overflow, broken token images or browser errors (2.1s)
+  ✓  2 e2e/app.spec.ts:57:1 › missing wallet gives an honest error without simulated connection (2.2s)
+  ✓  4 e2e/app.spec.ts:101:1 › switching from a wrapped-token basket keeps at least two valid LP pairs (2.3s)
+  ✓  1 e2e/app.spec.ts:33:1 › all chains load their own verified tokens (2.4s)
+  ✓  3 e2e/app.spec.ts:2:1 › basket allocation, token picker, removal and settings (2.6s)
+  ✓  9 e2e/price-range.spec.ts:147:1 › missing volume stays unavailable and the mobile chart fits (2.8s)
+  ✓  7 e2e/app.spec.ts:216:1 › wallet rejection does not expose RPC URLs or raw transaction data (3.2s)
+  ✓  8 e2e/price-range.spec.ts:19:1 › LP pair settings, custom dragging, reciprocal prices, hover and zoom (3.9s)
+  ✓  6 e2e/app.spec.ts:114:1 › wallet review requests one atomic batch and waits for its receipt (6.0s)
+
+  9 passed (13.0s)
+
+EXIT_CODE=0
