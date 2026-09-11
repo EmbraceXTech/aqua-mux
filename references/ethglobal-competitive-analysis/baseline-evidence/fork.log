@@ -1,0 +1,5 @@
+
+> aquamux@0.1.0 verify:fork
+> tsx scripts/verify-fork.ts
+
+ENOENT: no such file or directory, open 'contracts/TestWallet.sol'

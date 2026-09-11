@@ -1,0 +1,33 @@
+
+> aquamux@0.1.0 verify:fork
+> tsx scripts/verify-fork.ts
+
+[
+  {
+    "code": "invalid_union",
+    "errors": [
+      [
+        {
+          "code": "invalid_value",
+          "values": [
+            "full"
+          ],
+          "path": [],
+          "message": "Invalid input: expected \"full\""
+        }
+      ],
+      [
+        {
+          "expected": "object",
+          "code": "invalid_type",
+          "path": [],
+          "message": "Invalid input: expected object, received number"
+        }
+      ]
+    ],
+    "path": [
+      "range"
+    ],
+    "message": "Invalid input"
+  }
+]

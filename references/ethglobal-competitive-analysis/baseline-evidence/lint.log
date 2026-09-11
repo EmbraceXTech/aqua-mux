@@ -1,0 +1,4 @@
+
+> aquamux@0.1.0 lint
+> eslint app components lib test e2e --max-warnings=0
+
