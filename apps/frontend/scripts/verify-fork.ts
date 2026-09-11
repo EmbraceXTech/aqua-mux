@@ -25,6 +25,7 @@ import {
 import { AQUA, SWAP_VM, KYC, NATIVE, tokens, wrapped } from "../lib/config";
 import { buildPlan } from "../lib/server/plan";
 import type { Call } from "../lib/model";
+import { verifyManagedLifecycle } from "./verify-managed-lifecycle";
 process.loadEnvFile(".env");
 const fork = process.env.ARBITRUM_RPC_URL;
 assert.ok(fork, "ARBITRUM_RPC_URL is required");
@@ -112,7 +113,10 @@ try {
         language: "Solidity",
         sources: {
           "TestWallet.sol": {
-            content: readFileSync(new URL("../../contracts/TestWallet.sol", import.meta.url), "utf8"),
+            content: readFileSync(
+              new URL("../../contracts/TestWallet.sol", import.meta.url),
+              "utf8",
+            ),
           },
         },
         settings: {
@@ -369,6 +373,15 @@ try {
   checks.push(
     "A failing output minimum on the final swap rolls back the first fill and native wrapping.",
   );
+  const managed = await verifyManagedLifecycle({
+    client,
+    owner,
+    walletAbi,
+    deployWallet: () => deploy("TestWallet"),
+    execute,
+    rpc,
+  });
+  checks.push(...managed.checks);
   mkdirSync("verification", { recursive: true });
   writeFileSync(
     "verification/fork.json",
@@ -383,6 +396,7 @@ try {
           "Local TestWallet contracts; paired token code and resolver credential replaced only on isolated Anvil fork. WETH, Aqua and SwapVM use forked deployments. No live transactions.",
         checks,
         transactionHashes: hashes,
+        managedLifecycle: managed,
       },
       null,
       2,
