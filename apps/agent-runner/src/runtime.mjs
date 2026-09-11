@@ -18,6 +18,10 @@ export function validateReview(value) {
   if (!value || value.status !== 'hold' || typeof value.marker !== 'string' || Object.keys(value).sort().join(',') !== 'marker,status') throw new Error('Invalid spike output');
   return value;
 }
+/**
+ * @param {'codex' | 'claude'} provider
+ * @param {{ structured?: boolean, schema?: import('ai').FlexibleSchema<unknown>, instructions?: string }} [options]
+ */
 export function createAgent(provider, { structured = false, schema, instructions } = {}) {
   assertSubscriptionEnvironment();
   if (!['codex', 'claude'].includes(provider)) throw new Error('Unknown provider');
