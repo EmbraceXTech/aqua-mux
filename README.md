@@ -26,7 +26,7 @@ Each Aqua strategy references real inventory in the maker wallet, so a fill in o
 - Owner-scoped records, review history, lifecycle plans, idempotency, execution locks, and migrations use durable local SQLite at `.data/managed.sqlite` by default.
 - Wallet ownership uses origin-bound challenges and expiring bearer sessions for the local prototype.
 - Position observation decodes deployed Aqua registration and SwapVM fill events, reconciles current backing, recovers submitted receipts, and reports incomplete coverage instead of inventing inactivity or performance.
-- The token registry contains curated entries for Ethereum, Arbitrum, BNB Chain, and Robinhood Chain, with chain-specific addresses and local token imagery.
+- The token registry combines a searchable runtime registry with curated fallback entries for Ethereum, Arbitrum, BNB Chain, and Robinhood Chain, with chain-specific addresses and local token imagery.
 - The local ReviewService uses the AI SDK HarnessAgent adapters for Codex or Claude, stores sanitized review results and usage, and exposes an authenticated loopback HTTP endpoint.
 - The runner uses a disposable non-root Docker environment without host mounts, signing material, repository access, or a Docker socket.
 - The original basket planner still supports wrapping, approvals, Classic Swap routes, and EIP-5792 atomic wallet batches where the connected wallet exposes that capability.
@@ -39,7 +39,15 @@ The manual mode uses an external browser wallet and requires the owner to review
 
 The local review runner can analyze a managed group and return a validated hold, fund-and-open, replace, close, or propose-conversion result, but model output is never transaction authorization.
 
+Explicit owner confirmation can submit transactions through the external-wallet path or the optional local development signer.
+Starting the app and running read-only verification do not submit transactions by themselves.
+The local development signer can use real funds when explicitly configured, and its setup and evidence are separate from external-wallet compatibility and local-fork fixtures.
+
 Recurring reviews require an active browser lease and pause when the browser heartbeat expires.
+The current lease timeout is 45 seconds.
+Stopping the bot or losing the browser lease pauses management, does not dock existing Aqua strategies, and cannot cancel a transaction that was already submitted.
+Existing passive positions can continue filling after a pause until they are closed or their configured program expiry makes them inactive.
+Confirmed Close retires the selected positions.
 This is browser-bound management, not 24/7 operation or guaranteed stop-loss protection.
 
 The optional delegated Privy path is disabled until authorization, refusal, expiry, revocation, and owner-recovery evidence passes for a specific wallet and chain.
@@ -58,11 +66,13 @@ The current token and RPC configuration names these EVM networks:
 - Robinhood Chain
 
 Network support means that the application has configuration and token-catalog coverage for that network.
-It does not by itself prove a successful LP registration, resolver discovery, fill, or delegated execution on that network.
+A listed token is not proof of a usable funding route or an executable Aqua strategy.
+Route validation is separate from registry listing, and a successful quote applies only to its amount, direction, and observation time, so it must be refreshed for the intended operation.
+Network support does not by itself prove a successful LP registration, resolver discovery, fill, or delegated execution on that network.
 
 ## Quick start
 
-Required local tools are Node.js 22 or newer, npm, and Docker.
+Required local tools are Node.js 22.13 or newer, npm, and Docker.
 Node.js 22.23.2 and a local OrbStack Docker engine were used for the recorded runner checks.
 
 From the repository root, install and start the frontend:
@@ -90,7 +100,8 @@ PRIVATE_KEY=
 
 `ONEINCH_API_KEY` is required for live Classic Swap quotes and execution.
 `PRIVATE_KEY` is read only by the explicit development-wallet and live verification paths, and must never be committed or sent to the agent runner.
-The normal frontend and read-only verification paths do not submit transactions.
+Starting the frontend and running read-only verification do not submit transactions by themselves.
+Explicit owner confirmation can submit through the connected external wallet, and the optional development-wallet adapter can sign real transactions when configured.
 
 ## Local ReviewService runner
 
@@ -102,13 +113,15 @@ Start the runner from a second terminal while Docker is running:
 ```sh
 cd apps/agent-runner
 npm install
-export AQUAMUX_AGENT_RUNNER_TOKEN="$(openssl rand -base64 32 | tr -d '\\n')"
+export AQUAMUX_AGENT_RUNNER_TOKEN="$(openssl rand -base64 32)"
 export AQUAMUX_AGENT_RUNNER_PROVIDER=codex
+npm run image:build
 npm run service
 ```
 
 The runner listens on `127.0.0.1:4319` by default and stores its SQLite state under `apps/agent-runner/.runtime` unless `AQUAMUX_AGENT_RUNNER_DATABASE` is set.
 The frontend managed service connects to the runner only when `AQUAMUX_AGENT_RUNNER_URL` and `AQUAMUX_AGENT_RUNNER_TOKEN` are configured in the server environment.
+After starting the runner, add `AQUAMUX_AGENT_RUNNER_URL=http://127.0.0.1:4319` and the same privately supplied token to `apps/frontend/.env`, then restart the frontend.
 The runner token is a secret and must not appear in source, screenshots, logs, or committed files.
 
 The runner's provider selection is `codex` or `claude` through `AQUAMUX_AGENT_RUNNER_PROVIDER`.
@@ -157,7 +170,9 @@ The frontend fork verifier is intended to run against an isolated local Arbitrum
 npm run verify:fork
 ```
 
-The recorded baseline still has a fixture path and range-schema failure, so this command is not presented as complete lifecycle proof until the verifier owner reruns it successfully.
+The September 12, 2026 lifecycle run passed 13 isolated Arbitrum fork checks after correcting the fixture path and range schema.
+The [lifecycle results](references/ethglobal-competitive-analysis/lifecycle-results.md) and [lifecycle quality review](references/ethglobal-competitive-analysis/lifecycle-quality-review.md) record the fixture boundary and verification details.
+This fork evidence does not establish present live execution, public resolver discovery, or complete application E2E acceptance.
 
 Read-only receipt and position checks use:
 
@@ -188,7 +203,8 @@ The [runtime spike results](references/ethglobal-competitive-analysis/runtime-sp
 
 The [implementation task map](references/ethglobal-competitive-analysis/implementation-task-map.md) lists ownership, review gates, remaining integration work, and the commands that must be refreshed before release claims.
 
-The [frontend guide](apps/frontend/README.md) contains the full environment variable list and frontend command reference.
+The [frontend guide](apps/frontend/README.md) contains the frontend command reference and its application environment variables.
+Runner connection variables and development-wallet settings belong to the setup sections above and the relevant evidence reports.
 
 ## Boundaries
 
