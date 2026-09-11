@@ -13,19 +13,23 @@ export function proposalPolicy(
     value,
     enforcedBy: "execution-broker" as const,
   });
+  const advisory = <T>(value: T) => ({
+    value,
+    enforcedBy: "advisory-display" as const,
+  });
   return {
     id,
     version: 1,
     intervalMs: rule(intent.intervalMs),
-    cooldownMs: rule(intent.intervalMs),
-    maxActions: rule(1),
-    spendBudgets: rule([
+    cooldownMs: advisory(intent.intervalMs),
+    maxActions: advisory(1),
+    spendBudgets: advisory([
       {
         token: verifiedToken(intent.chainId, intent.fundingToken),
         amount: intent.budget,
       },
     ]),
-    gasBudgetWei: rule(intent.gasReserveWei),
+    gasBudgetWei: advisory(intent.gasReserveWei),
     allowedAssets: rule(intent.permittedAssets),
     allowedRoutes: rule([classicRouter(intent.chainId)]),
     maxSlippageBps: rule(50),
@@ -37,7 +41,7 @@ export function proposalPolicy(
       "close",
       "propose-conversion",
     ]),
-    triggers: rule({
+    triggers: advisory({
       rangeExit: false,
       inventoryDriftBps: 10000,
       upwardOnly: intent.recipeId === "upward-only-lp",
