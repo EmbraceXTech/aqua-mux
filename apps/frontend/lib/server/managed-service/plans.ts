@@ -96,7 +96,12 @@ export async function createManagedPlan(
       chainId: group.chainId,
       maker: group.maker,
       assets: [
-        ...group.config.policy.allowedAssets.value,
+        ...(close
+          ? group.config.pairs.flatMap((pair) => [
+              pair.baseToken.address,
+              pair.quoteToken.address,
+            ])
+          : group.config.policy.allowedAssets.value),
         ...group.inventory.map((i) => i.token.address),
       ],
       maxAgeMs: group.config.policy.maxReferenceAgeMs.value,
@@ -170,6 +175,11 @@ export async function createManagedPlan(
       },
       simulate: simulateLifecyclePlan,
     });
+    if ("routesDigest" in plan && plan.routesDigest !== canonicalDigest(routes))
+      throw new ManagedError(
+        "route_binding",
+        "Verified route records do not match the compiled plan.",
+      );
     return store.transaction(() => {
       store.assertExecutionLock(lock);
       const current = groupBot(store, owner, groupId);
