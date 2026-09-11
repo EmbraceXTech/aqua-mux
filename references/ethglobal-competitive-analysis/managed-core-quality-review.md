@@ -6,11 +6,16 @@ The review follows the managed LP implementation plan and the supplied repositor
 
 ## Reviewed revisions and verdict
 
+Final verdict: accepted for the private local prototype after correction commit `1b6315449f79376609c7b76c4f0c3d72148b2c06`.
+All four findings below are resolved in that commit, and their original evidence remains documented for traceability.
+Public hosting still requires trusted ingress abuse controls because challenge creation now has no application rate limit.
+
 | Deliverable | Exact commit | Verdict |
 | --- | --- | --- |
-| Managed contracts and schema tests | `f3c73d2b7e3fe8776c9dda8cfe92758b2711f16d` | Changes required for call quantities and schema invariants. |
+| Original managed contracts and schema tests | `f3c73d2b7e3fe8776c9dda8cfe92758b2711f16d` | Superseded by verified corrections below. |
 | Durable store and lock tests | `670e64d4e6c22b3e825da871091c0163592c4ced` | Accepted within the persistence scope described below. |
-| Wallet authentication and tests | `b17cfc6d25515fcd15a6738dc51145ff0092e49f` | Changes required for unauthenticated challenge exhaustion. |
+| Original wallet authentication and tests | `b17cfc6d25515fcd15a6738dc51145ff0092e49f` | Superseded by verified correction below. |
+| Contract and authentication corrections | `1b6315449f79376609c7b76c4f0c3d72148b2c06` | Accepted for private local use; R1 through R4 closed. |
 
 The shared checkout contains concurrent implementation work.
 Findings below distinguish the named committed implementation from inspected integration code and pending fixes.
@@ -145,3 +150,28 @@ SQLite emitted the runtime's experimental feature warning; there were no test fa
 Independent probes reproduced R1 through R4 without modifying implementation files.
 The existing tests did not cover those malformed metadata or login exhaustion cases.
 No browser wallet, RPC transaction, power-loss fault injection, or multi-process contention claim follows from these results.
+
+## Correction verification
+
+The reviewer independently read the complete relevant diff of `1b6315449f79376609c7b76c4f0c3d72148b2c06` and verified that the tested contract, store, authentication, route, and test files matched that revision.
+R1 now uses a separate unsigned RPC quantity schema capped at 64 hex digits.
+R2 now uses a focused registration schema with equal-length, uniqueness, and maximum-length checks.
+R3 now checks shared token decimals and symbols across both pair definitions and policy spending budgets.
+R4 removes the unauthenticated per-owner quota and adds a regression that signs in successfully after 20 unsolicited challenges for the same owner.
+The removal fixes targeted wallet lockout; it does not establish resistance to general request or database exhaustion on a public server.
+
+Final commands run independently from `apps/frontend`:
+
+```sh
+npx tsx --test test/managed-schema.test.ts test/managed-store.test.ts test/managed-auth.test.ts test/managed-auth-http.test.ts
+npx eslint lib/managed lib/server/store lib/server/auth app/api/auth test/managed-schema.test.ts test/managed-fixtures.ts test/managed-store.test.ts test/managed-auth.test.ts test/managed-auth-http.test.ts --max-warnings=0
+npm run typecheck
+```
+
+All 17 tests passed, scoped lint passed, and full frontend TypeScript checking passed.
+Additional independent assertions checked the actual lifecycle call schema with `0x0`, the uint256 maximum, uint256 overflow, negative quantities, and the opposite registration mismatch of three tokens with two amounts.
+Every assertion passed.
+The HTTP test uses real local HTTP requests to the actual authentication route handlers and a generated fixture wallet signature.
+Its authenticated read check invokes `requireOwner` directly, so it does not prove a full managed-group HTTP endpoint or browser wallet flow.
+The focused module split remains acceptable after the corrections.
+No implementation refactor remains required within this review's private local scope.
