@@ -406,3 +406,31 @@ That relay failure occurs outside the client cleanup block, leaving a prepared a
 The exact review-stop-during-signature.ts probe confirms that state with no broadcast.
 The owner must cancel positively known pre-broadcast relay refusals while retaining transport-ambiguous submissions.
 The four earlier findings are closed at this revision, but full app acceptance remains held for this remaining recovery case and final browser evidence.
+
+
+## Independent outage and correction result ledger
+
+All results below use exact `e2bc73b` production code in an isolated archive and authenticated local HTTP with controlled providers.
+Temporary E2E scripts supplement the existing owner fixture; no unit-test coverage or production implementation was changed by the reviewer.
+Every scenario records zero public transactions.
+
+| Scenario | Observed result |
+| --- | --- |
+| Unsupported sign method | Attempt failed without a hash before and after reconciliation |
+| Local workspace changed while signing | Client refused the result; attempt failed without a hash; no relay |
+| Resume without configured index start | HTTP 200 with current indexed coverage derived from registration block 504214023 through target block 504214025 |
+| Native conversion destination | Actual UI request shape returned HTTP 200 |
+| Another tab stopped while signing | Server refused execution, but attempt remained prepared without a hash; correction pending |
+| Conversion quote dependency unavailable | HTTP 503 with route_unavailable; separately reviewed close-only still confirmed |
+| Quote dependency restored after close | Explicit native conversion confirmed from the closed group |
+
+The outage probe replaces only the pinned quoter's code on the disposable fork and restores it in a finally block.
+Close-only confirmed in fork transaction `0x0ea3966506bf62a9bac8e6a9eb231850ba74889946f426b2cda9acfe01db4af6`.
+The later native conversion confirmed in fork transaction `0xe581fb18f4b54d288262c5232938e12f9c3e231bca76d28d919e1ca2996c2701`.
+The final group remained closed.
+These hashes identify local fork transactions and must not be presented as public-chain execution.
+
+The isolated script directory is `/var/folders/x3/4w6qlmgx7ss4zsvzcjq7592m0000gn/T/aquamux-review-e2bc73b-jtuqjlp_/apps/frontend/scripts`.
+The relevant scripts are review-unsupported-provider.ts, review-stale-signature.ts, review-resume-coverage.ts, review-native-conversion.ts, review-stop-during-signature.ts and review-route-outage.ts.
+The stale-signature probe changed its expectation from submission to rejection when testing the correction, while retaining the same controlled provider transition.
+Raw private tool logs are not included because transport diagnostics can contain authenticated endpoints; this ledger retains the non-secret observed results.
