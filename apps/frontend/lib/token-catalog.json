@@ -678,6 +678,22 @@
         ]
       },
       {
+        "address": "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+        "symbol": "USDT",
+        "name": "Tether USD",
+        "decimals": 6,
+        "logo": "",
+        "source": "verified local route policy",
+        "tags": [
+          "GROUP:USDT",
+          "PEG:USD",
+          "RISK:info"
+        ],
+        "providers": [
+          "verified local route policy"
+        ]
+      },
+      {
         "address": "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
         "symbol": "WBTC",
         "name": "Wrapped BTC",

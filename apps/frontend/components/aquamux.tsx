@@ -194,6 +194,19 @@ function initialLegs(id: number): Leg[] {
     amount: "0",
   }));
 }
+function localDevelopmentLegs(id: ChainId): Leg[] {
+  const symbols = id === 4663 ? ["USDG", "PONS"] : ["USDC", "USDT"];
+  const selected = symbols
+    .map((symbol) => tokens(id).find((token) => token.symbol === symbol))
+    .filter((token): token is Token => !!token);
+  if (selected.length !== 2)
+    throw new Error("Local wallet outputs are not configured for this network.");
+  return selected.map((token, index) => ({
+    address: token.address,
+    bps: [5000, 5000][index],
+    amount: "0",
+  }));
+}
 export function AquaMux() {
   const [chainId, setChainId] = useState<ChainId>(42161),
     [mode, setMode] = useState<"swap" | "liquidity">("swap"),
@@ -480,7 +493,11 @@ export function AquaMux() {
     change();
     setChainId(id);
     setSource(NATIVE);
-    setLegs(initialLegs(id));
+    setLegs(
+      session?.mode === "local-development" && mode === "swap"
+        ? localDevelopmentLegs(id)
+        : initialLegs(id),
+    );
     setBalances({});
     setChainPicker(false);
   }
@@ -534,7 +551,14 @@ export function AquaMux() {
       setError("");
       setBusy(true);
       const connected = await wallet.connect(walletMode);
-      if (connected) setWalletOpen(false);
+      if (connected) {
+        if (connected.mode === "local-development" && mode === "swap") {
+          change();
+          setSource(NATIVE);
+          setLegs(localDevelopmentLegs(chainId));
+        }
+        setWalletOpen(false);
+      }
     } catch (error) {
       setError(errorMessage(error));
     } finally {
@@ -598,8 +622,16 @@ export function AquaMux() {
     typeof picker === "number" ? legs[picker]?.address : undefined;
   const registryCandidates: Token[] = registrySearch.result ? registrySearch.result.items.map((item) => ({ address: item.address, symbol: item.symbol, name: item.name, decimals: item.decimals, logo: tokens(chainId).find((known) => known.address === item.address)?.logo ?? "", source: "1inch registry" })) : catalog;
   if (!registryCandidates.some((item) => item.address === NATIVE)) registryCandidates.unshift(tokens(chainId).find((item) => item.address === NATIVE)!);
+  const localDevelopmentWallet =
+    session?.mode === "local-development" && mode === "swap";
   const available = registryCandidates.filter(
     (t) =>
+      (!localDevelopmentWallet ||
+        (picker === "source"
+          ? t.address === NATIVE || t.address === wrapped(chainId).address
+          : localDevelopmentLegs(chainId).some(
+              (leg) => leg.address === t.address,
+            ))) &&
       (picker === "source" ||
         (t.address !== source &&
           !legs.some(
@@ -631,6 +663,8 @@ export function AquaMux() {
             onClick={() => {
               change();
               setMode("swap");
+              if (session?.mode === "local-development")
+                setLegs(localDevelopmentLegs(chainId));
               setManagedOpen(false);
             }}
           >
@@ -763,6 +797,8 @@ export function AquaMux() {
                   onClick={() => {
                     change();
                     setMode("swap");
+                    if (session?.mode === "local-development")
+                      setLegs(localDevelopmentLegs(chainId));
                   }}
                 >
                   <ArrowDownUp size={15} />
@@ -1039,7 +1075,7 @@ export function AquaMux() {
             </div>
             <button
               className="add-token"
-              disabled={legs.length >= 6}
+              disabled={legs.length >= 6 || localDevelopmentWallet}
               onClick={() => {
                 setSearch("");
                 setPicker(legs.length);

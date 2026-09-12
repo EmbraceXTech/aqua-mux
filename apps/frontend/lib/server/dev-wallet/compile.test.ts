@@ -114,6 +114,31 @@ test("basket preparation binds displayed minimums and exact per-leg source alloc
   }
 });
 
+test("local route failures stay actionable without reflecting provider diagnostics", async () => {
+  await assert.rejects(
+    () =>
+      buildDevBasketPlan(input, account, {
+        resolve,
+        rpc,
+        quote: async () => {
+          throw new Error("No verified single-pool route for this token pair.");
+        },
+      }),
+    /No verified single-pool route for this token pair/,
+  );
+  await assert.rejects(
+    () =>
+      buildDevBasketPlan(input, account, {
+        resolve,
+        rpc,
+        quote: async () => {
+          throw new Error("https://rpc.example/private-credential");
+        },
+      }),
+    /verified local route is unavailable/,
+  );
+});
+
 test("provider metadata cannot substitute spend, destination or encoded minimum during preparation", async () => {
   for (const mutate of [
     (route: VerifiedRoute) => {

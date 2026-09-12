@@ -135,13 +135,15 @@ test("a configured local development wallet prepares and submits through its ser
     await route.fulfill({ status: 404, json: { error: "Unknown action" } });
   });
   await page.goto("/");
-  await page.getByRole("button", { name: "Multi-LP" }).click();
-  for (const symbol of ["USDC", "WBTC", "LINK"])
-    await page.getByLabel(`${symbol} paired amount`).fill("1");
-  await page.locator(".main-action").click();
+  await page.locator(".wallet-button").click();
   await page
     .getByRole("button", { name: "Use local development wallet" })
     .click();
+  await expect(page.locator(".output-list")).toContainText("USDT");
+  await expect(page.locator(".output-list")).not.toContainText("WBTC");
+  await page.getByRole("button", { name: "Multi-LP" }).click();
+  await page.getByLabel("USDC paired amount").fill("1");
+  await page.getByLabel("USDT paired amount").fill("1");
   await page
     .getByRole("button", { name: "Review liquidity positions" })
     .click();

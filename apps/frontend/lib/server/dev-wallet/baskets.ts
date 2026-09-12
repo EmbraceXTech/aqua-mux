@@ -21,6 +21,20 @@ type Operation = DevWalletOutcome & {
   phase: "preparing" | "broadcast" | "settled" | "refused";
 };
 
+function preparationError(error: unknown) {
+  if (error instanceof DevWalletError) return error;
+  const message = error instanceof Error ? error.message : "";
+  if (
+    /^(Insufficient [A-Z0-9]+ balance|Configured RPC returned the wrong chain|Required contract is unavailable|The paired token must differ|Choose a wrapped)/.test(
+      message,
+    )
+  )
+    return new DevWalletError(message);
+  return new DevWalletError(
+    "Local wallet plan could not be prepared. Review the selected assets and configured RPC connection.",
+  );
+}
+
 // Dependency injection is server-only and keeps tests off real networks and real keys.
 export class DevBasketService {
   constructor(
@@ -35,8 +49,13 @@ export class DevBasketService {
     session: DevSession,
     basket: unknown,
   ): Promise<DevWalletReview> {
-    const plan = await this.compile(basket, session.owner);
-    validateDevPlan(plan, session.owner);
+    let plan: Awaited<ReturnType<typeof buildDevBasketPlan>>;
+    try {
+      plan = await this.compile(basket, session.owner);
+      validateDevPlan(plan, session.owner);
+    } catch (error) {
+      throw preparationError(error);
+    }
     const review = {
       id: randomUUID(),
       digest: planDigest(plan),
