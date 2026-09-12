@@ -6,6 +6,8 @@ import { canonicalRequest, selectPool } from "./calldata";
 import { routerDeployments } from "./deployments";
 import type { VerifiedRoute } from "./types";
 import { validateCompiledRoute } from "./validate";
+import { implementationSlot } from "../proxy-implementation";
+export { implementationSlot } from "../proxy-implementation";
 
 export type ProvenanceReader = {
   getChainId(): Promise<number>;
@@ -15,9 +17,6 @@ export type ProvenanceReader = {
     slot: Hex;
   }): Promise<Hex | undefined>;
 };
-
-export const implementationSlot =
-  "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc";
 
 /** Run again immediately before signing/broadcast; do not trust persisted hash claims. */
 export async function verifyRouteProvenance(

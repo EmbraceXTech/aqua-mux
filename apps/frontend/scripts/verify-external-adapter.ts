@@ -1,3 +1,4 @@
+import { verifyProxyUpgrade } from "./fixtures/proxy-upgrade";
 import { createExternalConfig } from "./fixtures/external-config";
 import { createExternalExecution } from "./fixtures/external-execution";
 import { verifyReplacementRollback } from "./fixtures/lifecycle-rollback";
@@ -8,6 +9,7 @@ import { writeFileSync } from "node:fs";
 import { erc20Abi, parseEther, toHex, type Address } from "viem";
 import { controlledFork } from "./fixtures/controlled-fork";
 import {
+  AQUA,
   NATIVE,
   classicRouter,
   networks,
@@ -32,6 +34,12 @@ import { delegatedAccountCode } from "../lib/server/external-adapter/account";
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
 const results: unknown[] = [];
 const ethereumOnly = process.argv.includes("--ethereum");
+const proxyUpgrade = process.argv.includes("--proxy-upgrade");
+const indirectDependency = process.argv.includes("--indirect");
+if (proxyUpgrade && !ethereumOnly)
+  throw new Error(
+    "Proxy upgrade probe requires the isolated Ethereum scenario.",
+  );
 const scenarios = ethereumOnly
   ? [{ chainId: 1, bridged: false }]
   : [
@@ -116,6 +124,15 @@ for (const { chainId, bridged } of scenarios) {
       amountIn,
       initial,
     });
+    if (proxyUpgrade && indirectDependency) {
+      const hash = await fork.wallet.writeContract({
+        address: quotes[0].address,
+        abi: erc20Abi,
+        functionName: "approve",
+        args: [AQUA, BigInt(initial[0].minimumAmountOut)],
+      });
+      await fork.rpc.waitForTransactionReceipt({ hash });
+    }
     const groupId = `external-fork-${chainId}`;
     store.put(
       "group",
@@ -225,6 +242,20 @@ for (const { chainId, bridged } of scenarios) {
     process.env[setting.env] = fork.url;
     await fork.request("anvil_setCode", [maker, delegatedAccountCode]);
     const { execute, methods } = createExternalExecution(fork, store, input);
+    if (proxyUpgrade) {
+      await verifyProxyUpgrade({
+        fork,
+        store,
+        input,
+        plan: opened.plan,
+        token: quotes[0].address,
+        execute,
+        indirectDependency,
+        beforeSigning: process.argv.includes("--proxy-pointer-before-signing"),
+        expectedProof: !process.argv.includes("--expect-unverified"),
+      });
+      continue;
+    }
     const openReceipt = await execute(opened.plan.id);
     const fills = await verifyResolverFills(
       fork,
@@ -445,12 +476,13 @@ for (const { chainId, bridged } of scenarios) {
     process.env[setting.env] = upstream;
   }
 }
-writeFileSync(
-  new URL(
-    ethereumOnly
-      ? "../../../references/ethglobal-competitive-analysis/ethereum-adapter-fork.json"
-      : "../../../references/ethglobal-competitive-analysis/external-adapter-fork.json",
-    import.meta.url,
-  ),
-  JSON.stringify(results, null, 2) + "\n",
-);
+if (!proxyUpgrade)
+  writeFileSync(
+    new URL(
+      ethereumOnly
+        ? "../../../references/ethglobal-competitive-analysis/ethereum-adapter-fork.json"
+        : "../../../references/ethglobal-competitive-analysis/external-adapter-fork.json",
+      import.meta.url,
+    ),
+    JSON.stringify(results, null, 2) + "\n",
+  );

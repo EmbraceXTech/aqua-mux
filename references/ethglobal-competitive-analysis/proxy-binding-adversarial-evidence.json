@@ -1,0 +1,52 @@
+{
+  "before": {
+    "chainId": 1,
+    "evidence": "controlled fork implementation change after final preflight",
+    "proxy": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "implementation": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+    "originalImplementationHash": "0xcdfb7d322961af3acae7a8f7ee8b69c205b36f576cc5b077f170c7eb8ecbe3ea",
+    "changedImplementationHash": "0xcad29e62c0ad239ff06d36ca8bf1d31a45fa0e62b35c11647b8eb680f87a04fd",
+    "receiptStatus": "success",
+    "hash": "0x565248dd6e37e4dfc8da86e7187a916aff65eb01e7a3f2d9bd1dd80c81da9317",
+    "incorrectlyConfirmed": true,
+    "finalAttemptStatus": "confirmed",
+    "publicBroadcasts": 0
+  },
+  "after": {
+    "chainId": 1,
+    "evidence": "controlled fork implementation change after final preflight",
+    "proxy": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "implementation": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+    "originalImplementationHash": "0xcdfb7d322961af3acae7a8f7ee8b69c205b36f576cc5b077f170c7eb8ecbe3ea",
+    "changedImplementationHash": "0xcad29e62c0ad239ff06d36ca8bf1d31a45fa0e62b35c11647b8eb680f87a04fd",
+    "receiptStatus": "success",
+    "hash": "0x8a03942de75284b7c4db62c516201599c749e41b3d77c2c79687ba9ed7efc557",
+    "incorrectlyConfirmed": false,
+    "finalAttemptStatus": "unknown",
+    "publicBroadcasts": 0
+  },
+  "indirect": {
+    "chainId": 1,
+    "indirectDependency": true,
+    "evidence": "controlled fork implementation change after final preflight",
+    "proxy": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "implementation": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+    "originalImplementationHash": "0xcdfb7d322961af3acae7a8f7ee8b69c205b36f576cc5b077f170c7eb8ecbe3ea",
+    "changedImplementationHash": "0xcad29e62c0ad239ff06d36ca8bf1d31a45fa0e62b35c11647b8eb680f87a04fd",
+    "receiptStatus": "success",
+    "hash": "0xe9220b7fe0c20252f42605f53caa9c80a170cb772f65a506d32bb7041e1641bd",
+    "incorrectlyConfirmed": false,
+    "finalAttemptStatus": "unknown",
+    "publicBroadcasts": 0
+  },
+  "pointerBeforeSigning": {
+    "chainId": 1,
+    "evidence": "controlled fork proxy pointer change before signing",
+    "proxy": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "implementation": "0x43506849d7c04f9138d1a2050bbf3a0c054402dd",
+    "changedImplementation": "0x000000000000000000000000000000000000beef",
+    "refusedBeforeSigning": true,
+    "journalEntries": 0,
+    "publicBroadcasts": 0
+  }
+}

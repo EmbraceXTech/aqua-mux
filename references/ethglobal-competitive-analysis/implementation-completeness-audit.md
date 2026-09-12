@@ -40,6 +40,11 @@ See `ethereum-route-provenance.md`.
 It covers both resolver fill directions, replacement rollback, exact signed transaction refusal cases, ambiguous relay recovery and production receipt reconciliation.
 See `ethereum-managed-execution.md` and `ethereum-adapter-fork.json`.
 
+A further controlled-fork audit reproduced a legacy token-proxy upgrade being incorrectly confirmed.
+The proxy-binding correction now captures the recognized legacy implementation slot and checks observed inner-call dependencies during receipt proof.
+Changed provenance stays unknown with the retry lock retained, while all five full lifecycle scenarios continue to pass.
+See `proxy-binding-audit.md`.
+
 ## Token and route coverage boundary
 
 The dynamic 1inch registry supports Ethereum, BNB, Arbitrum and Robinhood catalog discovery and search.

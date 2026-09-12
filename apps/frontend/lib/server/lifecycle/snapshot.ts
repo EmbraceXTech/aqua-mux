@@ -2,7 +2,7 @@ import { erc20Abi, keccak256, type Address } from "viem";
 import { routePolicyTargets } from "../route-policy/route-calls";
 import { AQUA, SWAP_VM, NATIVE } from "../../config";
 import { client } from "../rpc";
-import { implementationSlot } from "../route-policy/provenance";
+import { readProxyImplementation } from "../proxy-implementation";
 import { aquaLifecycleAbi } from "./calls";
 import { requestTokens, verifyLifecycleToken } from "./metadata";
 import type { LifecycleRequest, LifecycleSnapshot } from "./types";
@@ -64,15 +64,12 @@ export async function readLifecycleSnapshot(
     }),
   );
   for (const contract of [...contracts]) {
-    const value = await rpc.getStorageAt({
-      address: contract.address,
-      slot: implementationSlot,
+    const implementation = await readProxyImplementation(
+      rpc,
+      contract.address,
       blockNumber,
-    });
-    if (value && BigInt(value) !== 0n) {
-      if (BigInt(value) >= 1n << 160n)
-        throw new Error("Invalid proxy implementation slot.");
-      const implementation = `0x${value.slice(-40)}` as Address;
+    );
+    if (implementation) {
       const code = await rpc.getCode({ address: implementation, blockNumber });
       if (!code || code === "0x")
         throw new Error("Proxy implementation is unavailable.");

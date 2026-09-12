@@ -3,7 +3,7 @@ import { NATIVE, tokens } from "../../config";
 import { tokenSchema, type Token } from "../../managed";
 import type { DevBatchPlan } from "./batch";
 import { DevWalletError } from "./config";
-import { implementationSlot } from "../route-policy/provenance";
+import { readProxyImplementation } from "../proxy-implementation";
 
 // Extra metadata comes only from authoritative stored plans or registry resolution.
 // The browser cannot supply a DevBatchPlan to the execution endpoint.
@@ -35,15 +35,14 @@ export async function verifyDevAssets(
     Partial<Pick<PublicClient, "getStorageAt">>,
 ) {
   for (const deployment of plan.deploymentEvidence ?? []) {
-    if (deployment.implementation) {
-      const slot = await rpc.getStorageAt?.({
-        address: deployment.address,
-        slot: implementationSlot,
-      });
-      if (
-        slot?.toLowerCase() !==
-        `0x${deployment.implementation.slice(2).padStart(64, "0")}`
-      )
+    if (rpc.getStorageAt || deployment.implementation) {
+      const implementation = rpc.getStorageAt
+        ? await readProxyImplementation(
+            { getStorageAt: rpc.getStorageAt },
+            deployment.address,
+          )
+        : undefined;
+      if (implementation !== deployment.implementation)
         throw new DevWalletError(
           "A reviewed proxy implementation changed. Prepare a fresh plan.",
         );

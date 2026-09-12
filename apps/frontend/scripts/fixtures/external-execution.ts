@@ -53,7 +53,11 @@ export function createExternalExecution(
       });
     },
   };
-  const execute = async (planId: string, ambiguous = false) => {
+  const execute = async (
+    planId: string,
+    ambiguous = false,
+    probe?: { beforeBroadcast(): Promise<void>; expectedProof: boolean },
+  ) => {
     const plan = store.get("plan", planId, maker)!;
     const prepared = await prepareExternalExecution(
       { ...input, planId, idempotencyKey: planId },
@@ -134,11 +138,13 @@ export function createExternalExecution(
         serializedTransaction: signed,
       },
       store,
-      ambiguous
+      ambiguous || probe
         ? {
             ...fork.rpc,
             sendRawTransaction: async (args) => {
-              await fork.rpc.sendRawTransaction(args);
+              await probe?.beforeBroadcast();
+              const hash = await fork.rpc.sendRawTransaction(args);
+              if (!ambiguous) return hash;
               throw new Error(
                 "Controlled transport lost response after submission",
               );
@@ -154,7 +160,10 @@ export function createExternalExecution(
     const tx = await fork.rpc.getTransaction({
       hash: receipt.transactionHash,
     });
-    assert.equal(await verifyManagedTransactionProof(fork.rpc, tx, plan), true);
+    assert.equal(
+      await verifyManagedTransactionProof(fork.rpc, tx, plan),
+      probe?.expectedProof ?? true,
+    );
     const confirmations = Number(
       process.env[`AQUAMUX_CONFIRMATIONS_${chainId}`] ?? 1,
     );
@@ -167,8 +176,20 @@ export function createExternalExecution(
     await reconcileManagedTransactions(maker, groupId);
     assert.equal(
       store.get("transaction", attempt.id, maker)!.status,
-      "confirmed",
+      probe?.expectedProof === false ? "unknown" : "confirmed",
     );
+    if (probe?.expectedProof === false)
+      assert.throws(
+        () =>
+          store.acquireExecutionLock(
+            chainId,
+            maker,
+            maker,
+            "unsafe-retry",
+            30000,
+          ),
+        /unresolved/,
+      );
     return receipt;
   };
   return { execute, methods };

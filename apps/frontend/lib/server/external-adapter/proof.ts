@@ -6,6 +6,10 @@ import {
   encodeDevBatch,
 } from "../dev-wallet/batch";
 import { delegatedAccountCode } from "./account";
+import {
+  implementationFromSlots,
+  proxyImplementationSlots,
+} from "../proxy-implementation";
 
 type Trace = {
   type?: string;
@@ -85,7 +89,11 @@ export function prestateProvesPlanDependencies(
       account as { code?: Hex; storage?: Record<string, string> },
     ]),
   );
-  for (const target of new Set(plan.calls.map((call) => call.to))) {
+  const directTargets = new Set(plan.calls.map((call) => call.to));
+  const observedTargets = plan.deploymentEvidence
+    .filter((entry) => accounts[entry.address]?.code)
+    .map((entry) => entry.address);
+  for (const target of new Set([...directTargets, ...observedTargets])) {
     const dependency = plan.deploymentEvidence.find(
       (entry) => entry.address === target,
     );
@@ -101,13 +109,18 @@ export function prestateProvesPlanDependencies(
         (entry) => entry.address === dependency.implementation,
       );
       const implementationCode = accounts[dependency.implementation]?.code;
-      const slot =
-        actual.storage?.[
-          "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
-        ];
+      let implementation: string | undefined;
+      try {
+        implementation = implementationFromSlots(
+          proxyImplementationSlots.map(
+            (slot) => actual.storage?.[slot] as Hex | undefined,
+          ),
+        );
+      } catch {
+        return false;
+      }
       if (
-        !slot ||
-        BigInt(slot) !== BigInt(dependency.implementation) ||
+        implementation !== dependency.implementation ||
         !implementationEvidence ||
         !implementationCode ||
         keccak256(implementationCode) !== implementationEvidence.codeHash
