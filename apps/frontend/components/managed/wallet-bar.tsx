@@ -1,17 +1,22 @@
 import { OwnerExport } from "./owner-export";
 import { Wallet } from "lucide-react";
+import type { DevWalletAvailability } from "@/lib/dev-wallet";
 import type { ManagedSession } from "@/lib/managed-client/api";
+import type { WalletMode } from "@/lib/managed-client/wallet-execution";
+import { WalletModePicker } from "../wallet-mode-picker";
 import { Button } from "../ui/button";
 
 export function WalletBar({
   session,
   busy,
+  developmentWallet,
   onConnect,
   onDisconnect,
 }: {
   session?: ManagedSession;
   busy: boolean;
-  onConnect: (mode: "external" | "local-development") => Promise<void>;
+  developmentWallet?: DevWalletAvailability;
+  onConnect: (mode: WalletMode) => Promise<void>;
   onDisconnect: () => Promise<void>;
 }) {
   return (
@@ -51,18 +56,12 @@ export function WalletBar({
             </Button>
           </>
         ) : (
-          <>
-            <Button disabled={busy} onClick={() => void onConnect("external")}>
-              Connect and authenticate wallet
-            </Button>
-            <Button
-              variant="outline"
-              disabled={busy}
-              onClick={() => void onConnect("local-development")}
-            >
-              Use local development wallet
-            </Button>
-          </>
+          <WalletModePicker
+            busy={busy}
+            developmentWallet={developmentWallet}
+            externalLabel="Connect and authenticate wallet"
+            onConnect={(mode) => void onConnect(mode)}
+          />
         )}
       </div>
     </div>

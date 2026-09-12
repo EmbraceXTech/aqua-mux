@@ -127,11 +127,10 @@ test("only compiler targets, wrapping and allowed token approvals pass", () => {
   );
 });
 
-test("local mode is opt-in, development-only, origin scoped and rejects proxies", () => {
+test("local mode is development-only, origin scoped and rejects proxies", () => {
   const original = { ...process.env };
   try {
     Object.assign(process.env, { NODE_ENV: "development" });
-    process.env.AQUAMUX_DEV_WALLET = "true";
     process.env.AQUAMUX_DEV_WALLET_ORIGIN = "http://127.0.0.1:3100";
     const request = (headers = {}) =>
       new Request("http://127.0.0.1:3100/api/dev-wallet/connect", {
@@ -187,8 +186,13 @@ test("local mode is opt-in, development-only, origin scoped and rejects proxies"
     assert.throws(() => assertLocalRequest(request()), /disabled/);
     assert.throws(() => devAccount(), /disabled/);
     Object.assign(process.env, { NODE_ENV: "development" });
+    delete process.env.AQUAMUX_DEV_WALLET;
+    assertLocalRequest(request());
     process.env.AQUAMUX_DEV_WALLET = "false";
-    assert.throws(() => assertLocalRequest(request()), /disabled/);
+    assert.throws(
+      () => assertLocalRequest(request()),
+      /disabled by server configuration/,
+    );
   } finally {
     process.env = original;
   }

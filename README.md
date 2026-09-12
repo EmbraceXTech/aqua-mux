@@ -118,13 +118,12 @@ The optional local development wallet is a real-funds server-side signer for exp
 Enable it only on a loopback development server by adding these server-only settings to `apps/frontend/.env`:
 
 ```dotenv
-AQUAMUX_DEV_WALLET=true
 AQUAMUX_DEV_WALLET_ORIGIN=http://127.0.0.1:3100
 AQUAMUX_AUTH_ORIGIN=http://127.0.0.1:3100
 AQUAMUX_DEV_WALLET_MAX_FEE_WEI=300000000000000
 ```
 
-The development wallet requires `NODE_ENV=development`, an exact origin matching the browser URL, and the existing server-only `PRIVATE_KEY` and RPC settings.
+The development wallet requires `NODE_ENV=development`, an exact origin matching the browser URL, a matching `AQUAMUX_AUTH_ORIGIN`, a positive fee cap, and the existing server-only `PRIVATE_KEY` and RPC settings.
 The fee cap is 0.0003 native units, and managed plans also apply their configured gas budget.
 Keep this server bound to loopback and require explicit owner confirmation for every submission.
 The adapter supports Ethereum, Arbitrum, BNB Chain, and Robinhood Chain in the current configuration and recorded controlled-fork evidence.

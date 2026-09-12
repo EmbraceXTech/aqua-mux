@@ -26,6 +26,7 @@ export function ManagedWorkspace({
       <WalletBar
         session={wallet.session}
         busy={wallet.busy}
+        developmentWallet={wallet.developmentWallet}
         onConnect={async (mode) => {
           await wallet.connect(mode);
         }}

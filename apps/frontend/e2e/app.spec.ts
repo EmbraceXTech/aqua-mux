@@ -63,6 +63,112 @@ test("missing wallet gives an honest error without simulated connection", async 
   await expect(page.getByRole("dialog")).toContainText("wallet installed");
   await expect(page.locator(".wallet-button")).toContainText("Connect wallet");
 });
+test("a configured local development wallet prepares and submits through its server route", async ({
+  page,
+}) => {
+  const account = "0x0000000000000000000000000000000000000001";
+  const actions: { action: string; body?: unknown }[] = [];
+  await page.route("**/api/dev-wallet/*", async (route) => {
+    const action = new URL(route.request().url()).pathname.split("/").pop()!;
+    const body =
+      route.request().method() === "POST"
+        ? route.request().postDataJSON()
+        : undefined;
+    actions.push({ action, body });
+    if (route.request().method() === "GET") {
+      await route.fulfill({ json: { available: true } });
+      return;
+    }
+    if (action === "connect") {
+      await route.fulfill({
+        json: {
+          mode: "local-development",
+          label: "Local development wallet",
+          account,
+          token: "local-session-token",
+          expiresAt: Date.now() + 120_000,
+          maxFeeWei: "1000000000000000",
+          networks: [],
+        },
+      });
+      return;
+    }
+    if (action === "plan") {
+      await route.fulfill({
+        json: {
+          id: "local-review",
+          digest: "11".repeat(32),
+          plan: {
+            chainId: 42161,
+            account,
+            mode: "liquidity",
+            calls: [
+              {
+                to: account,
+                data: "0x",
+                value: "0x0",
+                label: "Local fixture registration",
+              },
+            ],
+            strategies: [],
+            summary: ["Local wallet transport fixture."],
+            createdAt: Date.now(),
+            expiresAt: Date.now() + 120_000,
+          },
+        },
+      });
+      return;
+    }
+    if (action === "execute" || action === "status") {
+      await route.fulfill({
+        json: {
+          id: "local-transaction",
+          state: "confirmed",
+          transactionHash: `0x${"2".repeat(64)}`,
+        },
+      });
+      return;
+    }
+    await route.fulfill({ status: 404, json: { error: "Unknown action" } });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Multi-LP" }).click();
+  for (const symbol of ["USDC", "WBTC", "LINK"])
+    await page.getByLabel(`${symbol} paired amount`).fill("1");
+  await page.locator(".main-action").click();
+  await page
+    .getByRole("button", { name: "Use local development wallet" })
+    .click();
+  await page
+    .getByRole("button", { name: "Review liquidity positions" })
+    .click();
+  await expect(page.getByRole("dialog")).toContainText(
+    "Local fixture registration",
+  );
+  await page
+    .getByRole("button", { name: "Confirm with development wallet" })
+    .click();
+  await expect(page.getByRole("dialog")).toContainText("Transaction confirmed");
+  expect(actions).toEqual(
+    expect.arrayContaining([
+      { action: "status", body: undefined },
+      { action: "connect", body: {} },
+      {
+        action: "plan",
+        body: expect.objectContaining({ basket: expect.any(Object) }),
+      },
+      {
+        action: "execute",
+        body: {
+          id: "local-review",
+          digest: "11".repeat(32),
+          confirmed: true,
+        },
+      },
+    ]),
+  );
+});
+
 test("mobile has no overflow, broken token images or browser errors", async ({
   page,
 }) => {
@@ -134,6 +240,7 @@ test("wallet review requests one atomic batch and waits for its receipt", async 
           if (["eth_requestAccounts", "eth_accounts"].includes(a.method))
             return [account];
           if (a.method === "eth_chainId") return "0xa4b1";
+          if (a.method === "personal_sign") return `0x${"1".repeat(130)}`;
           if (a.method === "wallet_getCapabilities")
             return { "0xa4b1": { atomic: { status: "supported" } } };
           if (a.method === "wallet_sendCalls") {
@@ -160,6 +267,22 @@ test("wallet review requests one atomic batch and waits for its receipt", async 
   );
   await page.route("**/api/balances?**", (route) =>
     route.fulfill({ json: { balances: {} } }),
+  );
+  await page.route("**/api/auth/challenge", (route) =>
+    route.fulfill({ json: { id: "fixture-challenge", message: "Fixture" } }),
+  );
+  await page.route("**/api/auth/verify", (route) =>
+    route.fulfill({
+      json: {
+        token: "fixture-session",
+        owner: account,
+        sessionId: "fixture-session-id",
+        expiresAt: Date.now() + 120_000,
+      },
+    }),
+  );
+  await page.route("**/api/managed/recovery", (route) =>
+    route.fulfill({ json: { attempts: [], unavailable: [] } }),
   );
   await page.route("**/api/plan", (route) =>
     route.fulfill({
@@ -224,6 +347,7 @@ test("wallet rejection does not expose RPC URLs or raw transaction data", async 
           if (["eth_requestAccounts", "eth_accounts"].includes(method))
             return [account];
           if (method === "eth_chainId") return "0xa4b1";
+          if (method === "personal_sign") return `0x${"1".repeat(130)}`;
           if (method === "wallet_getCapabilities")
             return { "0xa4b1": { atomic: { status: "supported" } } };
           if (method === "wallet_sendCalls")
@@ -238,6 +362,22 @@ test("wallet rejection does not expose RPC URLs or raw transaction data", async 
   );
   await page.route("**/api/balances?**", (route) =>
     route.fulfill({ json: { balances: {} } }),
+  );
+  await page.route("**/api/auth/challenge", (route) =>
+    route.fulfill({ json: { id: "fixture-challenge", message: "Fixture" } }),
+  );
+  await page.route("**/api/auth/verify", (route) =>
+    route.fulfill({
+      json: {
+        token: "fixture-session",
+        owner: account,
+        sessionId: "fixture-session-id",
+        expiresAt: Date.now() + 120_000,
+      },
+    }),
+  );
+  await page.route("**/api/managed/recovery", (route) =>
+    route.fulfill({ json: { attempts: [], unavailable: [] } }),
   );
   await page.route("**/api/plan", (route) =>
     route.fulfill({
