@@ -6,7 +6,7 @@ import {
   resolveLegacyBasket,
   type ResolvedLegacyBasket,
 } from "./legacy-token-resolution";
-import { buildPlan } from "./plan";
+import { buildVerifiedPublicPlan as buildPlan } from "./verified-public-plan";
 import { quoteBasket } from "./swap";
 
 const planRequestSchema = z
