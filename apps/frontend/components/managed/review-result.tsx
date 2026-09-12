@@ -12,12 +12,14 @@ export function ReviewResultCard({ review }: { review: ReviewRecord }) {
           {titleLabel(review.status)}
         </span>
       </div>
-      <p>
-        {review.result?.rationale ??
-          (review.errors.join(" ") ||
+      <p role={review.status === "failed" ? "alert" : undefined}>
+        {review.status === "failed"
+          ? review.errors.join(" ") ||
+            "The review failed. No transaction is authorized."
+          : (review.result?.rationale ??
             "The agent review is pending. No transaction is authorized.")}
       </p>
-      {review.result && (
+      {review.status === "succeeded" && review.result && (
         <>
           <h3>{titleLabel(review.result.decision)}</h3>
           {review.result.expectedEffects.map((effect, index) => (

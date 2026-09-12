@@ -68,6 +68,19 @@ export async function proposeIntent(
     }
     if (
       store
+        .list("group", owner)
+        .some(
+          (group) =>
+            group.chainId === intent.chainId && group.state !== "closed",
+        )
+    )
+      throw new ManagedError(
+        "group_exists",
+        "This wallet already has a managed group on this chain. Open the existing group before creating another.",
+        409,
+      );
+    if (
+      store
         .listDocuments<ProposalDocument>("proposal-intents", owner)
         .some(
           (d) =>
