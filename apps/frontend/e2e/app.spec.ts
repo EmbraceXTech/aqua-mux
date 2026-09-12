@@ -68,6 +68,9 @@ test("a configured local development wallet prepares and submits through its ser
 }) => {
   const account = "0x0000000000000000000000000000000000000001";
   const actions: { action: string; body?: unknown }[] = [];
+  await page.route("**/api/managed/recovery", (route) =>
+    route.fulfill({ json: { attempts: [], unavailable: [] } }),
+  );
   await page.route("**/api/dev-wallet/*", async (route) => {
     const action = new URL(route.request().url()).pathname.split("/").pop()!;
     const body =

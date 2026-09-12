@@ -1,5 +1,6 @@
 import { privateKeyToAccount } from "viem/accounts";
 import type { Hex } from "viem";
+import { network } from "../../config";
 
 export const devNetworks = [
   { chainId: 1, name: "Ethereum mainnet", testnet: false },
@@ -28,6 +29,26 @@ export function devWalletMaxFee() {
       "Configure a positive local wallet maximum fee in wei.",
     );
   return BigInt(amount);
+}
+
+function isRpcUrl(value: string | undefined) {
+  try {
+    const url = new URL(value ?? "");
+    return ["http:", "https:"].includes(url.protocol) && !!url.host;
+  } catch {
+    return false;
+  }
+}
+
+export function configuredDevNetworks() {
+  const missing = devNetworks.filter(
+    ({ chainId }) => !isRpcUrl(process.env[network(chainId).env]),
+  );
+  if (missing.length)
+    throw new DevWalletError(
+      `Configure valid RPC URLs for the local development wallet: ${missing.map(({ chainId }) => network(chainId).env).join(", ")}.`,
+    );
+  return devNetworks;
 }
 
 export function devAccount() {
@@ -85,6 +106,7 @@ export function developmentWalletAvailability() {
     assertDevMode();
     devAccount();
     devWalletMaxFee();
+    configuredDevNetworks();
     devWalletOrigin();
     return { available: true };
   } catch (error) {
