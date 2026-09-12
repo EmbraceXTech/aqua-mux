@@ -73,3 +73,13 @@ No generated file, CHANGELOG, or README was modified by this dispatch.
 Independent review was requested for all source commits and is requested again with this evidence commit.
 Review acceptance is coordinator-owned and is not asserted by this report.
 The request to finish the client correction, export evidence, and hand off was received in msg_b359ffaeb005.
+
+## Reviewer correction: unresolved history gate
+
+The reviewer reproduced a newer unknown attempt being bypassed by selecting an older confirmed transaction.
+An Orca local two-row fixture reproduced that the unresolved-action label disappeared after selecting the older row.
+The gate now scans retained transaction history independently of the selected receipt, and submission checks the same unresolved history before invoking the wallet.
+It also blocks submission until transaction history has loaded.
+The same Orca fixture then kept Check unresolved transaction disabled with the older confirmed row selected.
+Lint and TypeScript checking passed after this focused correction.
+The original browser transaction records were restored after the fixture.

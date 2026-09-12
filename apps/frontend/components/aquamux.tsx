@@ -507,6 +507,9 @@ export function AquaMux() {
     try {
       setError("");
       setBusy(true);
+      if (!transactionsLoaded || transactions.some((transaction) =>
+        ["pending", "unknown"].includes(normalizeBatchStatus(transaction.status)),
+      )) throw new Error("An earlier transaction is unresolved. Check its status before submitting again.");
       const id = await submitPlan(plan);
       const transaction: TransactionRecord = {
         id,
@@ -548,7 +551,10 @@ export function AquaMux() {
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
-  const blocked = !!batch && ["pending", "unknown"].includes(normalizeBatchStatus(status));
+  const unresolvedTransaction = transactions.find((transaction) =>
+    ["pending", "unknown"].includes(normalizeBatchStatus(transaction.status)),
+  );
+  const blocked = !transactionsLoaded || !!unresolvedTransaction;
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -1048,7 +1054,7 @@ export function AquaMux() {
                   Preparing transaction
                 </>
               ) : blocked ? (
-                normalizeBatchStatus(status) === "unknown" ? "Check unresolved transaction" : "Transaction pending"
+                normalizeBatchStatus(unresolvedTransaction?.status) === "unknown" ? "Check unresolved transaction" : "Transaction pending"
               ) : account ? (
                 mode === "swap" ? (
                   "Review multi-swap"

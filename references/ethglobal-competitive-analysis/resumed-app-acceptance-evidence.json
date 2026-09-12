@@ -138,6 +138,19 @@
         "containsCredential": false
       },
       "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDownload my records\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nStopped\nAll strategies\nStrategy\nPositions\nActivity\nControls\nEdit proposal\nRegenerate fresh review\nNo executable review\nCurrent strategy\nRecipe\nManaged concentrated LP v1\nReview mode\nEvery transaction requires confirmation\nReview interval\n15 minutes\nNext review due\nManagement is not running\nLast decision\nHold\nPolicy expiry\n9/19/2026, 6:14:21 AM\n\nNo managed position or backing reconciliation is available to establish a range-exit or inventory-drift trigger for this interval review. Keep the current configuration unchanged; partial discovery does not establish zero exposure or justify a new opening.\n\n9/12/2026, 7:03:44 AM / codex / gpt-6-astra\n\nPair parameters\nPair\tOpening price\tRange\tVirtual reserves\tFee\nWETH / USDC\t2449.26632036 USDC per WETH\t1995.888 to 2993.832 USDC\t0.000033333333333333 WETH\n0.083162 USDC\t0.06%\n\nVirtual allocations share real inventory. Adding the allocations does not measure the capital in this group.\n\nManagement limits\nSpend budgets\n0.0001 ETH / advisory-display\nGas budget, raw native units\n500000000000000 / advisory-display\nMaximum reference age\n60 seconds / execution-broker\nAdvisory review signals\nRange exit: enabled. Inventory drift: 100%. These signals inform reviews; the broker does not enforce their thresholds.\nReplacement direction\nUpward-only restriction is disabled.\nAllowed actions\nHold, Fund and open, Replace, Close, Propose conversion\nAction limit\n1 / advisory-display\nCooldown\n15 minutes / execution-broker\nMaximum slippage\n0.5% / execution-broker\nPermitted token and route addresses\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua"
+    },
+    "resumed-history-bypass-before": {
+      "scope": "local two-row receipt fixture, no transaction",
+      "beforeBlocked": true,
+      "afterBlocked": false,
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nArbitrum\nConnect wallet\nOne token. Many possibilities.\n\nBuild your basket with one transaction. You choose the mix.\n\nMulti-swap\nMulti-LP\nYou pay\non Arbitrum\nETH\nEnter the total to split\nWallet not connected\nYour token mix\nChoose tokens and set your allocation\nSplit equally\nUSDC\nUSD Coin\n--\nAwaiting quote\n%\nWBTC\nWrapped BTC\n--\nAwaiting quote\n%\nLINK\nChainLink Token\n--\nAwaiting quote\n%\nAdd a token\n3 / 6\nTotal allocation\n100%\nAll swaps in one atomic transaction\ni\nBatch status is unavailable. Check wallet activity before submitting again.\nConnect wallet\nPREVIEW\nOne in. Your mix out.\n\nSplit a single payment across the tokens you choose.\n\n1 ETH\nOne input\nUSDC\n50%\nWBTC\n30%\nLINK\n20%\n3 swaps\n1 transaction\nTransaction details\nNetwork\nArbitrum\nExecution\n1inch Swap\nSlippage tolerance\n0.5%\nNetwork fee\nCalculated by wallet\nNew to shared liquidity? See how it works\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua\nTransaction confirmed\n\nReview the transaction receipt and its confirmation status.\n\nYour wallet reported successful execution.\n\nCopy batch ID\nView transaction\nOpen managed liquidity"
+    },
+    "resumed-history-bypass-after": {
+      "scope": "same local two-row fixture with older confirmed row selected",
+      "beforeBlocked": true,
+      "afterBlocked": true,
+      "mainActionDisabled": true,
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nArbitrum\nConnect wallet\nOne token. Many possibilities.\n\nBuild your basket with one transaction. You choose the mix.\n\nMulti-swap\nMulti-LP\nYou pay\non Arbitrum\nETH\nEnter the total to split\nWallet not connected\nYour token mix\nChoose tokens and set your allocation\nSplit equally\nUSDC\nUSD Coin\n--\nAwaiting quote\n%\nWBTC\nWrapped BTC\n--\nAwaiting quote\n%\nLINK\nChainLink Token\n--\nAwaiting quote\n%\nAdd a token\n3 / 6\nTotal allocation\n100%\nAll swaps in one atomic transaction\ni\nBatch status is unavailable. Check wallet activity before submitting again.\nCheck unresolved transaction\nPREVIEW\nOne in. Your mix out.\n\nSplit a single payment across the tokens you choose.\n\n1 ETH\nOne input\nUSDC\n50%\nWBTC\n30%\nLINK\n20%\n3 swaps\n1 transaction\nTransaction details\nNetwork\nArbitrum\nExecution\n1inch Swap\nSlippage tolerance\n0.5%\nNetwork fee\nCalculated by wallet\nNew to shared liquidity? See how it works\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua\nTransaction confirmed\n\nReview the transaction receipt and its confirmation status.\n\nYour wallet reported successful execution.\n\nCopy batch ID\nView transaction\nOpen managed liquidity"
     }
   },
   "validation": [
@@ -164,6 +177,16 @@
     {
       "path": "/tmp/resume-final-build.log",
       "sha256": "b8091f0dcca76676feee86beff4b0fbffc211c09e24612a9d8c2c3b94ac04ec5",
+      "result": "passed"
+    },
+    {
+      "path": "/tmp/resume-history-gate-lint.log",
+      "sha256": "1ae7b07530c0ce5f1fbe1cd01baa1efc39c065b290936ec1d26932434b905fa1",
+      "result": "passed"
+    },
+    {
+      "path": "/tmp/resume-history-gate-types.log",
+      "sha256": "0cfec1827489d14f529333f142fcfcb3123a7c82b316e010343c7da1a9d8881b",
       "result": "passed"
     }
   ]
