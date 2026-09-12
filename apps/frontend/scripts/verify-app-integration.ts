@@ -9,13 +9,13 @@ import { ManagedStore } from "../lib/server/store";
 import { intentSchema } from "../lib/server/managed-service/inputs";
 import { intentSnapshot } from "../lib/server/managed-service/snapshot";
 import { proposalPolicy } from "../lib/server/managed-service/policy-template";
-import { proposalPreview } from "../../agent-runner/src/service/proposal-preview";
+import { proposalPreview } from "../lib/server/managed-service/proposal-preview";
 import { delegatedAccountCode } from "../lib/server/external-adapter/account";
 import {
   signExternalTransaction,
   type ExternalTransaction,
 } from "../lib/external-adapter/sign";
-import type { ReviewRequest } from "../../agent-runner/src/service/contract";
+import type { RunnerRequest } from "../lib/server/managed-service/runner";
 
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
 const chainId = 42161;
@@ -61,10 +61,17 @@ try {
     snapshot.tokenMetadata,
   );
   const preview = proposalPreview({
+    requestId: "fork-app-preview",
+    owner: maker,
+    groupId: "fork-app-group",
+    botId: "fork-app-bot",
+    runGeneration: 0,
+    purpose: "proposal",
     intent,
     snapshot,
     policyTemplate,
-  } as ReviewRequest);
+    deadline: Date.now() + 120_000,
+  } satisfies RunnerRequest);
   assert.ok(preview.available && preview.config);
   const created = await api.send("groups", { config: preview.config });
   assert.equal(created.status, 200, JSON.stringify(created.data));

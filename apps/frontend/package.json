@@ -9,6 +9,8 @@
     "start": "next start --hostname 127.0.0.1 --port 3100",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test test/*.test.ts lib/server/dev-wallet/*.test.ts",
+    "test:review": "tsx --test test/managed-runner-http.test.ts test/managed-review-environment.test.ts test/automation-review.test.ts",
+    "test:review:live": "tsx scripts/live-inline-review.ts",
     "test:e2e": "playwright test",
     "lint": "eslint app components lib test e2e --max-warnings=0",
     "verify:fork": "tsx scripts/verify-fork.ts",
