@@ -70,12 +70,19 @@ export class ManagedStore extends StoreDatabase {
         this.list(kind, normalized),
       ]),
     );
-    // Internal documents, sessions, challenges and idempotency payloads never leave the service.
+    const proposalReviews = this.listDocuments<{
+      response?: { review?: unknown };
+    }>("proposal-intents", normalized).flatMap(({ data }) => {
+      const review = recordSchemas.review.safeParse(data.response?.review);
+      return review.success ? [review.data] : [];
+    });
+    // Export validated user reviews, never internal intent, session or idempotency documents.
     return redactExport({
       schemaVersion: 1,
       owner: normalized,
       exportedAt: Date.now(),
       records,
+      proposalReviews,
       events: this.history(normalized),
     });
   }
