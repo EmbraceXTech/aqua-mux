@@ -1,8 +1,10 @@
 import type { PoolDeployment, RouterDeployment } from "./types";
+import { ethereumPools, ethereumRouter } from "./ethereum";
 
 // Add a deployment only after source/runtime comparison and a read-only swap proof.
 // A matching address, ABI, or successful API quote alone is insufficient provenance.
 export const routerDeployments: Readonly<Record<number, RouterDeployment>> = {
+  1: ethereumRouter,
   56: {
     address: "0x111111125421ca6dc452d289314280a0f8842a65",
     codeHash:
@@ -37,6 +39,7 @@ export const routerDeployments: Readonly<Record<number, RouterDeployment>> = {
 };
 
 export const poolDeployments: readonly PoolDeployment[] = [
+  ...ethereumPools,
   {
     id: "arbitrum-weth-usdce-500",
     chainId: 42161,

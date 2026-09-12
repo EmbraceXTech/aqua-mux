@@ -11,7 +11,18 @@ import { transparentRouterAbi } from "../lib/server/route-policy/calldata";
 import { encodeDevBatch, implementation } from "../lib/server/dev-wallet/batch";
 
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
-const chainId = 42161;
+const chainId = Number(process.argv[2] ?? 42161);
+const pairedAssets: Record<number, string[]> = {
+  1: [
+    "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "0xdac17f958d2ee523a2206206994597c13d831ec7",
+  ],
+  42161: [
+    "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+    "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+  ],
+};
+if (!pairedAssets[chainId]) throw new Error("Unsupported audit fixture chain.");
 const setting = networks.find((network) => network.id === chainId)!;
 const fork = await controlledFork(chainId, process.env[setting.env]!);
 process.env[setting.env] = fork.url;
@@ -61,12 +72,12 @@ const basket = {
   range: "full",
   legs: [
     {
-      address: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+      address: pairedAssets[chainId][0],
       bps: 5000,
       amount: "0",
     },
     {
-      address: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+      address: pairedAssets[chainId][1],
       bps: 5000,
       amount: "0",
     },
@@ -108,6 +119,7 @@ const server = createServer(async (incoming, outgoing) => {
         batchSimulation = "passed against deployed contracts on local fork";
       }
       const result = {
+        chainId,
         status: response.status,
         attackerResponses,
         arbitraryProgramAccepted:

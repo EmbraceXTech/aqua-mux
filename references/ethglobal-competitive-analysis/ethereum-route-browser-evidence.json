@@ -1,0 +1,43 @@
+{
+  "evidence": "Orca embedded browser, authenticated HTTP, Ethereum fork, synthetic account, zero public broadcasts",
+  "before": {
+    "chainId": 1,
+    "status": 400,
+    "attackerResponses": 0,
+    "arbitraryProgramAccepted": false,
+    "error": "No verified transparent router deployment for this chain.",
+    "batchSimulation": "not attempted",
+    "publicBroadcasts": 0
+  },
+  "after": {
+    "chainId": 1,
+    "status": 200,
+    "attackerResponses": 0,
+    "arbitraryProgramAccepted": false,
+    "calls": [
+      {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "selector": "0x175accdc",
+        "value": "0x2d79883d2000",
+        "receiver": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+        "minimumOut": "125001"
+      },
+      {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "selector": "0x175accdc",
+        "value": "0x2d79883d2000",
+        "receiver": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+        "minimumOut": "125022"
+      }
+    ],
+    "summary": [
+      "Pay 0.0001 ETH.",
+      "Receive at least 0.125001 USDC.",
+      "Receive at least 0.125022 USDT.",
+      "Every call must succeed or the entire batch reverts.",
+      "Output minimums and receiver are encoded by the verified route compiler."
+    ],
+    "batchSimulation": "passed against deployed contracts on local fork",
+    "publicBroadcasts": 0
+  }
+}

@@ -6,13 +6,14 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import solc from "solc";
-const { builds } = JSON.parse(
-  readFileSync(new URL("./attestation.json", import.meta.url)),
-);
+const manifest = process.argv[3]
+  ? pathToFileURL(resolve(process.argv[3]))
+  : new URL("./attestation.json", import.meta.url);
+const { builds } = JSON.parse(readFileSync(manifest));
 const cache = process.argv[2];
 assert.ok(cache, "Supply the compiler cache directory.");
 for (const [name, build] of Object.entries(builds)) {
-  const input = readFileSync(new URL(build.inputFile, import.meta.url));
+  const input = readFileSync(new URL(build.inputFile, manifest));
   assert.equal(
     createHash("sha256").update(input).digest("hex"),
     build.inputSha256,
