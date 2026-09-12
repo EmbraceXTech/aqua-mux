@@ -25,12 +25,19 @@ import {
 import { formatUnits, type Address } from "viem";
 import { Button } from "./ui/button";
 import { Modal } from "./ui/modal";
+import { PriceRangeChart } from "./price-range-chart";
 import { ManagedWorkspace } from "./managed/managed-workspace";
+import { OwnerRecovery } from "./managed/owner-recovery";
 import { useManagedSession } from "@/lib/managed-client/use-managed-session";
 import { managedRequest } from "@/lib/managed-client/api";
 import { useLegacyQuote } from "@/lib/managed-client/use-legacy-quote";
 import { catalogTokenResolver } from "@/lib/managed-client/catalog-token";
 import { useTokenSearch } from "@/lib/managed-client/use-token-search";
+import {
+  defaultPairChartState,
+  pairChartKey,
+  type PairChartState,
+} from "@/lib/price-range";
 import {
   networks,
   network,
@@ -99,14 +106,16 @@ function NetworkIcon({
   chainId: number;
   size?: number;
 }) {
-  const token = tokens(chainId).find((item) =>
-    chainId === 42161 ? item.symbol === "ARB" : item.address === NATIVE,
-  )!;
+  const net = network(chainId);
+  const logo =
+    "logo" in net
+      ? net.logo
+      : tokens(chainId).find((item) => item.address === NATIVE)!.logo;
   return (
     <Image
       className="network-icon"
-      src={token.logo}
-      alt={`${network(chainId).name} token logo`}
+      src={logo}
+      alt={`${net.name} token logo`}
       width={size}
       height={size}
     />
@@ -190,8 +199,11 @@ export function AquaMux() {
     [walletOpen, setWalletOpen] = useState(false),
     [howOpen, setHowOpen] = useState(false),
     [slippageBps, setSlippageBps] = useState(50),
-    [feeBps, setFeeBps] = useState(5),
-    [range, setRange] = useState<0 | 10 | 20 | 50>(20);
+    [feeBps, setFeeBps] = useState(5);
+  const [pairCharts, setPairCharts] = useState<Record<string, PairChartState>>(
+    {},
+  );
+  const [chartPair, setChartPair] = useState<Address>();
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
     [plan, setPlan] = useState<Plan>(),
@@ -218,6 +230,22 @@ export function AquaMux() {
     catalog = [...tokens(chainId), ...(selectedRegistryTokens[chainId] ?? []).filter((item) => !tokens(chainId).some((known) => known.address === item.address))],
     src = catalog.find((t) => t.address === source)!,
     base = source === NATIVE ? wrapped(chainId) : src;
+  const chartLeg = legs.find((leg) => leg.address === chartPair) ?? legs[0];
+  const pairedToken = catalog.find((t) => t.address === chartLeg.address)!;
+  const pairKey = pairChartKey(chainId, base.address, pairedToken.address);
+  const pairState = pairCharts[pairKey] ?? defaultPairChartState;
+  const { fullRange, minPct, maxPct } = pairState;
+  const rangeBounds = { minPct, maxPct };
+  const derivedOpening =
+    Number(amount) > 0 && Number(chartLeg.amount) > 0
+      ? Number(chartLeg.amount) / Number(amount)
+      : undefined;
+  function updatePair(update: (old: PairChartState) => PairChartState) {
+    setPairCharts((old) => ({
+      ...old,
+      [pairKey]: update(old[pairKey] ?? defaultPairChartState),
+    }));
+  }
   const total = legs.reduce((s, l) => s + l.bps, 0),
     unreadTransactions = transactions.filter(
       (transaction) => !transaction.read,
@@ -227,10 +255,23 @@ export function AquaMux() {
       mode,
       source,
       amount,
-      legs,
+      legs:
+        mode === "liquidity"
+          ? legs.map((leg) => {
+              const state =
+                pairCharts[pairChartKey(chainId, base.address, leg.address)] ??
+                defaultPairChartState;
+              return {
+                ...leg,
+                range: state.fullRange
+                  ? ("full" as const)
+                  : { minPct: state.minPct, maxPct: state.maxPct },
+              };
+            })
+          : legs,
       slippageBps,
       feeBps,
-      range,
+      range: fullRange ? ("full" as const) : rangeBounds,
     };
   const serialized = JSON.stringify(basket);
   const serializedCatalog = JSON.stringify(catalog);
@@ -677,6 +718,7 @@ export function AquaMux() {
           </Button>
         </div>
       </header>
+      <OwnerRecovery key={wallet.session?.owner ?? "anonymous"} session={wallet.session} />
       {managedOpen ? <ManagedWorkspace wallet={wallet} /> : <main className="app-main">
         <div className="intro">
           <h1>
@@ -819,7 +861,28 @@ export function AquaMux() {
                     ? quote.legs.find((q) => q.address === leg.address)
                     : undefined;
                 return (
-                  <div className="output-row" key={leg.address}>
+                  <div
+                    className={`output-row${
+                      mode === "liquidity" ? " liquidity-pair" : ""
+                    }${
+                      mode === "liquidity" && chartLeg.address === leg.address
+                        ? " selected"
+                        : ""
+                    }`}
+                    key={leg.address}
+                    onClick={
+                      mode === "liquidity"
+                        ? (event) => {
+                            if (
+                              event.target instanceof Element &&
+                              event.target.closest("button, input")
+                            )
+                              return;
+                            setChartPair(leg.address);
+                          }
+                        : undefined
+                    }
+                  >
                     <div
                       className="row-color"
                       style={{ background: palette[i] }}
@@ -966,7 +1029,7 @@ export function AquaMux() {
               {mode === "swap" ? "Add a token" : "Add a pair"}
               <span>{legs.length} / 6</span>
             </button>
-            {mode === "swap" ? (
+            {mode === "swap" && (
               <div className="allocation">
                 <div className="allocation-bar">
                   {legs.map((l, i) => (
@@ -985,35 +1048,6 @@ export function AquaMux() {
                     {total / 100}% {total === 10000 && <Check size={13} />}
                   </strong>
                 </div>
-              </div>
-            ) : (
-              <div className="range-control">
-                <div>
-                  <span>Price range</span>
-                  <button
-                    className="text-button"
-                    onClick={() => setSettings(true)}
-                  >
-                    Fee {feeBps / 100}% <SlidersHorizontal size={12} />
-                  </button>
-                </div>
-                <div className="range-options">
-                  {([10, 20, 50, 0] as const).map((r) => (
-                    <button
-                      key={r}
-                      className={range === r ? "selected" : ""}
-                      onClick={() => {
-                        change();
-                        setRange(r);
-                      }}
-                    >
-                      {r ? `+/- ${r}%` : "Full range"}
-                    </button>
-                  ))}
-                </div>
-                <small>
-                  Relative to your reserve ratio, not a live market price.
-                </small>
               </div>
             )}
             <div className="execution-note">
@@ -1068,20 +1102,169 @@ export function AquaMux() {
             </Button>
           </section>
           <aside className="sidebar">
-            <section className="flow-card">
-              <div className="section-kicker">
-                {mode === "swap" ? "PREVIEW" : "SHARED LIQUIDITY"}
+            {mode === "liquidity" && (
+              <div className="range-control sidebar-range-control">
+                <div>
+                  <span>Price range</span>
+                  <button
+                    className="text-button"
+                    onClick={() => setSettings(true)}
+                  >
+                    Fee {feeBps / 100}% <SlidersHorizontal size={12} />
+                  </button>
+                </div>
+                <label className="range-pair-picker">
+                  Pair
+                  <select
+                    aria-label="Price range pair"
+                    value={pairedToken.address}
+                    onChange={(e) => setChartPair(e.target.value as Address)}
+                  >
+                    {legs.map((leg) => (
+                      <option key={leg.address} value={leg.address}>
+                        {base.symbol} /{" "}
+                        {catalog.find((t) => t.address === leg.address)!.symbol}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="range-options">
+                  {([10, 20] as const).map((r) => (
+                    <button
+                      key={r}
+                      className={
+                        pairState.preset === String(r) ? "selected" : ""
+                      }
+                      onClick={() => {
+                        change();
+                        updatePair((old) => ({
+                          ...old,
+                          fullRange: false,
+                          minPct: -r,
+                          maxPct: r,
+                          preset: r === 10 ? "10" : "20",
+                        }));
+                      }}
+                    >
+                      {`+/- ${r}%`}
+                    </button>
+                  ))}
+                  {pairState.customBounds && (
+                    <button
+                      className={pairState.preset === "saved" ? "selected" : ""}
+                      onClick={() => {
+                        change();
+                        updatePair((old) => ({
+                          ...old,
+                          ...old.customBounds!,
+                          fullRange: false,
+                          preset: "saved",
+                        }));
+                      }}
+                    >
+                      {`+${pairState.customBounds.maxPct}%/${pairState.customBounds.minPct}%`}
+                    </button>
+                  )}
+                  <button
+                    className={fullRange ? "selected" : ""}
+                    onClick={() => {
+                      change();
+                      updatePair((old) => ({
+                        ...old,
+                        fullRange: true,
+                        preset: "full",
+                      }));
+                    }}
+                  >
+                    Full range
+                  </button>
+                  <button
+                    className={pairState.preset === "custom" ? "selected" : ""}
+                    onClick={() => {
+                      change();
+                      updatePair((old) => ({
+                        ...old,
+                        fullRange: false,
+                        preset: "custom",
+                      }));
+                    }}
+                  >
+                    Custom
+                  </button>
+                </div>
+                <PriceRangeChart
+                  key={pairKey}
+                  chainId={chainId}
+                  base={base}
+                  paired={pairedToken}
+                  bounds={rangeBounds}
+                  fullRange={fullRange}
+                  period={pairState.period}
+                  denomination={pairState.denomination}
+                  onPeriodChange={(period) =>
+                    updatePair((old) => ({ ...old, period }))
+                  }
+                  onDenominationChange={(denomination) =>
+                    updatePair((old) => ({ ...old, denomination }))
+                  }
+                  onBoundsChange={(update) => {
+                    change();
+                    updatePair((old) => {
+                      const bounds = update({
+                        minPct: old.minPct,
+                        maxPct: old.maxPct,
+                      });
+                      return {
+                        ...old,
+                        ...bounds,
+                        customBounds: bounds,
+                        fullRange: false,
+                        preset: "custom",
+                      };
+                    });
+                  }}
+                  onExitFullRange={() => {
+                    change();
+                    updatePair((old) => ({
+                      ...old,
+                      fullRange: false,
+                      preset: "custom",
+                    }));
+                  }}
+                  openingPrice={
+                    pairState.openingPriceOverride ??
+                    (pairState.useMarketPrice ? undefined : derivedOpening)
+                  }
+                  onOpeningPriceChange={(openingPriceOverride) =>
+                    updatePair((old) => ({
+                      ...old,
+                      openingPriceOverride,
+                      useMarketPrice: openingPriceOverride === undefined,
+                    }))
+                  }
+                />
+                <small>
+                  Each pair has its own bounds around its reserve ratio. Opening
+                  price edits preview the chart; reserve amounts determine the
+                  registered position.
+                </small>
               </div>
-              <h2>
-                {mode === "swap"
-                  ? "One in. Your mix out."
-                  : "Put your balance to work."}
-              </h2>
-              <p>
-                {mode === "swap"
-                  ? "Split a single payment across the tokens you choose."
-                  : "The same base tokens can back every pair through Aqua."}
-              </p>
+            )}
+            {mode === "swap" && (
+              <section className="flow-card">
+                <div className="section-kicker">
+                  {mode === "swap" ? "PREVIEW" : "SHARED LIQUIDITY"}
+                </div>
+                <h2>
+                  {mode === "swap"
+                    ? "One in. Your mix out."
+                    : "Put your balance to work."}
+                </h2>
+                <p>
+                  {mode === "swap"
+                    ? "Split a single payment across the tokens you choose."
+                    : "The same base tokens can back every pair through Aqua."}
+                </p>
               <div className="flow-map">
                 <div className="flow-source">
                   <TokenIcon token={src} size={34} />
@@ -1127,11 +1310,13 @@ export function AquaMux() {
                 <ArrowRight size={14} />
                 <strong>1 transaction</strong>
               </div>
-            </section>
-            <section className="details-card">
-              <h3>
-                {mode === "swap" ? "Transaction details" : "Position details"}
-              </h3>
+              </section>
+            )}
+            {mode === "swap" && (
+              <section className="details-card">
+                <h3>
+                  {mode === "swap" ? "Transaction details" : "Position details"}
+                </h3>
               <dl>
                 <div>
                   <dt>Network</dt>
@@ -1172,7 +1357,8 @@ export function AquaMux() {
                   configure.
                 </p>
               )}
-            </section>
+              </section>
+            )}
             <button className="how-link" onClick={() => setHowOpen(true)}>
               New to shared liquidity? See how it works{" "}
               <ArrowUpRight size={13} />

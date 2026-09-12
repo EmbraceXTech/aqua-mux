@@ -23,6 +23,7 @@ export const networks = [
     explorer: "https://arbiscan.io",
     color: "#337bb6",
     mark: "A",
+    logo: "/tokens/42161-0x912ce59144191c1204e64559fe8253a0e49e6548.png",
   },
   {
     id: 1,
@@ -41,6 +42,7 @@ export const networks = [
     explorer: "https://robinhoodchain.blockscout.com",
     color: "#bdf600",
     mark: "R",
+    logo: "/networks/4663-robinhood-chain.png",
   },
   {
     id: 56,

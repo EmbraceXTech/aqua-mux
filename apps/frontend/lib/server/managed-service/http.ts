@@ -1,4 +1,5 @@
 import { proposalHistory } from "./proposal-history";
+import { recoverOwnerExecutions } from "./owner-recovery";
 import { checkManagedFundingRoute } from "./funding-route";
 import { attemptApi } from "./attempt-http";
 import { body, ok } from "./http-body";
@@ -60,6 +61,10 @@ export async function managedApi(
       });
     const { owner } = requireOwner(request),
       store = openManagedStore();
+    if (segments.join("/") === "recovery" && ["GET", "POST"].includes(method)) {
+      if (method === "POST") z.strictObject({}).parse(await body(request));
+      return ok(await recoverOwnerExecutions(owner, method === "POST"));
+    }
     if (segments.join("/") === "proposals" && method === "GET")
       return ok({ proposals: proposalHistory(store, owner) });
     if (

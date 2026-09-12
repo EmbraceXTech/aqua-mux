@@ -553,6 +553,17 @@ p {
   min-height: 79px;
   overflow: hidden;
 }
+.output-row.liquidity-pair {
+  cursor: pointer;
+}
+.output-row.liquidity-pair:hover,
+.output-row.liquidity-pair.selected {
+  border-color: #b9caf4;
+  background: #f8faff;
+}
+.output-row.liquidity-pair.selected {
+  box-shadow: inset 0 0 0 1px #dce7ff;
+}
 .row-color {
   width: 3px;
   position: absolute;
@@ -1060,6 +1071,13 @@ footer button {
 .range-control {
   margin-top: 20px;
 }
+.sidebar-range-control {
+  margin-top: 0;
+  border: 1px solid #e1e9fa;
+  border-radius: 16px;
+  padding: 20px;
+  background: white;
+}
 .range-control > div:first-child {
   display: flex;
   justify-content: space-between;
@@ -1093,6 +1111,134 @@ footer button {
   color: #9da7b8;
   font-size: 9px;
   margin-top: 9px;
+}
+.price-range-chart {
+  margin-top: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 10px 8px;
+  background: #fbfcfe;
+}
+.price-range-tabs {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-end;
+}
+.price-range-tabs button {
+  background: none;
+  color: #9aa4b6;
+  font-size: 10px;
+  padding: 3px 7px;
+  border-radius: 6px;
+}
+.price-range-tabs .selected {
+  background: #eef1f8;
+  color: var(--blue);
+}
+.price-range-plot {
+  position: relative;
+  margin-top: 6px;
+  height: 160px;
+}
+.price-range-plot svg {
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  overflow: visible;
+}
+.price-area {
+  fill: #3468f51a;
+  stroke: none;
+}
+.price-line {
+  fill: none;
+  stroke: #a7b0c2;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.range-band {
+  fill: #3468f51f;
+}
+.opening-line {
+  stroke: #c3cadb;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  vector-effect: non-scaling-stroke;
+}
+.handle-line {
+  stroke: var(--blue);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  cursor: ns-resize;
+}
+.handle:hover .handle-line {
+  stroke-width: 2.5;
+}
+.handle-hit {
+  fill: transparent;
+  cursor: ns-resize;
+}
+.price-range-label {
+  position: absolute;
+  left: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  pointer-events: none;
+  background: #ffffffd0;
+  padding: 1px 5px;
+  border-radius: 5px;
+}
+.price-range-label strong {
+  font-weight: 570;
+  color: var(--foreground);
+}
+.price-range-label .up {
+  color: #1c9a6c;
+}
+.price-range-label .down {
+  color: #d24d4d;
+}
+.price-range-opening {
+  position: absolute;
+  right: 6px;
+  transform: translateY(-100%);
+  font-size: 9px;
+  color: #9aa4b6;
+  pointer-events: none;
+}
+.price-range-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 10px;
+  color: #8c99ad;
+  background: #fbfcfeb0;
+  text-align: center;
+  padding: 0 20px;
+}
+.price-range-overlay.soft {
+  background: none;
+  align-items: flex-end;
+  padding-bottom: 6px;
+}
+.price-range-overlay button {
+  background: none;
+  color: var(--blue);
+  font-size: 10px;
+  text-decoration: underline;
+}
+.price-range-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 4px;
+  font-size: 9px;
+  color: #9aa4b6;
 }
 .error-box {
   border: 1px solid #f4d8d7;
@@ -1566,4 +1712,155 @@ footer button {
 .review-summary p,
 .explanation p {
   color: #68758b;
+}
+
+.range-pair-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 12px;
+  color: #78879d;
+  font-size: 11px;
+}
+.range-pair-picker select {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 9px;
+  background: white;
+  color: var(--foreground);
+}
+.price-range-opening-editor {
+  padding: 4px 2px 12px;
+}
+.price-range-opening-editor label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #78879d;
+  font-size: 10px;
+}
+.price-range-opening-editor > div {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+.price-range-opening-editor input {
+  width: 100%;
+  min-width: 0;
+  background: transparent;
+  color: var(--foreground);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 23px;
+  font-weight: 550;
+  padding: 5px 0;
+}
+.price-range-opening-editor button {
+  white-space: nowrap;
+  font-size: 10px;
+}
+.price-range-toolbar {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.price-range-chart button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.price-range-extreme {
+  min-height: 20px;
+  text-align: right;
+  font-size: 9px;
+  color: #78879d;
+  padding-top: 6px;
+}
+.price-range-extreme span:first-child {
+  margin-right: 4px;
+}
+.price-range-extreme .up {
+  color: #1c9a6c;
+}
+.price-range-extreme .down {
+  color: #d24d4d;
+}
+.price-range-plot {
+  height: 240px;
+}
+.price-range-plot > svg {
+  overflow: hidden;
+}
+.price-range-zoom {
+  position: absolute;
+  left: 3px;
+  top: -24px;
+  display: flex;
+  gap: 3px;
+}
+.price-range-zoom button {
+  display: grid;
+  place-items: center;
+  width: 23px;
+  height: 23px;
+  background: #ffffffed;
+  color: #78879d;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+.price-crosshair {
+  stroke: #8b97ac;
+  stroke-width: 1;
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+.volume-bar {
+  fill: #b9c1cf;
+  pointer-events: none;
+}
+.price-range-tooltip {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  display: grid;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 16px #26365015;
+  color: #78879d;
+  font-size: 10px;
+}
+.price-range-tooltip strong {
+  color: var(--foreground);
+}
+.price-range-overlay.soft {
+  pointer-events: none;
+}
+.price-range-overlay.soft button {
+  pointer-events: auto;
+}
+.price-range-volume-empty {
+  position: absolute;
+  bottom: 20px;
+  width: 100%;
+  text-align: center;
+  color: #9aa4b6;
+  font-size: 10px;
+  pointer-events: none;
+}
+.price-range-volume-note {
+  margin-top: 7px;
+  color: #9aa4b6;
+  font-size: 9px;
+}
+.range-options {
+  flex-wrap: wrap;
+}
+.range-options button {
+  white-space: nowrap;
 }

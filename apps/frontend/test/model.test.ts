@@ -14,7 +14,7 @@ const basket = {
   amount: "1",
   slippageBps: 50,
   feeBps: 5,
-  range: 20,
+  range: { minPct: -20, maxPct: 20 },
   legs: [
     { address: usdc.address, bps: 5000, amount: "1" },
     { address: wbtc.address, bps: 5000, amount: "1" },
@@ -64,7 +64,7 @@ test("SDK ship calls register the wallet as maker, sorted tokens and full shared
     1000000n,
     1000n,
     5,
-    20,
+    { minPct: -20, maxPct: 20 },
     1n,
   );
   const b = makeStrategy(
@@ -74,7 +74,7 @@ test("SDK ship calls register the wallet as maker, sorted tokens and full shared
     1000000n,
     1000n,
     5,
-    20,
+    { minPct: -20, maxPct: 20 },
     2n,
   );
   assert.notEqual(a.hash, b.hash);

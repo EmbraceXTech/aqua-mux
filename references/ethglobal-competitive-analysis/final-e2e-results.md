@@ -1,7 +1,8 @@
 # Managed LP integrated E2E evidence
 
 This report records read-only preflight on September 12, 2026, Asia/Bangkok.
-No transaction has been signed or submitted by this worker.
+The designated execution worker has submitted the bounded funding transfers on all three chains recorded below.
+No managed LP transaction has been submitted.
 The complete managed LP workflow remains pending the coordinator's signing, lifecycle and route-policy acceptance gate.
 
 ## Ownership and evidence
@@ -43,7 +44,7 @@ BNB and Robinhood account code is empty at their pinned blocks.
 The coordinator directed an isolated new execution wallet to avoid changing historical registrations, allowances and shared backing.
 The original wallet may only fund that wallet through separately gated plain native transfers.
 Coordinator message `msg_21ac15722687` released the exact funding step below, while all managed transactions remain gated.
-The executor is awaiting independent review before the first transfer.
+The executor passed independent review before the first transfer.
 
 ## Proposed isolated funding
 
@@ -98,6 +99,55 @@ The quote script completed all six route requests without transaction submission
 The funding script completed all three read-only funding estimates.
 Scoped ESLint passed for all three scripts.
 Frontend TypeScript passed after all three scripts were added.
-The scripts and this report still await independent review.
+The original preflight scripts and corrected funding executor passed independent review.
 The funding executor passed scoped ESLint.
 A later full TypeScript run found unrelated concurrent test errors in `legacy-token-integration.test.ts` and `route-policy.test.ts`, which were routed to their owners.
+
+## Resumed funding checkpoint
+
+Dispatch `ctx_780ad367be39` resumed sole transaction ownership on September 12, 2026.
+Coordinator messages `msg_2433dfbc364f` and `msg_293e0690ba71` carried the original funding-only authorization forward.
+[The refreshed baseline](final-e2e-baseline-refresh.json) found unchanged original maker balances, account code, token allowances and tracked registrations before funding.
+[The refreshed funding estimate](final-e2e-funding-refresh.json) found the isolated wallet unfunded on all three chains.
+
+The exact reviewed executor SHA-256 was `f5c6a05ecc99dcad61462cac8637d20c1f974717a1831cfa95a9f0ea4fcb6076`.
+[The immutable first funding journal](final-e2e-funding-execution.json) records one successful Arbitrum transfer of 0.0015 ETH.
+Its transaction is [0x1b1aaf05d8825eaa821b731b94639009d061dbea2a84b4fc6d71e676c28a3347](https://arbiscan.io/tx/0x1b1aaf05d8825eaa821b731b94639009d061dbea2a84b4fc6d71e676c28a3347).
+The receipt block is 504193867 and the actual fee is 423904764000 wei.
+The source retained 7971167009696000 wei and its original delegation code.
+The destination held exactly 1500000000000000 wei at that block.
+Independent reviewer dispatch `ctx_14f240ca5e0b` confirmed the transaction envelope, receipt-block balances, all tracked allowances and strategy allocations, and unchanged contract hashes in message `msg_b1a9285d9389`.
+
+The executor then stopped before creating a BNB attempt in its journal.
+Its fixed error handler did not record the failed operation, so the exact cause remains unknown.
+Fresh read-only BNB and Robinhood checks found zero destination native balances, no destination code, and unchanged settled source nonces 5 and 6.
+No BNB or Robinhood submission is recorded at this checkpoint.
+[The later original-wallet snapshot](final-e2e-after-arbitrum-funding.json) preserves the tracked state after Arbitrum funding.
+
+Commit `cb0551a` adds a separate read-only recovery helper and an explicit remaining-chain funding mode.
+The helper verifies the exact Arbitrum transaction hash, sender, receiver, value, calldata, nonce, absence of authorizations, successful receipt and canonical receipt block.
+It requires the original BNB and Robinhood source nonces to remain settled and the destinations to remain unfunded with zero pending nonce.
+The executor preserves the original journal, creates a new exclusive journal bound to its SHA-256, and permits only chains 56 and 4663 in this recovery mode.
+Existing fee and reserve limits still apply before signing and submission.
+Scoped ESLint and the live read-only recovery check passed.
+Full frontend TypeScript failed during a concurrent token-resolver refactor, with errors routed to its owner.
+Independent reviewer dispatch `ctx_14f240ca5e0b` accepted the recovery correction in message `msg_fac8d49a76ae` after scoped lint and nine dependency-fixtured reconciliation cases.
+
+[The remaining-chain journal](final-e2e-funding-remaining.json) records successful BNB and Robinhood funding after that acceptance.
+The BNB transaction is [0x19abd51c15d8d38c05cdf00d680e53ad2567a3769d544de69d0999d6eee56e9c](https://bscscan.com/tx/0x19abd51c15d8d38c05cdf00d680e53ad2567a3769d544de69d0999d6eee56e9c).
+The Robinhood transaction hash is `0x1a4a475178317a49b5985b1b0e73f43865d479419a422c41de542aaadf5e05ab`; its explorer URL is retained in the journal.
+Both receipt-block destination balances are exactly 1500000000000000 wei.
+The BNB source retained 7716590050000000 wei and the Robinhood source retained 8038402025896000 wei.
+[The post-funding snapshot](final-e2e-after-funding.json) records the tracked original-wallet state on all three chains.
+The remaining-chain receipt evidence awaits independent review.
+
+## Current browser blockers
+
+An actual Orca snapshot on port 33127 reproduced `resolveToken is not a function` in the legacy Swap builder during the token-resolver refactor.
+The observation was routed to its implementation owner.
+After disconnecting the previous original-maker session, clicking `Use local development wallet` returned `Local development wallet is disabled.`
+The server owner received that reproduction and owns the launcher correction.
+The server owner then corrected the explicit development-wallet opt-in and verified connection to the isolated maker.
+The next browser attempt reproduced a separate `wallet.session` TypeError at `managed-workspace.tsx:24` when clicking Strategies after a fresh reload.
+The UI owner received that repeatable failure before any feature fix by this worker.
+No new proposal or managed signing action was submitted during these observations.

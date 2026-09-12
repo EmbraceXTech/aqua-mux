@@ -124,6 +124,7 @@ export async function buildPlan(
       const n = units(leg.amount, t.decimals);
       await requireBalance(t.address, n);
       await approve(t.address, AQUA, n);
+      const range = leg.range ?? b.range;
       const s = makeStrategy(
         account,
         base.address,
@@ -131,12 +132,15 @@ export async function buildPlan(
         total,
         n,
         b.feeBps,
-        b.range,
+        range,
         BigInt("0x" + randomBytes(8).toString("hex")),
       );
       calls.push({ ...s.call, label: `Create ${base.symbol} / ${t.symbol}` });
       summary.push(
         `${base.symbol} / ${t.symbol}: shared ${b.amount} ${base.symbol}, paired with ${leg.amount} ${t.symbol}.`,
+        range === "full"
+          ? "Full-range constant product."
+          : `Concentrated bounds ${range.minPct}% to +${range.maxPct}% around the reserve ratio.`,
       );
       strategies.push({
         hash: s.hash,
@@ -148,7 +152,7 @@ export async function buildPlan(
       `${b.amount} ${base.symbol} backs all ${b.legs.length} pairs. It is shared, not multiplied.`,
       `Paired assets must already be in your wallet. Fills against one pair change the backing of the others.`,
       `The reserve amounts and selected curve determine the opening price. Review them against the market before signing.`,
-      `Swap fee ${b.feeBps / 100}%. ${b.range ? `Concentrated bounds ${b.range}% below and above the reserve ratio.` : "Full-range constant product."}`,
+      `Swap fee ${b.feeBps / 100}%.`,
       `Strategies include the 1inch resolver access check. Portfolio indexing and resolver discovery are external to AquaMux.`,
     );
   }

@@ -9,6 +9,27 @@ export const addressSchema = z
   .string()
   .regex(/^0x[0-9a-fA-F]{40}$/)
   .transform((a) => a.toLowerCase() as Address);
+export const priceRangeSchema = z.union([
+  z.literal("full"),
+  z.object({
+    minPct: z.number().min(-99.99).max(-0.01),
+    maxPct: z.number().min(0.01).max(1000),
+  }),
+]);
+export type PriceRange = z.infer<typeof priceRangeSchema>;
+export const chartPeriods = ["7d", "1m", "3m", "6m", "All"] as const;
+export type ChartPeriod = (typeof chartPeriods)[number];
+export const chartQuerySchema = z.object({
+  chainId: z.union([
+    z.literal(1),
+    z.literal(42161),
+    z.literal(4663),
+    z.literal(56),
+  ]),
+  token0: addressSchema,
+  token1: addressSchema,
+  period: z.enum(chartPeriods),
+});
 export const basketSchema = z
   .object({
     chainId: z.union([
@@ -22,13 +43,14 @@ export const basketSchema = z
     amount: amountSchema,
     slippageBps: z.number().int().min(1).max(500),
     feeBps: z.number().int().min(1).max(100),
-    range: z.union([z.literal(10), z.literal(20), z.literal(50), z.literal(0)]),
+    range: priceRangeSchema,
     legs: z
       .array(
         z.object({
           address: addressSchema,
           bps: z.number().int().min(1).max(10000),
           amount: amountSchema,
+          range: priceRangeSchema.optional(),
         }),
       )
       .min(2)

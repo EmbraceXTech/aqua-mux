@@ -17,10 +17,18 @@ test("basket allocation, token picker, removal and settings", async ({
   await expect(page.locator(".output-row")).toHaveCount(4);
   await page.getByLabel("Remove DAI").click();
   await expect(page.locator(".output-row")).toHaveCount(3);
-  await page.getByLabel("Transaction settings").click();
+  await page
+    .getByRole("button", { name: "Transaction settings", exact: true })
+    .click();
   await page.getByRole("button", { name: "1%", exact: true }).first().click();
   await page.getByLabel("Close dialog").click();
-  await expect(page.locator(".composer-foot")).toContainText("1%");
+  await page
+    .getByRole("button", { name: "Transaction settings", exact: true })
+    .click();
+  await expect(
+    page.getByRole("button", { name: "1%", exact: true }).first(),
+  ).toHaveClass(/selected/);
+  await page.getByLabel("Close dialog").click();
 });
 test("all chains load their own verified tokens", async ({ page }) => {
   await page.goto("/");

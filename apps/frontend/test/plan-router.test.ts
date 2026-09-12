@@ -13,7 +13,7 @@ const basket = {
   amount: "0.1",
   slippageBps: 50,
   feeBps: 5,
-  range: 0,
+  range: "full",
   legs: ["WETH", "PONS"].map((symbol) => ({
     address: catalog.find((t) => t.symbol === symbol)!.address,
     bps: 5000,
