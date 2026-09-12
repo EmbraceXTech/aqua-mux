@@ -42,7 +42,7 @@ test("connect proves core ownership without exposing a key or signature; request
     const payload = await connected.json();
     assert.equal(payload.mode, "local-development");
     assert.match(payload.label, /real mainnet/);
-    assert.equal(payload.networks.length, 3);
+    assert.equal(payload.networks.length, 4);
     assert.ok(!JSON.stringify(payload).includes(process.env.PRIVATE_KEY!));
     assert.ok(!("signature" in payload));
     const authorized = request("status", { id: "missing" }, payload.token);

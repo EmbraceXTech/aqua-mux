@@ -192,7 +192,7 @@ test("local mode is opt-in, development-only, origin scoped and rejects proxies"
   } finally {
     process.env = original;
   }
-  for (const chain of [56, 42161, 4663]) assertDevChain(chain);
-  for (const chain of [1, 97, 421614, 46630])
+  for (const chain of [1, 56, 42161, 4663]) assertDevChain(chain);
+  for (const chain of [97, 421614, 46630])
     assert.throws(() => assertDevChain(chain));
 });
