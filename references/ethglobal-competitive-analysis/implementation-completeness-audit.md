@@ -90,3 +90,31 @@ Production multi-user inference and PostgreSQL leases remain hosted-service work
 Exact balance sweeping, cross-chain conversion and resolver discovery guarantees are not implemented or promised by this release.
 
 Independent code-quality and correctness review is required for each audit commit before integration acceptance.
+
+## Review queue and integration handoff
+
+The following commits were submitted to the coordinator for independent review in dispatch `ctx_da3b2cc3bd76`.
+No independent review result has been delivered for this audit dispatch.
+The earlier accepted implementation review does not cover these changes.
+
+| Commit | Owned change | Evidence |
+| --- | --- | --- |
+| `ab1bdf4` | Public swap compiler and authenticated HTTP driver | Browser reproduction and verified whole-batch fork simulation. |
+| `1b14e8e` | Ethereum route manifest, source inputs and compiler replay | Four compiler replays, five deployment attestations and browser fork simulation. |
+| `e543164` | Ethereum local and named external account support | Full two-pair lifecycle with controlled EIP-1193 provider. |
+| `cf3c1ce` | Authenticated owner export API | Browser owner isolation, anonymous refusal and private payload exclusion. |
+| `3608871` | Completeness audit checkpoint | Original plan and current implementation inspection. |
+| `c794980` | Existing Ethereum chain expectations | Only existing fixture expectations changed at app owner's request; no new unit tests or unit execution. |
+| `2f30621` | Legacy proxy slots and observed execution dependencies | Before/after proxy mutation, pointer refusal before journaling, retained recovery lock and five full lifecycle replays. |
+| `e9d7e67` | Robinhood source provenance without funding routes | Changed runtime refused, owner close preserved and supported full lifecycle replay. |
+
+The coordinator owns reviewer dispatch and shared-file assignment.
+Ownership question `msg_92fc2e555a85` remains pending after resumed waits and escalation.
+The app owner retains the active browser page, frontend, runner and local application database.
+No active app state or original funding transaction was changed by this audit worker.
+
+The active observation correction should attach fresh amount-specific pair observations to `WalletSnapshot.routeQuotes` before the review runtime starts, preserve unavailable coverage, and apply the existing post-model freshness refusal.
+The policy correction must distinguish enforced upward-only replacement direction from range-exit and inventory-drift signals that currently lack deterministic broker checks.
+The public wallet correction needs a stored canonical plan, authenticated named-adapter preparation, exact signed-transaction binding, receipt/prestate proof and durable unknown-attempt recovery before the UI may call it verified execution.
+The export UI can consume authenticated `GET /api/managed/export` and download its redacted JSON payload.
+These integration items remain open and are not represented as completed by the owned commits above.
