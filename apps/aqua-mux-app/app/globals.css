@@ -125,16 +125,19 @@ p {
   font-weight: 530;
   color: #818798;
 }
-.main-nav button {
+.main-nav button,
+.main-nav a {
   background: none;
   padding: 0;
   height: 100%;
   position: relative;
 }
-.main-nav button.active {
+.main-nav button.active,
+.main-nav a.active {
   color: var(--blue);
 }
-.main-nav button.active:after {
+.main-nav button.active:after,
+.main-nav a.active:after {
   content: "";
   position: absolute;
   bottom: 0;

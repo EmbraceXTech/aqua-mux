@@ -1,4 +1,5 @@
-import { AquaMux } from "@/components/aquamux";
+import { redirect } from "next/navigation";
+
 export default function Page() {
-  return <AquaMux />;
+  redirect("/swap");
 }
