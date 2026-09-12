@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { hashSchema, idSchema } from "../../managed";
-import type { ManagedStore } from "../store";
+import type { ExecutionLock, ManagedStore } from "../store";
 import { ManagedError } from "./errors";
-import { recordManagedSubmission } from "./execution";
+import { failManagedExecution, recordManagedSubmission } from "./execution";
 import {
   recordWalletStatus,
   rejectPreparedAttempt,
@@ -56,19 +56,43 @@ export async function attemptApi(
         "Transaction attempt not found.",
         404,
       );
-    return ok({
-      attempt: await relayExternalExecution(
-        {
+    try {
+      return ok({
+        attempt: await relayExternalExecution(
+          {
+            owner,
+            groupId: id,
+            planId: attempt.planId,
+            attemptId: attempt.id,
+            ...input,
+            serializedTransaction: input.serializedTransaction as `0x${string}`,
+          },
+          store,
+        ),
+      });
+    } catch (cause) {
+      // The relay journals before transport. Only a still-hashless preparation is safe to release.
+      store.transaction(() => {
+        const current = store.get("transaction", attempt.id, owner);
+        const lockToken = store.getDocument<ExecutionLock>(
+          "attempt-lock",
+          attempt.id,
           owner,
-          groupId: id,
-          planId: attempt.planId,
-          attemptId: attempt.id,
-          ...input,
-          serializedTransaction: input.serializedTransaction as `0x${string}`,
-        },
-        store,
-      ),
-    });
+        )?.data;
+        if (
+          current?.status === "prepared" &&
+          !current.transactionHash &&
+          !current.walletBatchId &&
+          !current.providerTransactionId &&
+          lockToken
+        )
+          failManagedExecution(
+            { owner, attemptId: attempt.id, lockToken, submitted: false },
+            store,
+          );
+      });
+      throw cause;
+    }
   }
   if (segments.length === 5 && segments[4] === "submitted") {
     const input = z
