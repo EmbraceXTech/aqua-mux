@@ -6,7 +6,12 @@ import {
   type Hex,
 } from "viem";
 import { client } from "../rpc";
-import { devAccount, assertDevChain, DevWalletError } from "./config";
+import {
+  devAccount,
+  assertDevChain,
+  devWalletMaxFee,
+  DevWalletError,
+} from "./config";
 import { validateDevPlan } from "./policy";
 import { verifyDevAssets } from "./assets";
 import { verifyDevRoutes } from "./routes";
@@ -25,14 +30,7 @@ export type SignedDevBatch = {
   broadcast: (beforeSend?: () => void) => Promise<Hex>;
 };
 
-export function maxFeeBudget() {
-  const amount = process.env.AQUAMUX_DEV_WALLET_MAX_FEE_WEI;
-  if (!amount || !/^[1-9]\d{0,29}$/.test(amount))
-    throw new DevWalletError(
-      "Configure a positive local wallet maximum fee in wei.",
-    );
-  return BigInt(amount);
-}
+export const maxFeeBudget = devWalletMaxFee;
 
 export async function signDevBatch(
   plan: DevBatchPlan,

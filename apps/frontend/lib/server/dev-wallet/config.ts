@@ -1,5 +1,6 @@
 import { privateKeyToAccount } from "viem/accounts";
 import type { Hex } from "viem";
+import { network } from "../../config";
 
 export const devNetworks = [
   { chainId: 1, name: "Ethereum mainnet", testnet: false },
@@ -11,22 +12,58 @@ export const devNetworks = [
 export class DevWalletError extends Error {}
 
 export function assertDevMode() {
-  if (
-    process.env.NODE_ENV !== "development" ||
-    process.env.AQUAMUX_DEV_WALLET !== "true"
-  )
-    throw new DevWalletError("Local development wallet is disabled.");
+  if (process.env.NODE_ENV !== "development")
+    throw new DevWalletError(
+      "Local development wallet is disabled outside development.",
+    );
+  if (process.env.AQUAMUX_DEV_WALLET === "false")
+    throw new DevWalletError(
+      "Local development wallet is disabled by server configuration.",
+    );
+}
+
+export function devWalletMaxFee() {
+  const amount = process.env.AQUAMUX_DEV_WALLET_MAX_FEE_WEI;
+  if (!amount || !/^[1-9]\d{0,29}$/.test(amount))
+    throw new DevWalletError(
+      "Configure a positive local wallet maximum fee in wei.",
+    );
+  return BigInt(amount);
+}
+
+function isRpcUrl(value: string | undefined) {
+  try {
+    const url = new URL(value ?? "");
+    return ["http:", "https:"].includes(url.protocol) && !!url.host;
+  } catch {
+    return false;
+  }
+}
+
+export function configuredDevNetworks() {
+  const missing = devNetworks.filter(
+    ({ chainId }) => !isRpcUrl(process.env[network(chainId).env]),
+  );
+  if (missing.length)
+    throw new DevWalletError(
+      `Configure valid RPC URLs for the local development wallet: ${missing.map(({ chainId }) => network(chainId).env).join(", ")}.`,
+    );
+  return devNetworks;
 }
 
 export function devAccount() {
   assertDevMode();
   const key = process.env.PRIVATE_KEY?.replace(/^0x/, "");
   if (!key || !/^[0-9a-fA-F]{64}$/.test(key))
-    throw new DevWalletError("Local development wallet is not configured.");
+    throw new DevWalletError(
+      "Configure a valid server-only PRIVATE_KEY for the local development wallet.",
+    );
   try {
     return privateKeyToAccount(`0x${key}` as Hex);
   } catch {
-    throw new DevWalletError("Local development wallet is not configured.");
+    throw new DevWalletError(
+      "Configure a valid server-only PRIVATE_KEY for the local development wallet.",
+    );
   }
 }
 
@@ -35,9 +72,7 @@ export function assertDevChain(chainId: number) {
     throw new DevWalletError("Unsupported local development wallet chain.");
 }
 
-// A loopback-bound Next server is mandatory. Never publish this server through a proxy.
-export function assertLocalRequest(request: Request) {
-  assertDevMode();
+function devWalletOrigin() {
   let origin: URL;
   try {
     origin = new URL(process.env.AQUAMUX_DEV_WALLET_ORIGIN ?? "");
@@ -46,16 +81,52 @@ export function assertLocalRequest(request: Request) {
       "Configure the exact local development wallet origin.",
     );
   }
+  if (
+    !["127.0.0.1", "[::1]", "localhost"].includes(origin.hostname) ||
+    !["http:", "https:"].includes(origin.protocol) ||
+    origin.username ||
+    origin.password ||
+    origin.pathname !== "/" ||
+    origin.search ||
+    origin.hash
+  )
+    throw new DevWalletError(
+      "Configure the exact local development wallet origin.",
+    );
+  const authOrigin = process.env.AQUAMUX_AUTH_ORIGIN ?? "http://127.0.0.1:3100";
+  if (authOrigin !== origin.origin)
+    throw new DevWalletError(
+      "Configure AQUAMUX_AUTH_ORIGIN to match the local development wallet origin.",
+    );
+  return origin;
+}
+
+export function developmentWalletAvailability() {
+  try {
+    assertDevMode();
+    devAccount();
+    devWalletMaxFee();
+    configuredDevNetworks();
+    devWalletOrigin();
+    return { available: true };
+  } catch (error) {
+    return {
+      available: false,
+      error:
+        error instanceof DevWalletError
+          ? error.message
+          : "Local development wallet configuration could not be checked.",
+    };
+  }
+}
+
+// A loopback-bound Next server is mandatory. Never publish this server through a proxy.
+export function assertLocalRequest(request: Request) {
+  assertDevMode();
+  const origin = devWalletOrigin();
   const url = new URL(request.url);
   const checks = {
-    configuration:
-      ["127.0.0.1", "[::1]", "localhost"].includes(origin.hostname) &&
-      ["http:", "https:"].includes(origin.protocol) &&
-      !origin.username &&
-      !origin.password &&
-      origin.pathname === "/" &&
-      !origin.search &&
-      !origin.hash,
+    configuration: true,
     // Next reconstructs internal URLs with its bind hostname. Host and Origin
     // below must still exactly match the configured browser origin.
     url:

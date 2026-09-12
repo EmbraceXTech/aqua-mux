@@ -29,7 +29,6 @@ import { PriceRangeChart } from "./price-range-chart";
 import { ManagedWorkspace } from "./managed/managed-workspace";
 import { OwnerRecovery } from "./managed/owner-recovery";
 import { useManagedSession } from "@/lib/managed-client/use-managed-session";
-import { managedRequest } from "@/lib/managed-client/api";
 import { useLegacyQuote } from "@/lib/managed-client/use-legacy-quote";
 import { catalogTokenResolver } from "@/lib/managed-client/catalog-token";
 import { useTokenSearch } from "@/lib/managed-client/use-token-search";
@@ -51,23 +50,25 @@ import {
   evenWeights,
   validateBasket,
   type Basket,
-  type Plan,
 } from "@/lib/model";
+import { normalizeBatchStatus, type BatchStatus } from "@/lib/wallet";
 import {
-  submitPlan,
-  batchStatus,
-  normalizeBatchStatus,
-  type BatchStatus,
-} from "@/lib/wallet";
+  walletExecutor,
+  type PreparedWalletPlan,
+  type WalletExecutionStatus,
+  type WalletMode,
+} from "@/lib/managed-client/wallet-execution";
+import { WalletModePicker } from "./wallet-mode-picker";
 type Leg = { address: Address; bps: number; amount: string };
 type TransactionRecord = {
   id: string;
   chainId: number;
   account: Address;
   mode: string;
+  walletMode: WalletMode;
   submittedAt: number;
   read: boolean;
-  status?: BatchStatus;
+  status?: WalletExecutionStatus;
 };
 type Health = {
   networks: {
@@ -142,6 +143,18 @@ const compact = (value: string | undefined | null) =>
   value == null
     ? "Unavailable"
     : Number(value).toLocaleString("en-US", { maximumFractionDigits: 6 });
+const transactionState = (status?: WalletExecutionStatus) =>
+  status?.state ?? "pending";
+function storedExecutionStatus(value: unknown): WalletExecutionStatus {
+  if (value && typeof value === "object" && "state" in value) {
+    const state = (value as { state?: unknown }).state;
+    if (["pending", "confirmed", "reverted", "unknown"].includes(String(state)))
+      return value as WalletExecutionStatus;
+  }
+  if (value && typeof value === "object" && "status" in value)
+    return { state: normalizeBatchStatus(value as BatchStatus) };
+  return { state: "pending" };
+}
 async function api<T>(url: string, body?: unknown): Promise<T> {
   const r = await fetch(
     url,
@@ -181,6 +194,19 @@ function initialLegs(id: number): Leg[] {
     amount: "0",
   }));
 }
+function localDevelopmentLegs(id: ChainId): Leg[] {
+  const symbols = id === 4663 ? ["USDG", "PONS"] : ["USDC", "USDT"];
+  const selected = symbols
+    .map((symbol) => tokens(id).find((token) => token.symbol === symbol))
+    .filter((token): token is Token => !!token);
+  if (selected.length !== 2)
+    throw new Error("Local wallet outputs are not configured for this network.");
+  return selected.map((token, index) => ({
+    address: token.address,
+    bps: [5000, 5000][index],
+    amount: "0",
+  }));
+}
 export function AquaMux() {
   const [chainId, setChainId] = useState<ChainId>(42161),
     [mode, setMode] = useState<"swap" | "liquidity">("swap"),
@@ -188,7 +214,7 @@ export function AquaMux() {
     [amount, setAmount] = useState("1"),
     [legs, setLegs] = useState<Leg[]>(() => initialLegs(42161));
   const wallet = useManagedSession(chainId);
-  const session = wallet.session?.mode === "external" ? wallet.session : undefined;
+  const session = wallet.session;
   const account = session?.owner;
   const [balances, setBalances] = useState<Record<string, string | null>>({}),
     [health, setHealth] = useState<Health>();
@@ -206,15 +232,16 @@ export function AquaMux() {
   const [chartPair, setChartPair] = useState<Address>();
   const [error, setError] = useState(""),
     [busy, setBusy] = useState(false),
-    [plan, setPlan] = useState<Plan>(),
+    [reviewed, setReviewed] = useState<PreparedWalletPlan>(),
     [review, setReview] = useState(false),
     [batch, setBatch] = useState<{
       id: string;
       chainId: number;
       account: Address;
       mode: string;
+      walletMode: WalletMode;
     }>(),
-    [status, setStatus] = useState<BatchStatus>(),
+    [status, setStatus] = useState<WalletExecutionStatus>(),
     [transactions, setTransactions] = useState<TransactionRecord[]>([]),
     [transactionsLoaded, setTransactionsLoaded] = useState(false),
     [activityOpen, setActivityOpen] = useState(false),
@@ -223,6 +250,7 @@ export function AquaMux() {
     [now, setNow] = useState(0),
     [revision, setRevision] = useState(0);
   const [selectedRegistryTokens, setSelectedRegistryTokens] = useState<Record<number, Token[]>>({});
+  const plan = reviewed?.plan;
   const registrySearch = useTokenSearch(chainId, search, picker !== null);
   const requestId = useRef(0),
     healthRequested = useRef(false);
@@ -295,32 +323,33 @@ export function AquaMux() {
     };
   }, []);
   useEffect(() => {
-    const p = window.ethereum;
-    if (!p) return;
+    if (!session || !walletExecutor(session.mode).observesBrowserWallet) return;
+    const provider = window.ethereum;
+    if (!provider) return;
     const changed = () => {
       requestId.current += 1;
       setReview(false);
-      setPlan(undefined);
+      setReviewed(undefined);
       setBalances({});
       setBusy(false);
     };
     const chainChanged = () => {
       requestId.current += 1;
-      setPlan(undefined);
+      setReviewed(undefined);
       setReview(false);
       setBusy(false);
     };
-    p.on?.("accountsChanged", changed);
-    p.on?.("chainChanged", chainChanged);
+    provider.on?.("accountsChanged", changed);
+    provider.on?.("chainChanged", chainChanged);
     return () => {
-      p.removeListener?.("accountsChanged", changed);
-      p.removeListener?.("chainChanged", chainChanged);
+      provider.removeListener?.("accountsChanged", changed);
+      provider.removeListener?.("chainChanged", chainChanged);
     };
-  }, []);
+  }, [session]);
   useEffect(() => {
     requestId.current += 1;
     const timer = setTimeout(() => {
-      setPlan(undefined);
+      setReviewed(undefined);
       setReview(false);
       setBalances({});
     }, 0);
@@ -367,14 +396,18 @@ export function AquaMux() {
           .slice(0, 10)
           .map((item) => ({
             ...item,
+            walletMode:
+              item.walletMode === "local-development"
+                ? "local-development"
+                : "external",
             submittedAt: item.submittedAt || Date.now(),
             read: item.read ?? true,
-            status: item.status ?? { status: 100 },
+            status: storedExecutionStatus(item.status),
           })) as TransactionRecord[];
         setTransactions(valid);
         if (valid[0]) {
           setBatch(valid[0]);
-          setStatus(valid[0].status);
+          setStatus(valid[0].status ?? { state: "pending" });
         }
       } catch {
         /* Storage may be unavailable in private browser contexts. */
@@ -396,30 +429,29 @@ export function AquaMux() {
     }
   }, [transactions, transactionsLoaded]);
   useEffect(() => {
-    if (!batch) return;
+    if (!batch || !session || session.mode !== batch.walletMode) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout>;
     const poll = async () => {
       try {
-        const s = await batchStatus(batch.id);
+        const next = await walletExecutor(batch.walletMode).status(session, batch.id);
         if (!alive) return;
-        const outcome = normalizeBatchStatus(s);
-        if (outcome === "unknown")
+        if (next.state === "unknown")
           setError("The wallet response is incomplete. Execution is unknown; check wallet activity before retrying.");
-        setStatus(s);
+        setStatus(next);
         setTransactions((old) =>
           old.map((transaction) =>
             transaction.id === batch.id
-              ? { ...transaction, status: s }
+              ? { ...transaction, status: next }
               : transaction,
           ),
         );
-        if (outcome === "pending" || outcome === "unknown") timer = setTimeout(poll, outcome === "unknown" ? 8000 : 2500);
-        else setRevision((v) => v + 1);
+        if (next.state === "pending" || next.state === "unknown") timer = setTimeout(poll, next.state === "unknown" ? 8000 : 2500);
+        else setRevision((value) => value + 1);
       } catch {
         if (alive) {
           setError(
-            "Batch status is unavailable. Check wallet activity before submitting again.",
+            "Transaction status is unavailable. Check wallet activity before submitting again.",
           );
           timer = setTimeout(poll, 8000);
         }
@@ -430,10 +462,10 @@ export function AquaMux() {
       alive = false;
       clearTimeout(timer);
     };
-  }, [batch]);
+  }, [batch, session]);
   function change() {
     requestId.current++;
-    setPlan(undefined);
+    setReviewed(undefined);
     setError("");
     setReview(false);
   }
@@ -461,7 +493,11 @@ export function AquaMux() {
     change();
     setChainId(id);
     setSource(NATIVE);
-    setLegs(initialLegs(id));
+    setLegs(
+      session?.mode === "local-development" && mode === "swap"
+        ? localDevelopmentLegs(id)
+        : initialLegs(id),
+    );
     setBalances({});
     setChainPicker(false);
   }
@@ -510,14 +546,21 @@ export function AquaMux() {
     setPicker(null);
     setSearch("");
   }
-  async function connect() {
+  async function connect(walletMode: WalletMode) {
     try {
       setError("");
       setBusy(true);
-      const connected = await wallet.connect("external");
-      if (connected) setWalletOpen(false);
-    } catch (e) {
-      setError(errorMessage(e));
+      const connected = await wallet.connect(walletMode);
+      if (connected) {
+        if (connected.mode === "local-development" && mode === "swap") {
+          change();
+          setSource(NATIVE);
+          setLegs(localDevelopmentLegs(chainId));
+        }
+        setWalletOpen(false);
+      }
+    } catch (error) {
+      setError(errorMessage(error));
     } finally {
       setBusy(false);
     }
@@ -532,9 +575,9 @@ export function AquaMux() {
       setError("");
       setBusy(true);
       validateBasket(basket, catalogTokenResolver(chainId, catalog));
-      const p = await managedRequest<Plan>("/api/plan", session, { basket, account });
+      const prepared = await walletExecutor(session.mode).prepare(session, basket);
       if (id === requestId.current) {
-        setPlan(p);
+        setReviewed(prepared);
         setReview(true);
       }
     } catch (e) {
@@ -544,32 +587,33 @@ export function AquaMux() {
     }
   }
   async function execute() {
-    if (!plan || !session || plan.account.toLowerCase() !== session.owner.toLowerCase() || session.expiresAt <= Date.now()) return;
+    if (!reviewed || !plan || !session || plan.account.toLowerCase() !== session.owner.toLowerCase() || session.expiresAt <= Date.now()) return;
     try {
       setError("");
       setBusy(true);
       if (!transactionsLoaded || transactions.some((transaction) =>
-        ["pending", "unknown"].includes(normalizeBatchStatus(transaction.status)),
+        ["pending", "unknown"].includes(transactionState(transaction.status)),
       )) throw new Error("An earlier transaction is unresolved. Check its status before submitting again.");
-      const id = await submitPlan(plan);
+      const submitted = await walletExecutor(session.mode).submit(session, reviewed);
       const transaction: TransactionRecord = {
-        id,
+        id: submitted.id,
         chainId: plan.chainId,
         account: plan.account,
         mode: plan.mode,
+        walletMode: session.mode,
         submittedAt: Date.now(),
         read: false,
-        status: { status: 100 },
+        status: submitted.status,
       };
       setBatch(transaction);
       setTransactions((old) =>
-        [transaction, ...old.filter((item) => item.id !== id)].slice(0, 10),
+        [transaction, ...old.filter((item) => item.id !== submitted.id)].slice(0, 10),
       );
       setStatus(transaction.status);
       setReview(false);
       setReceiptOpen(true);
-    } catch (e) {
-      setError(errorMessage(e));
+    } catch (error) {
+      setError(errorMessage(error));
     } finally {
       setBusy(false);
     }
@@ -578,8 +622,16 @@ export function AquaMux() {
     typeof picker === "number" ? legs[picker]?.address : undefined;
   const registryCandidates: Token[] = registrySearch.result ? registrySearch.result.items.map((item) => ({ address: item.address, symbol: item.symbol, name: item.name, decimals: item.decimals, logo: tokens(chainId).find((known) => known.address === item.address)?.logo ?? "", source: "1inch registry" })) : catalog;
   if (!registryCandidates.some((item) => item.address === NATIVE)) registryCandidates.unshift(tokens(chainId).find((item) => item.address === NATIVE)!);
+  const localDevelopmentWallet =
+    session?.mode === "local-development" && mode === "swap";
   const available = registryCandidates.filter(
     (t) =>
+      (!localDevelopmentWallet ||
+        (picker === "source"
+          ? t.address === NATIVE || t.address === wrapped(chainId).address
+          : localDevelopmentLegs(chainId).some(
+              (leg) => leg.address === t.address,
+            ))) &&
       (picker === "source" ||
         (t.address !== source &&
           !legs.some(
@@ -593,7 +645,7 @@ export function AquaMux() {
         .includes(search.toLowerCase()),
   );
   const unresolvedTransaction = transactions.find((transaction) =>
-    ["pending", "unknown"].includes(normalizeBatchStatus(transaction.status)),
+    ["pending", "unknown"].includes(transactionState(transaction.status)),
   );
   const blocked = !transactionsLoaded || !!unresolvedTransaction;
   return (
@@ -611,6 +663,8 @@ export function AquaMux() {
             onClick={() => {
               change();
               setMode("swap");
+              if (session?.mode === "local-development")
+                setLegs(localDevelopmentLegs(chainId));
               setManagedOpen(false);
             }}
           >
@@ -656,7 +710,7 @@ export function AquaMux() {
                         key={transaction.id}
                         onClick={() => {
                           setBatch(transaction);
-                          setStatus(transaction.status ?? { status: 100 });
+                          setStatus(transaction.status ?? { state: "pending" });
                           setActivityOpen(false);
                           setReceiptOpen(true);
                         }}
@@ -681,11 +735,11 @@ export function AquaMux() {
                           </span>
                         </span>
                         <small
-                          className={`transaction-state state-${normalizeBatchStatus(transaction.status) === "confirmed" ? 200 : normalizeBatchStatus(transaction.status) === "pending" ? 100 : 500}`}
+                          className={`transaction-state state-${transactionState(transaction.status) === "confirmed" ? 200 : transactionState(transaction.status) === "pending" ? 100 : 500}`}
                         >
-                          {normalizeBatchStatus(transaction.status) === "confirmed"
+                          {transactionState(transaction.status) === "confirmed"
                             ? "Confirmed"
-                            : normalizeBatchStatus(transaction.status) === "pending"
+                            : transactionState(transaction.status) === "pending"
                               ? "Pending"
                               : "Check status"}
                         </small>
@@ -743,6 +797,8 @@ export function AquaMux() {
                   onClick={() => {
                     change();
                     setMode("swap");
+                    if (session?.mode === "local-development")
+                      setLegs(localDevelopmentLegs(chainId));
                   }}
                 >
                   <ArrowDownUp size={15} />
@@ -1019,7 +1075,7 @@ export function AquaMux() {
             </div>
             <button
               className="add-token"
-              disabled={legs.length >= 6}
+              disabled={legs.length >= 6 || localDevelopmentWallet}
               onClick={() => {
                 setSearch("");
                 setPicker(legs.length);
@@ -1088,7 +1144,7 @@ export function AquaMux() {
                   Preparing transaction
                 </>
               ) : blocked ? (
-                normalizeBatchStatus(unresolvedTransaction?.status) === "unknown" ? "Check unresolved transaction" : "Transaction pending"
+                transactionState(unresolvedTransaction?.status) === "unknown" ? "Check unresolved transaction" : "Transaction pending"
               ) : account ? (
                 mode === "swap" ? (
                   "Review multi-swap"
@@ -1494,7 +1550,7 @@ export function AquaMux() {
         open={walletOpen}
         onOpenChange={setWalletOpen}
         title={account ? "Your wallet" : "Connect your wallet"}
-        description="Connect your Ethereum browser wallet and sign an authentication message to request quotes and plans. Transactions require a separate confirmation and atomic batch support."
+        description="Choose a browser wallet or a configured local development wallet. Each transaction needs a separate confirmation. Browser-wallet transactions require atomic batch support."
       >
         {account ? (
           <>
@@ -1506,7 +1562,7 @@ export function AquaMux() {
                 void wallet.disconnect();
                 requestId.current += 1;
                 setBalances({});
-                setPlan(undefined);
+                setReviewed(undefined);
                 setWalletOpen(false);
               }}
             >
@@ -1514,10 +1570,12 @@ export function AquaMux() {
             </Button>
           </>
         ) : (
-          <Button className="main-action" onClick={connect} disabled={busy}>
-            <Wallet size={18} />
-            {busy || wallet.busy ? "Waiting for wallet" : "Connect browser wallet"}
-          </Button>
+          <WalletModePicker
+            busy={busy || wallet.busy}
+            developmentWallet={wallet.developmentWallet}
+            externalLabel="Connect browser wallet"
+            onConnect={(mode) => void connect(mode)}
+          />
         )}
         {(error || wallet.error) && (
           <p role="alert" className="error-box">
@@ -1535,7 +1593,7 @@ export function AquaMux() {
             ? "Review your multi-swap"
             : "Review your Aqua positions"
         }
-        description={`${n.name}. All calls execute atomically from your wallet.`}
+        description={`${n.name}. All calls execute atomically from ${session?.mode === "local-development" ? "the local development wallet after your explicit confirmation" : "your browser wallet"}.`}
       >
         {plan && (
           <>
@@ -1561,7 +1619,7 @@ export function AquaMux() {
                 0,
                 Math.ceil((plan.expiresAt - (now || plan.createdAt)) / 1000),
               )}
-              s. Your wallet calculates gas and simulates the batch.
+              s. {session?.mode === "local-development" ? "The local development signer applies its configured fee cap after you confirm." : "Your wallet calculates gas and simulates the batch."}
             </div>
             {error && (
               <p role="alert" className="error-box">
@@ -1575,6 +1633,8 @@ export function AquaMux() {
             >
               {busy ? (
                 <Loader2 className="spin" size={18} />
+              ) : session?.mode === "local-development" ? (
+                "Confirm with development wallet"
               ) : (
                 "Confirm in wallet"
               )}
@@ -1587,16 +1647,16 @@ export function AquaMux() {
         open={receiptOpen}
         onOpenChange={setReceiptOpen}
         title={
-          normalizeBatchStatus(status) === "confirmed"
+          transactionState(status) === "confirmed"
             ? "Transaction confirmed"
-            : normalizeBatchStatus(status) === "pending"
+            : transactionState(status) === "pending"
               ? "Transaction submitted"
               : "Check transaction status"
         }
         description={
-          normalizeBatchStatus(status) === "confirmed"
+          transactionState(status) === "confirmed"
             ? "Review the transaction receipt and its confirmation status."
-            : normalizeBatchStatus(status) === "pending"
+            : transactionState(status) === "pending"
               ? "Your transaction is submitted. Waiting for confirmation."
               : "Check your wallet activity and transaction receipt."
         }
@@ -1604,19 +1664,19 @@ export function AquaMux() {
         {batch && (
           <>
             <div className="receipt-status">
-              {normalizeBatchStatus(status) === "confirmed" ? (
+              {transactionState(status) === "confirmed" ? (
                 <Check size={35} />
-              ) : normalizeBatchStatus(status) === "pending" ? (
+              ) : transactionState(status) === "pending" ? (
                 <Loader2 className="spin" size={35} />
               ) : (
                 <X size={35} />
               )}
               <p>
-                {normalizeBatchStatus(status) === "confirmed"
+                {transactionState(status) === "confirmed"
                   ? "Your wallet reported successful execution."
-                  : normalizeBatchStatus(status) === "pending"
+                  : transactionState(status) === "pending"
                     ? "Waiting for on-chain confirmation."
-                    : normalizeBatchStatus(status) === "reverted" ? "The wallet reported a reverted batch. Check the transaction receipt." : "Execution is unknown. The wallet response does not prove a complete atomic result. Check its activity before retrying."}
+                    : transactionState(status) === "reverted" ? "The wallet reported a reverted batch. Check the transaction receipt." : "Execution is unknown. The wallet response does not prove a complete atomic result. Check its activity before retrying."}
               </p>
             </div>
             <button
@@ -1626,18 +1686,28 @@ export function AquaMux() {
                   await navigator.clipboard.writeText(batch.id);
                   setCopied(true);
                 } catch {
-                  setError("Could not copy the batch ID.");
+                  setError("Could not copy the transaction ID.");
                 }
               }}
             >
               <Copy size={14} />
-              {copied ? "Copied batch ID" : "Copy batch ID"}
+              {copied ? "Copied transaction ID" : "Copy transaction ID"}
             </button>
-            {status?.receipts?.map((r) => (
+            {status?.transactionHash && (
               <a
                 className="primary-link"
-                key={r.transactionHash}
-                href={`${network(batch.chainId).explorer}/tx/${r.transactionHash}`}
+                href={`${network(batch.chainId).explorer}/tx/${status.transactionHash}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                View transaction <ExternalLink size={14} />
+              </a>
+            )}
+            {status?.receipts?.map((receipt) => (
+              <a
+                className="primary-link"
+                key={receipt.transactionHash}
+                href={`${network(batch.chainId).explorer}/tx/${receipt.transactionHash}`}
                 target="_blank"
                 rel="noreferrer"
               >

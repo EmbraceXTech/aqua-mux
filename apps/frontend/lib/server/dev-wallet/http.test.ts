@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { requireOwner } from "../auth";
 import { ManagedStore } from "../store";
+import { developmentWalletAvailability } from "./config";
 import { handleDevWallet } from "./http";
 import { requireDevSession } from "./session";
 
@@ -30,10 +31,13 @@ test("connect proves core ownership without exposing a key or signature; request
   try {
     Object.assign(process.env, {
       NODE_ENV: "development",
-      AQUAMUX_DEV_WALLET: "true",
       AQUAMUX_DEV_WALLET_ORIGIN: origin,
       AQUAMUX_AUTH_ORIGIN: origin,
       AQUAMUX_DEV_WALLET_MAX_FEE_WEI: "1000000000000000",
+      ETHEREUM_RPC_URL: "http://127.0.0.1:8545",
+      BNB_RPC_URL: "http://127.0.0.1:8545",
+      ARBITRUM_RPC_URL: "http://127.0.0.1:8545",
+      ROBINHOOD_RPC_URL: "http://127.0.0.1:8545",
       PRIVATE_KEY: "01".repeat(32),
     });
     const connected = await handleDevWallet(request("connect", {}), "connect");
@@ -45,6 +49,27 @@ test("connect proves core ownership without exposing a key or signature; request
     assert.equal(payload.networks.length, 4);
     assert.ok(!JSON.stringify(payload).includes(process.env.PRIVATE_KEY!));
     assert.ok(!("signature" in payload));
+    assert.deepEqual(developmentWalletAvailability(), { available: true });
+    delete process.env.PRIVATE_KEY;
+    assert.deepEqual(developmentWalletAvailability(), {
+      available: false,
+      error:
+        "Configure a valid server-only PRIVATE_KEY for the local development wallet.",
+    });
+    process.env.PRIVATE_KEY = "01".repeat(32);
+    delete process.env.ARBITRUM_RPC_URL;
+    assert.deepEqual(developmentWalletAvailability(), {
+      available: false,
+      error:
+        "Configure valid RPC URLs for the local development wallet: ARBITRUM_RPC_URL.",
+    });
+    const missingRpc = await handleDevWallet(request("connect", {}), "connect");
+    assert.equal(missingRpc.status, 400);
+    assert.deepEqual(await missingRpc.json(), {
+      error:
+        "Configure valid RPC URLs for the local development wallet: ARBITRUM_RPC_URL.",
+    });
+    process.env.ARBITRUM_RPC_URL = "http://127.0.0.1:8545";
     const authorized = request("status", { id: "missing" }, payload.token);
     assert.equal(requireOwner(authorized).owner, payload.account.toLowerCase());
     assert.equal(
@@ -116,7 +141,7 @@ test("connect proves core ownership without exposing a key or signature; request
     const disabled = await handleDevWallet(request("connect", {}), "connect");
     assert.equal(disabled.status, 400);
     assert.deepEqual(await disabled.json(), {
-      error: "Local development wallet is disabled.",
+      error: "Local development wallet is disabled outside development.",
     });
   } finally {
     process.env = original;

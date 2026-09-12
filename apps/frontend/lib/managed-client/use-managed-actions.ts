@@ -6,12 +6,8 @@ import type {
   LPStrategyConfig,
   ReviewRecord,
 } from "@/lib/managed";
-import { submitExternalManaged } from "./external-execution";
 import { recoverWalletBatches } from "./wallet-recovery";
-import {
-  prepareDevWalletLifecyclePlan,
-  submitDevWalletPlan,
-} from "@/lib/dev-wallet";
+import { walletExecutor } from "./wallet-execution";
 import {
   managedRequest,
   requestKey,
@@ -125,13 +121,6 @@ export function useManagedActions(
   async function confirm() {
     if (!session || !detail || !pendingPlan) return;
     await perform(async () => {
-      if (
-        session.mode === "external" &&
-        !detail.executionCapabilities?.external?.verified
-      )
-        throw new Error(
-          "Managed execution is unavailable for this external wallet until its account adapter and receipt recovery are verified.",
-        );
       const reviewed = pendingPlan;
       const revision = scope.current.revision;
       const assertCurrent = () => {
@@ -140,6 +129,15 @@ export function useManagedActions(
             "Wallet or workspace changed. Review the action again.",
           );
       };
+      const executor = walletExecutor(session.mode);
+      const executionInput = {
+        plan: reviewed.plan,
+        tabSession,
+        assertCurrent,
+        externalExecutionVerified:
+          detail.executionCapabilities?.external?.verified === true,
+      };
+      executor.assertManagedExecution(executionInput);
       await managedRequest(
         `/groups/${detail.group.id}/plans/${reviewed.plan.id}/confirm`,
         session,
@@ -150,38 +148,9 @@ export function useManagedActions(
         },
       );
       assertCurrent();
-      if (session.mode === "local-development") {
-        const approved = await prepareDevWalletLifecyclePlan(
-          session.token,
-          reviewed.plan.id,
-          { sessionId: tabSession, generation: reviewed.plan.runGeneration },
-        );
-        assertCurrent();
-        if (!session.maxFeeWei || approved.maxFeeWei !== session.maxFeeWei)
-          throw new Error(
-            "Development signer fee cap changed. Reconnect and review the updated cap before signing.",
-          );
-        const outcome = await submitDevWalletPlan(
-          session.token,
-          approved,
-          true,
-        );
-        setPendingPlan(undefined);
-        setNotice(
-          `Development signer returned ${outcome.state}. Reconcile to verify the position and remaining inventory.`,
-        );
-      } else {
-        const attempt = await submitExternalManaged(
-          session,
-          reviewed.plan,
-          tabSession,
-          assertCurrent,
-        );
-        setPendingPlan(undefined);
-        setNotice(
-          `Wallet transaction ${attempt.status}: ${attempt.transactionHash ?? "hash unavailable"}. Reconcile before taking another action.`,
-        );
-      }
+      const execution = await executor.submitManaged(session, executionInput);
+      setPendingPlan(undefined);
+      setNotice(execution.notice);
       const current = await managedRequest<GroupDetail>(
         `/groups/${detail.group.id}`,
         session,

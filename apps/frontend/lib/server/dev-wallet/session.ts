@@ -3,8 +3,8 @@ import { requireOwnerSession, walletAuth } from "../auth";
 import { openManagedStore } from "../store";
 import {
   assertLocalRequest,
+  configuredDevNetworks,
   devAccount,
-  devNetworks,
   DevWalletError,
 } from "./config";
 import { maxFeeBudget } from "./signer";
@@ -17,6 +17,7 @@ export async function connectLocalWallet(request: Request) {
   assertLocalRequest(request);
   const fee = maxFeeBudget();
   const account = devAccount();
+  const networks = configuredDevNetworks();
   const origin = request.headers.get("origin")!;
   const auth = walletAuth();
   const challenge = auth.challenge(account.address, origin, 56);
@@ -34,7 +35,7 @@ export async function connectLocalWallet(request: Request) {
     token: session.token,
     expiresAt: session.expiresAt,
     maxFeeWei: String(fee),
-    networks: devNetworks,
+    networks,
   };
 }
 

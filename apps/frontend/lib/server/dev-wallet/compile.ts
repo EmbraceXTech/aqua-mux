@@ -6,7 +6,7 @@ import { buildPlan } from "../plan";
 import { verifiedRouteCalls } from "../route-policy/route-calls";
 import { quoteVerifiedRoute } from "../route-policy/quote";
 import { validateCompiledRoute } from "../route-policy/validate";
-import type { RoutePolicyRequest } from "../route-policy/types";
+import type { RoutePolicyRequest, VerifiedRoute } from "../route-policy/types";
 import { client } from "../rpc";
 import type { DevBatchPlan } from "./batch";
 import { DevWalletError } from "./config";
@@ -18,6 +18,17 @@ type Dependencies = {
   rpc?: typeof client;
   liquidity?: typeof buildPlan;
 };
+
+function routeError(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+  if (
+    /^(No verified|Verified routes|Route amount|A route must|The verified|Direct-pool|Route RPC|Route deployment)/.test(
+      message,
+    )
+  )
+    return message;
+  return "The verified local route is unavailable. Review the selected pair and configured RPC connection.";
+}
 
 /** The local signer never forwards quote-provider executor calldata. */
 export async function buildDevBasketPlan(
@@ -77,9 +88,14 @@ export async function buildDevBasketPlan(
       minimumAmountOut: "1",
       slippageBps: basket.slippageBps,
     };
-    const route = await (dependencies.quote ?? quoteVerifiedRoute)({
-      ...request,
-    });
+    let route: VerifiedRoute;
+    try {
+      route = await (dependencies.quote ?? quoteVerifiedRoute)({
+        ...request,
+      });
+    } catch (error) {
+      throw new DevWalletError(routeError(error));
+    }
     validateCompiledRoute(request, route);
     if (
       route.approvalRequired !== false &&

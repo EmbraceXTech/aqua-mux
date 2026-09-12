@@ -38,6 +38,28 @@ const fixture = (): Plan => ({
   summary: [],
 });
 
+test("preparation reports a safe balance refusal without exposing transport details", async () => {
+  const store = new ManagedStore(":memory:");
+  try {
+    const insufficient = new DevBasketService(store, async () => {
+      throw new Error("Insufficient USDC balance.");
+    });
+    await assert.rejects(
+      () => insufficient.prepare(session, {}),
+      /Insufficient USDC balance/,
+    );
+    const unavailable = new DevBasketService(store, async () => {
+      throw new Error("https://rpc.example/private-credential");
+    });
+    await assert.rejects(
+      () => unavailable.prepare(session, {}),
+      /Local wallet plan could not be prepared/,
+    );
+  } finally {
+    store.close();
+  }
+});
+
 test("durable review binding, shared nonce lock and ambiguous submission survive restart", async () => {
   const directory = mkdtempSync(join(tmpdir(), "aquamux-dev-wallet-"));
   const path = join(directory, "test.sqlite");

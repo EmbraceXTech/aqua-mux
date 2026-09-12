@@ -1,6 +1,11 @@
 import type { Address } from "viem";
 import type { Basket, Plan } from "./model";
 
+export type DevWalletAvailability = {
+  available: boolean;
+  error?: string;
+};
+
 export type DevWalletConnection = {
   mode: "local-development";
   label: string;
@@ -42,6 +47,19 @@ async function request<T>(
   if (!response.ok)
     throw new Error(result.error ?? "Local development wallet request failed.");
   return result as T;
+}
+
+export async function devWalletAvailability() {
+  const response = await fetch("/api/dev-wallet/status", {
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  const result = (await response
+    .json()
+    .catch(() => null)) as DevWalletAvailability | null;
+  if (!response.ok || !result || typeof result.available !== "boolean")
+    throw new Error("Local development wallet status could not be read.");
+  return result;
 }
 
 // Call only after an explicit click on the labelled local development wallet option.

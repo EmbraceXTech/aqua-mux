@@ -1,12 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { authenticateWallet, managedRequest, type ManagedSession } from "./api";
-import { connectDevWallet, disconnectDevWallet } from "@/lib/dev-wallet";
+import { type ManagedSession } from "./api";
+import { walletExecutor, type WalletMode } from "./wallet-execution";
+import {
+  devWalletAvailability,
+  type DevWalletAvailability,
+} from "@/lib/dev-wallet";
 
 const sessionKey = "aquamux-managed-session-v1";
 export function useManagedSession(chainId = 42161) {
   const [session, setSession] = useState<ManagedSession>();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [developmentWallet, setDevelopmentWallet] =
+    useState<DevWalletAvailability>();
   const generation = useRef(0);
   const clear = useCallback((message = "") => {
     generation.current += 1;
@@ -41,6 +47,13 @@ export function useManagedSession(chainId = 42161) {
         /* Authenticate again when the session cache is unavailable. */
       }
     });
+    return () => {
+      active = false;
+      generation.current += 1;
+    };
+  }, [clear]);
+  useEffect(() => {
+    if (!session || !walletExecutor(session.mode).observesBrowserWallet) return;
     const changed = () =>
       clear("Wallet account changed. Authenticate the selected wallet again.");
     const chainChanged = () =>
@@ -48,12 +61,28 @@ export function useManagedSession(chainId = 42161) {
     window.ethereum?.on?.("accountsChanged", changed);
     window.ethereum?.on?.("chainChanged", chainChanged);
     return () => {
-      active = false;
-      generation.current += 1;
       window.ethereum?.removeListener?.("accountsChanged", changed);
       window.ethereum?.removeListener?.("chainChanged", chainChanged);
     };
-  }, [clear]);
+  }, [session, clear]);
+  useEffect(() => {
+    let active = true;
+    devWalletAvailability()
+      .then((availability) => {
+        if (active) setDevelopmentWallet(availability);
+      })
+      .catch(() => {
+        if (active)
+          setDevelopmentWallet({
+            available: false,
+            error:
+              "Local development wallet status could not be checked. Refresh before connecting.",
+          });
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   useEffect(() => {
     if (!session) return;
     const timer = setTimeout(
@@ -72,23 +101,12 @@ export function useManagedSession(chainId = 42161) {
       window.removeEventListener("aquamux-auth-invalidated", invalidated);
     };
   }, [session, clear]);
-  async function connect(mode: "external" | "local-development") {
+  async function connect(mode: WalletMode) {
     const requestGeneration = ++generation.current;
     setBusy(true);
     setError("");
     try {
-      let value: ManagedSession;
-      if (mode === "local-development") {
-        const result = await connectDevWallet();
-        value = {
-          token: result.token,
-          owner: result.account,
-          expiresAt: result.expiresAt,
-          sessionId: crypto.randomUUID(),
-          mode,
-          maxFeeWei: result.maxFeeWei,
-        };
-      } else value = await authenticateWallet(chainId);
+      const value = await walletExecutor(mode).connect(chainId);
       if (requestGeneration !== generation.current) return;
       setSession(value);
       try {
@@ -113,9 +131,7 @@ export function useManagedSession(chainId = 42161) {
     clear();
     const disconnectGeneration = generation.current;
     try {
-      if (previous?.mode === "local-development")
-        await disconnectDevWallet(previous.token);
-      else if (previous) await managedRequest("/api/auth/logout", previous, {});
+      if (previous) await walletExecutor(previous.mode).disconnect(previous);
     } catch {
       if (disconnectGeneration === generation.current)
         setError(
@@ -123,5 +139,12 @@ export function useManagedSession(chainId = 42161) {
         );
     }
   }
-  return { session, error, busy, connect, disconnect };
+  return {
+    session,
+    error,
+    busy,
+    developmentWallet,
+    connect,
+    disconnect,
+  };
 }
