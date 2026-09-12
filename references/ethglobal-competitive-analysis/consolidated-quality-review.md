@@ -14,14 +14,30 @@ Installed dependencies were linked without installation or modification.
 The original dirty overlay was not included, so the snapshot does not represent the complete starting workspace.
 Owner-reported evidence and independently rerun evidence are distinguished below.
 
-## Milestone decisions
+## Current acceptance decision
 
-| Milestone | Decision | Independent evidence | Remaining gate |
-| --- | --- | --- | --- |
-| Request-local metadata, `29a199d3bd5e07a1cdc95c08947417ac08bf0f7b` | Accepted for asynchronous metadata binding. | All 36 focused API, lease, auth, store and metadata tests pass; scoped ESLint passes. | Label normalization, inventory attribution and full app workflow remain separate. |
-| Route provenance, `a9a7c273` with `cad298a7d98837b410f77adc63a3f822fb4d0523` | Accepted for the Arbitrum and BNB route-policy scope. | Nine route tests, thirteen adapter tests, seven compiler replays, 260 independent mutations and expiry/proxy probes pass; corrected recursive route lint passes. | External execution and funded lifecycle evidence remain separate. |
-| External backend, `d95f893` with `fd68e4a` and `41ae2f7` | Accepted for the named adapter and controlled-fork backend scope. | Independent three-chain funded forks, exact trace/prestate proof, expiry and signature mutations, signer code/nonce refusal, rollback and eight Robinhood compiler replays pass. | App signing correction and persistent restart recovery; no wallet brand compatibility proven. |
-| Full initial app scope | Pending owner delivery. | Earlier narrowly scoped acceptances remain limited to their exact revisions. | Coherent app milestone and integrated browser/fork evidence. |
+Both delivered implementation scopes are accepted for their stated initial managed-LP scope.
+Chain acceptance is pinned through `4730813bbc005399020ab16a90dfc0b8ffed4e18`.
+App acceptance is pinned through `89c24d64d730818a18fff0af3bccd2b66538ad86`, including heartbeat correction `a20c8308fbbfd3c08e8cb96b06cb2911134b54f9` and evidence commit `cba95d455b690fbfe7af617fd65aa7f8fc962da9`.
+The chronological sections below retain intermediate failures and their subsequent corrections; they do not override this current decision.
+No blocking source-quality or correctness finding remains in these delivered scopes.
+
+| Scope | Decision and evidence | Practical boundary |
+| --- | --- | --- |
+| Route source and transaction authority | Accepted exact source replay, runtime/proxy attestations, amount/minimum/receiver binding and mutation refusals | RPC and fork evidence does not prevent future administrator upgrades |
+| External manual execution | Accepted named self-signed EIP-7702 path, preflight before journal, exact relay and production receipt recovery | Requires the supported predelegated account and signing method; no MetaMask brand claim |
+| Chain lifecycle | Independent four-scenario forks pass through4730813, including shared backing, forward/reverse fills, rollback and later conversion | Three chains with labelled credential fixtures and zero public sends |
+| Authentication, metadata and proposal | Accepted shared auth, authoritative labels, exact integers, scoped snapshots and narrow model tools | Known-maker discovery coverage and unavailable costs remain explicit |
+| Management and exits | Independent authenticated HTTP covers replacements, direction/policy/cooldown refusals, fresh-fill Resume, explicit quantities, native exit and outage retry | Seeded review and aged cooldown fixtures isolate execution rules |
+| Recovery races | Unsupported signing, stale workspace and other-tab Stop release hashless attempts; rejected duplicate relay preserves a submitted hash and later confirms | Transport-ambiguous submissions remain subject to reconciliation |
+| Browser management | Reviewed pinned Orca evidence for takeover, lease loss, reload recovery and cancellation of actual inference | Owner-recorded final browser evidence; no physical sleep experiment |
+| Maintainability and checks | Focused source boundaries accepted; independent frontend lint/typecheck, 156 tests plus one skip, production webpack build, runner 13 runtime and 16 service tests plus three skips | Original dirty chart overlay is excluded from the pinned suite and adds four shared-workspace cases |
+
+The final integration slot should exercise the combined app at the accepted revision, including a two-pair UI journey and normal legacy flows.
+Existing evidence combines a real one-pair model/UI proposal with independent multi-pair chain forks; it does not establish one uninterrupted two-pair model-to-UI-to-execution journey.
+A minor singular/plural plan label was reported for product polish and does not affect transaction semantics.
+Public-chain receipts, actual wallet-extension compatibility, delegated execution, MM and later paid-service phases are outside this acceptance.
+Unknown profit and fee decomposition are displayed as unknown, rather than treated as measured performance.
 
 ## Route source, authority and evidence
 
@@ -69,9 +85,10 @@ The separation between token verification, snapshot collection, proposal orchest
 No additional split is required for this correction.
 This acceptance does not establish that stored symbols are normalized correctly or that all token-code and decimal checks required by later app changes are complete.
 
-## Initial plan gates still open
+## Historical initial plan gates
 
-The following gates come from the current task's full-plan audit and remain pending exact implementation delivery and review.
+The following gates were identified at the initial full-plan audit and were pending at that checkpoint.
+The current acceptance table and later correction sections record their resolution.
 They are not new findings against the narrow accepted metadata correction.
 
 - Normalize display labels such as USDC_1 only after verified address, runtime and decimal identity.
@@ -434,3 +451,32 @@ The isolated script directory is `/var/folders/x3/4w6qlmgx7ss4zsvzcjq7592m0000gn
 The relevant scripts are review-unsupported-provider.ts, review-stale-signature.ts, review-resume-coverage.ts, review-native-conversion.ts, review-stop-during-signature.ts and review-route-outage.ts.
 The stale-signature probe changed its expectation from submission to rejection when testing the correction, while retaining the same controlled provider transition.
 Raw private tool logs are not included because transport diagnostics can contain authenticated endpoints; this ledger retains the non-secret observed results.
+
+
+## Final app acceptance and refusal recovery
+
+The reviewer independently overlaid the exact final attempt handler at `89c24d6` and heartbeat hook at `a20c830` onto the already verified `e2bc73b` archive.
+An authenticated production HTTP probe stopped the group from another tab while eth_signTransaction awaited completion.
+The relay refused the changed generation, left the attempt failed without a hash and sent no public transaction.
+A separate negative probe submitted a valid signed batch and then attempted an invalid second relay.
+The second request returned HTTP 409, retained the original submitted hash and allowed production reconciliation to confirm the original attempt.
+These results close the final prepared-attempt recovery finding while verifying that the correction does not discard a durable submission.
+The transactional guard checks all transaction, wallet-batch and provider identifiers, and the store supports nested savepoints.
+No additional file split is required for this focused handler correction.
+
+The final browser artifact at `cba95d4` records one stale-generation heartbeat at 00:03:40.696 UTC followed by no further obsolete heartbeats through 00:05:26.766 UTC.
+It records actual heartbeat-source navigation loss, Paused after lease expiry, Paused after reload, and final Stopped state.
+Actual model request 53e1dc98-34a1-4bfd-a170-17df1c36aaa0 ended cancelled with review_cancelled after 27,537 milliseconds.
+This is reviewed owner-produced Orca evidence, separate from the reviewer's earlier independent authentication/browser probe and independently inspected successful runner record.
+The source correction refreshes ownership after a rejected heartbeat and requires no new controller abstraction.
+
+Independent full checks at the prior broad correction remain applicable to unchanged modules.
+Final changed-file lint and full frontend typechecking were rerun after both small corrections.
+The owner's final full shared-workspace checks additionally pass 160 tests with one skip, lint, typecheck and webpack build.
+The four-case difference from the independent 156-test snapshot belongs to the preserved original dirty chart overlay.
+The independent runner full suite passes 13 runtime tests with three intentional skips and 16 service tests, and its strict service typecheck passes.
+No new or expanded unit tests were authored by this reviewer.
+
+Only this review report was modified and committed by this reviewer.
+Implementation owners retain ownership of all source changes and evidence artifacts.
+The coordinator can advance both accepted implementation scopes to the final integrated E2E slot with the boundaries stated in the current acceptance table.
