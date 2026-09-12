@@ -1,0 +1,26 @@
+{
+  "evidence": "Orca embedded browser with real authenticated HTTP and isolated synthetic owner records",
+  "before": {
+    "status": 404,
+    "anonymousStatus": 401,
+    "privatePayloadExcluded": true,
+    "internalDocumentsExcluded": true,
+    "attachment": null,
+    "cacheControl": null,
+    "error": "Managed endpoint not found.",
+    "publicBroadcasts": 0
+  },
+  "after": {
+    "status": 200,
+    "anonymousStatus": 401,
+    "owner": "0x19e7e376e7c213b7e7e7e46cc70a5dd086daff2a",
+    "groups": [
+      "export-fixture-0"
+    ],
+    "privatePayloadExcluded": true,
+    "internalDocumentsExcluded": true,
+    "attachment": "attachment; filename=\"aquamux-owner-export.json\"",
+    "cacheControl": "private, no-store",
+    "publicBroadcasts": 0
+  }
+}
