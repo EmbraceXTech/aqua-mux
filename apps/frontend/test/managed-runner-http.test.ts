@@ -1,17 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-  HttpReviewRunner,
+  claudeSubscriptionEnvironment,
+  reviewNotImplemented,
+  reviewRunnerForEnvironment,
+  type ClaudeCodeInvocation,
   type RunnerRequest,
 } from "../lib/server/managed-service/runner";
+import { ManagedError } from "../lib/server/managed-service/errors";
+
 const request: RunnerRequest = {
   requestId: "review",
-  owner: "owner",
+  owner: "0x1111111111111111111111111111111111111111",
   groupId: "group",
   botId: "bot",
   runGeneration: 1,
   purpose: "interval",
-  deadline: Date.now() + 1000,
+  deadline: Date.now() + 1_000,
   snapshot: {
     tokenMetadata: { chainId: 42161, tokens: [] },
     observedAt: Date.now(),
@@ -26,58 +31,113 @@ const request: RunnerRequest = {
     coverage: [],
   },
 };
-test("runner client requires safe transport and sends authenticated request identity", async () => {
-  assert.throws(
-    () => new HttpReviewRunner("http://untrusted.test", "test-only"),
-    /HTTPS or loopback/,
-  );
-  let called = false;
-  const fetcher: typeof fetch = async (_url, init) => {
-    called = true;
-    assert.equal(
-      new Headers(init?.headers).get("authorization"),
-      "Bearer test-only",
-    );
-    assert.equal(new Headers(init?.headers).get("idempotency-key"), "review");
-    assert.equal(init?.redirect, "error");
-    return Response.json({
-      requestId: "review",
-      provider: "fixture",
-      model: "fixture",
-      runtimeVersion: "fixture",
-      usage: { cost: null },
-      result: {
-        version: 1,
-        decision: "hold",
-        rationale: "Fixture hold.",
-        evidence: [],
-        expectedEffects: [],
-        uncertainties: [],
-      },
-    });
-  };
-  const result = await new HttpReviewRunner(
-    "http://127.0.0.1:4444",
-    "test-only",
-    fetcher,
-  ).review(request, new AbortController().signal);
+
+function cliResult(result: unknown) {
+  return JSON.stringify({
+    type: "result",
+    subtype: "success",
+    is_error: false,
+    duration_ms: 1,
+    result: JSON.stringify(result),
+  });
+}
+
+const hold = {
+  version: 1,
+  decision: "hold",
+  rationale: "The fixture snapshot has no action to take.",
+  evidence: [],
+  proposedConfig: null,
+  expectedEffects: [],
+  uncertainties: ["The fixture has no market observations."],
+  previewId: null,
+};
+
+test("development reviews call the restricted local Claude Code CLI and validate its result", async () => {
+  let invocation: ClaudeCodeInvocation | undefined;
+  const runner = reviewRunnerForEnvironment("development", async (input) => {
+    invocation = input;
+    return cliResult(hold);
+  });
+  const result = await runner.review(request, new AbortController().signal);
   assert.equal(result.result.decision, "hold");
-  assert.equal(called, true);
+  assert.equal(result.provider, "claude-code-subscription");
+  assert.equal(result.usage.cost, null);
+  assert.ok(invocation);
+  assert.equal(invocation.args.includes("--no-session-persistence"), true);
+  assert.equal(invocation.args.includes("--safe-mode"), true);
+  assert.equal(invocation.args.includes("--restricted"), true);
+  assert.equal(invocation.args.includes("--strict-mcp-config"), true);
+  const tools = invocation.args.indexOf("--tools");
+  assert.equal(invocation.args[tools + 1], "");
+  const prompt = JSON.parse(invocation.input);
+  assert.equal(prompt.request.requestId, request.requestId);
+  assert.equal(prompt.request.snapshot.maker, request.snapshot.maker);
 });
-test("runner malformed, wrong identity and private error payloads never become valid reviews", async () => {
-  for (const response of [
-    Response.json({ secret: "do not expose" }, { status: 500 }),
-    Response.json({ requestId: "other" }),
-    new Response("not JSON"),
-  ]) {
-    await assert.rejects(
-      new HttpReviewRunner(
-        "http://127.0.0.1:4444",
-        "test-only",
-        async () => response,
-      ).review(request, new AbortController().signal),
-      (error) =>
-        error instanceof Error && !error.message.includes("do not expose"),
-    );
-  }
+
+test("development review cancellation aborts the local command result", async () => {
+  let started!: () => void;
+  const running = new Promise<void>((resolve) => {
+    started = resolve;
+  });
+  const runner = reviewRunnerForEnvironment(
+    "development",
+    async ({ signal }) => {
+      started();
+      await new Promise<void>((_resolve, reject) =>
+        signal.addEventListener("abort", () => reject(signal.reason), {
+          once: true,
+        }),
+      );
+      return cliResult(hold);
+    },
+  );
+  const controller = new AbortController();
+  const pending = runner.review(request, controller.signal);
+  await running;
+  controller.abort();
+  await assert.rejects(
+    pending,
+    (error) =>
+      error instanceof ManagedError && error.code === "review_cancelled",
+  );
+});
+
+test("non-development reviews return the stable not-implemented response without a local process", async () => {
+  let called = false;
+  const runner = reviewRunnerForEnvironment("production", async () => {
+    called = true;
+    return cliResult(hold);
+  });
+  await assert.rejects(
+    runner.review(request, new AbortController().signal),
+    (error) =>
+      error instanceof ManagedError &&
+      error.code === reviewNotImplemented.code &&
+      error.message === reviewNotImplemented.message &&
+      error.status === 501,
+  );
+  assert.equal(called, false);
+});
+
+test("Claude Code receives only subscription runtime variables and provider output stays private on failure", async () => {
+  const environment = claudeSubscriptionEnvironment({
+    HOME: "/home/aquamux",
+    PATH: "/usr/bin",
+    PRIVATE_KEY: "wallet-secret",
+    ONEINCH_API_KEY: "route-secret",
+    ANTHROPIC_API_KEY: "provider-secret",
+    CLAUDE_CODE_OAUTH_TOKEN: "provider-secret",
+  });
+  assert.deepEqual(environment, { HOME: "/home/aquamux", PATH: "/usr/bin" });
+  const runner = reviewRunnerForEnvironment("development", async () =>
+    JSON.stringify({ privateDiagnostic: "provider-secret" }),
+  );
+  await assert.rejects(
+    runner.review(request, new AbortController().signal),
+    (error) =>
+      error instanceof ManagedError &&
+      error.code === "runner_failed" &&
+      !error.message.includes("provider-secret"),
+  );
 });

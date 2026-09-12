@@ -27,8 +27,7 @@ Each Aqua strategy references real inventory in the maker wallet, so a fill in o
 - Wallet ownership uses origin-bound challenges and expiring bearer sessions for the local prototype.
 - Position observation decodes deployed Aqua registration and SwapVM fill events, reconciles current backing, recovers submitted receipts, and reports incomplete coverage instead of inventing inactivity or performance.
 - The token registry combines a searchable runtime registry with curated fallback entries for Ethereum, Arbitrum, BNB Chain, and Robinhood Chain, with chain-specific addresses and local token imagery.
-- The local ReviewService uses the AI SDK HarnessAgent adapters for Codex or Claude, stores sanitized review results and usage, and exposes an authenticated loopback HTTP endpoint.
-- The runner uses a disposable non-root Docker environment without host mounts, signing material, repository access, or a Docker socket.
+- In development, the managed API invokes the locally authenticated Claude Code subscription directly. It stores validated, sanitized review results in the managed SQLite database. Non-development environments return an explicit not-implemented response and do not start Claude Code.
 - The original basket planner still supports wrapping, approvals, Classic Swap routes, and EIP-5792 atomic wallet batches where the connected wallet exposes that capability.
 
 ## Workflow and wallet modes
@@ -41,7 +40,7 @@ Controlled-fork lifecycle evidence covers this account path on Ethereum, Arbitru
 These are isolated forks with synthetic accounts and no public broadcasts.
 They do not establish compatibility with MetaMask, Coinbase Wallet, or any other third-party wallet brand, and a wallet's generic EIP-5792 capability report is not sufficient evidence for this adapter.
 
-The local review runner can analyze a managed group and return a validated hold, fund-and-open, replace, close, or propose-conversion result, but model output is never transaction authorization.
+The local development review can analyze a managed group and return a validated hold, fund-and-open, replace, close, or propose-conversion result, but model output is never transaction authorization.
 
 Explicit owner confirmation can submit supported original basket transactions through the external-wallet path or the optional local development signer.
 The managed workflow exposes review and close planning for external wallets, while execution remains gated until the selected account passes the named adapter checks.
@@ -63,7 +62,7 @@ The optional delegated Privy path is disabled until authorization, refusal, expi
 The application does not claim general external-wallet compatibility or delegated execution from mock tests.
 
 The directional market-making recipe is disabled because the installed and tested deployed instruction path does not yet establish a supported LimitSwap encoding.
-Hedera payments and Blocky402 fulfillment are deferred, and the current ReviewService entitlement is explicitly uncharged development use.
+Hedera payments and Blocky402 fulfillment are deferred, and the current review entitlement is explicitly uncharged development use.
 
 ## Supported networks
 
@@ -81,9 +80,7 @@ Network support does not by itself prove a successful LP registration, resolver 
 
 ## Quick start
 
-Required local tools are Node.js 22.13 or newer and npm.
-Docker is required for ReviewService inference and runner checks, but not for starting the frontend.
-Node.js 22.23.2 and a local OrbStack Docker engine were used for the recorded runner checks.
+Required local tools are Node.js 22.13 or newer and npm. Development reviews also require the locally installed Claude Code CLI with an active Claude subscription login. Docker is not part of the application review path.
 
 From the repository root, install and start the frontend:
 
@@ -110,7 +107,7 @@ PRIVATE_KEY=
 
 `ONEINCH_API_KEY` is required for live Classic Swap quotes and execution.
 `PRIVATE_KEY` is a server-side secret read only by explicitly invoked local development-wallet and live verification or funding paths.
-It is not required to start the frontend, use an external browser wallet, or run read-only verification, and must never be committed, exposed to browser code, sent to the agent runner, or configured on a public or production server.
+It is not required to start the frontend, use an external browser wallet, or run read-only verification, and must never be committed, exposed to browser code, sent to the local Claude Code process, or configured on a public or production server.
 Starting the frontend and running read-only verification do not submit transactions by themselves.
 Explicit owner confirmation can submit through the connected external wallet, and the optional development-wallet adapter can sign real transactions when configured.
 
@@ -132,32 +129,19 @@ Production mode rejects the opt-in, and forwarded or non-loopback requests are r
 This opt-in does not establish third-party wallet-brand compatibility or live public-chain execution.
 See the [development-wallet results](references/ethglobal-competitive-analysis/dev-wallet-results.md) for the setup boundary and evidence.
 
-## Local ReviewService runner
+## Local development reviews
 
-The ReviewService is a private local prototype that uses the developer's existing Codex or Claude subscription through the installed HarnessAgent adapters.
-It does not use an API key or a hosted multi-user inference service for the recorded subscription checks.
-Before starting the runner, log in to the selected provider locally and confirm that its subscription-backed CLI session is available to the current user.
-The runner does not inherit a login automatically from another account or silently fall back to an API key.
-
-Start the runner from a second terminal while Docker is running:
+A development instance invokes the locally installed Claude Code CLI from the managed API. Install Claude Code and complete its Claude subscription login for the same operating-system user that starts Next.js:
 
 ```sh
-cd apps/agent-runner
-npm install
-export AQUAMUX_AGENT_RUNNER_TOKEN="$(openssl rand -base64 32)"
-export AQUAMUX_AGENT_RUNNER_PROVIDER=codex
-npm run image:build
-npm run service
+claude auth login
+cd apps/frontend
+npm run dev
 ```
 
-The runner listens on `127.0.0.1:4319` by default and stores its SQLite state under `apps/agent-runner/.runtime` unless `AQUAMUX_AGENT_RUNNER_DATABASE` is set.
-The frontend managed service connects to the runner only when `AQUAMUX_AGENT_RUNNER_URL` and `AQUAMUX_AGENT_RUNNER_TOKEN` are configured in the server environment.
-After starting the runner, add `AQUAMUX_AGENT_RUNNER_URL=http://127.0.0.1:4319` and the same privately supplied token to `apps/frontend/.env`, then restart the frontend.
-The runner token is a secret and must not appear in source, screenshots, logs, or committed files.
+No Anthropic API key, runner URL, runner token, Docker engine, or second service is used. The app starts Claude Code in a fresh temporary directory with tools, MCP configuration, session persistence, and inherited application secrets disabled. It sends the validated review request through standard input and keeps prompts, wallet data, credentials, and raw model reasoning out of browser code and durable evidence.
 
-The runner's provider selection is `codex` or `claude` through `AQUAMUX_AGENT_RUNNER_PROVIDER`.
-The tested Codex request used `gpt-6-astra` with medium reasoning.
-The tested Claude request used the local Claude subscription adapter.
+This path runs only when `NODE_ENV=development`. Every other environment returns HTTP 501 with `review_not_implemented` for proposal and review requests, and never starts a local agent process. See the [redacted inline review check](apps/frontend/verification/INLINE_DEVELOPMENT_REVIEW.md) for the exact prerequisites and recorded result.
 
 ## Development
 
@@ -177,27 +161,7 @@ The managed suite uses `apps/frontend/e2e/managed.config.ts`, targets `MANAGED_E
 Use the managed suite only after that server has the fixture or explicitly configured development-wallet prerequisites required by its tests.
 Ordinary frontend startup does not enable the local development wallet.
 
-Run the runner's local and service checks from `apps/agent-runner`:
-
-```sh
-npm test
-npm run test:service
-npm run image:build
-npm run test:docker
-```
-
-The subscription-backed compatibility matrix requires an existing local Codex or Claude login and Docker.
-Run the provider checks one at a time:
-
-```sh
-npm run spike:adapters -- claude prepare
-npm run spike:adapters -- claude resume
-npm run spike:adapters -- codex prepare
-npm run spike:adapters -- codex resume
-```
-
-Each `prepare` command must be followed by its matching `resume` command.
-The checks retain only the provider-owned stopped container between those commands and remove it after the matrix completes.
+The unit suite covers both review environments. It verifies that development invokes the restricted local Claude Code command with sanitized process variables, while non-development returns the stable not-implemented response without an invocation.
 
 ## Verification and live signing
 
@@ -243,12 +207,11 @@ The [position observation results](references/ethglobal-competitive-analysis/pos
 
 The [token registry results](references/ethglobal-competitive-analysis/token-registry-results.md) record the expanded chain-specific catalog and validation.
 
-The [runtime spike results](references/ethglobal-competitive-analysis/runtime-spike-results.md) record subscription-backed Codex and Claude requests, structured output, timeout, cancellation, restart recovery, Docker isolation, and sanitized evidence.
+The [runtime spike results](references/ethglobal-competitive-analysis/runtime-spike-results.md) are retained as historical pre-launch evidence. The current development review path is the in-app Claude Code integration documented above.
 
 The [implementation task map](references/ethglobal-competitive-analysis/implementation-task-map.md) lists ownership, review gates, remaining integration work, and the commands that must be refreshed before release claims.
 
-The [frontend guide](apps/frontend/README.md) contains the frontend command reference and its application environment variables.
-Runner connection variables and development-wallet settings belong to the setup sections above and the relevant evidence reports.
+The [frontend guide](apps/frontend/README.md) contains the frontend command reference and its application environment variables. Development-wallet settings belong to the setup section above and the relevant evidence reports.
 
 ## Boundaries
 
@@ -258,7 +221,7 @@ Unknown balances, fills, fee components, and performance remain unknown when obs
 
 The app does not move positions between an external wallet and a Privy execution wallet merely because a user selects a different mode.
 
-The local runner is not a production multi-user signing boundary.
-No signing key, wallet credential, production database credential, or raw model reasoning belongs in its environment or durable evidence.
+The local Claude Code integration is not a production multi-user signing boundary.
+No signing key, wallet credential, production database credential, or raw model reasoning belongs in its process environment or durable evidence.
 
 Do not interpret a successful plan simulation, mock wallet test, old receipt, or local fork setup as proof of present live-chain execution.

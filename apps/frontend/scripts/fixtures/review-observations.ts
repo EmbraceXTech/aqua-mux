@@ -5,10 +5,7 @@ import type { Address } from "viem";
 import type { ManagedStore } from "../../lib/server/store";
 import { groupReviewSnapshot } from "../../lib/server/managed-service/review-snapshot";
 import { assertReviewSnapshotFresh } from "../../lib/server/managed-service/freshness";
-import { requestSchema } from "../../../agent-runner/src/service/contract";
-import { reviewTools } from "../../../agent-runner/src/service/review-tools";
-
-/** Exercise the production active-group snapshot and actual agent tool after fork entry. */
+/** Exercise the production active-group snapshot after fork entry. */
 export async function verifyReviewObservations(
   fork: Awaited<ReturnType<typeof controlledFork>>,
   store: ManagedStore,
@@ -18,30 +15,13 @@ export async function verifyReviewObservations(
   const group = store.get("group", groupId, owner)!;
   assert.equal(group.state, "active");
   const snapshot = await groupReviewSnapshot(group, store);
-  const request = requestSchema.parse({
-    requestId: "active-observation-audit",
-    owner,
-    groupId,
-    runGeneration: 1,
-    purpose: "interval",
-    config: group.config,
-    snapshot,
-  });
-  const tools = reviewTools(
-    request,
-    new AbortController().signal,
-    () => {},
-    () => {},
-  );
-  const observations = [];
-  for (const pair of group.config.pairs) {
-    observations.push(
-      await tools.route_observations.execute!(
-        { destination: pair.quoteToken.address },
-        { toolCallId: "audit", messages: [] },
-      ),
-    );
-  }
+  const observations = group.config.pairs.map((pair) => ({
+    quotes:
+      snapshot.routeQuotes?.filter(
+        (quote) => quote.toToken.address === pair.quoteToken.address,
+      ) ?? [],
+    observedAt: snapshot.observedAt,
+  }));
   const expected = process.argv.includes("--expect-observations");
   assert.equal((snapshot.routeQuotes?.length ?? 0) > 0, expected);
   if (expected) {
@@ -84,8 +64,7 @@ export async function verifyReviewObservations(
   const evidence = {
     chainId: group.chainId,
     groupState: group.state,
-    evidence:
-      "production active snapshot and agent tool after controlled fork LP entry",
+    evidence: "production active snapshot after controlled fork LP entry",
     publicBroadcasts: 0,
     observations,
     expiryRefused: expected,

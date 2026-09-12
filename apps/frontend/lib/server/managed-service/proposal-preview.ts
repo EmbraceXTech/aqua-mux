@@ -1,16 +1,13 @@
-import { NATIVE, wrapped } from "../../../frontend/lib/config";
+import { NATIVE, wrapped } from "../../config";
 import {
   strategyConfigSchema,
   type LPStrategyConfig,
-} from "../../../frontend/lib/managed/config";
-import {
-  compileLP,
-  describeLPPrice,
-} from "../../../frontend/lib/managed-compiler/lp";
-import type { ReviewRequest } from "./contract";
+} from "../../managed/config";
+import { compileLP, describeLPPrice } from "../../managed-compiler/lp";
+import type { RunnerRequest } from "./runner";
 
-/** Arithmetic and compiler preview only; signing still requires a fresh whole-batch simulation. */
-export function proposalPreview(request: ReviewRequest) {
+/** This computes an editable proposal only. It never signs or submits a transaction. */
+export function proposalPreview(request: RunnerRequest) {
   const { intent, snapshot, policyTemplate } = request;
   if (!intent || !policyTemplate)
     return {
@@ -147,7 +144,7 @@ export function proposalPreview(request: ReviewRequest) {
     simulation: "not-performed",
     limitations: [
       "A starting 5-basis-point fee and 20-percent bounds are editable recipe parameters, not an inferred optimal strategy.",
-      "The preview uses exact observed quote amounts and conservative receipts; fresh routes and whole-batch simulation are mandatory before signing.",
+      "The preview uses exact observed quote amounts and conservative receipts. Fresh routes and whole-batch simulation are mandatory before signing.",
       "Resolver discovery, future fills, gas estimates and returns remain unknown.",
     ],
   };
