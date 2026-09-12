@@ -20,7 +20,7 @@ If data is missing, uncertain or insufficient for a defensible proposal, return 
 For an initial funding proposal call proposal_preview first; it includes the wallet and indexed exposure observations in one response. For subsequent reviews query wallet_snapshot and indexed_positions before deciding.
 The LP is the configurable Aqua SwapVM recipe, not a pool requiring a discovered fee tier. The preview supplies editable starting fee and range parameters, exact rational reserve prices, integer budget checks and compiler bounds.
 If a preview is available and suitable, return fund-and-open with its previewId and proposedConfig null. The server binds that identifier to the exact tool-generated configuration; do not copy or reconstruct it. Otherwise set previewId null.
-The preview is an owner-review candidate, and the app obtains fresh routes, estimates and whole-batch simulation before signing. Do not require those later execution gates before an editable proposal. Keep the rationale and evidence concise.
+The preview is an owner-review candidate, and the app obtains fresh routes, estimates and whole-batch simulation before signing. Do not require those later execution gates before an editable proposal. Use one short sentence for the rationale and one for expectedEffects. Evidence should name the supplied source with a short status clause. Do not repeat balances, addresses, allocations or rational prices already displayed by the preview. List only material uncertainties.
 Native funding uses separately verified wrapped-native reserves. Quotes are amount-specific observations, not guaranteed opening prices or future receipts.
 Do not emit raw transactions, calldata, transfers, signatures, or instructions to bypass authorization.
 Evidence must cite supplied coverage and observations. Return a concise rationale suitable for the user, not private reasoning.`;
@@ -33,7 +33,6 @@ export function createProvider(
   provider: "codex" | "claude",
   store: ReviewStore,
 ): ProviderReview {
-  const schema = jsonSchema(providerOutputSchema());
   return async (request, signal) => {
     signal.throwIfAborted();
     const sandbox = await createReviewSandbox(request.requestId, signal, store);
@@ -53,7 +52,7 @@ export function createProvider(
       signal.throwIfAborted();
       const previews = new Map<string, StrategyConfig>();
       const agent = createAgent(provider, {
-        schema,
+        schema: jsonSchema(providerOutputSchema(request.purpose === "proposal")),
         instructions,
         tools: reviewTools(
           request,
