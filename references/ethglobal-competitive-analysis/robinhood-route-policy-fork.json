@@ -1,0 +1,55 @@
+[
+  {
+    "chainId": 4663,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "localSigner": {
+      "hash": "0xd79e344668bccb783052e54e859d9fb87309d79ccf02ebfa4bdc2174fb9de622",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0xf26acd16a6be6c2dfeef5cee867db5e1bfb94ddabdce3865da28cb9973ba36a4",
+    "fills": {
+      "forward": "0xe7679e209c215ce41e3e2564c7677722065a161b837937eec56cbfb247f27ff9",
+      "reverse": "0x3344b6822a63b5421b72505addddc581e4ceeb73bdfc3a423920d230d81eed69",
+      "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
+      "credentialFixtureOnly": true,
+      "sharedBaseBefore": "52500000000000",
+      "sharedBaseAfter": "51221187979519"
+    },
+    "replacementHash": "0x5fd25ef214ea87ab489a1ac253a15a8ffb46c89c0ccb28e24a081484739cae29",
+    "replacementRollback": {
+      "hash": "0x07608355367ab31c3747872a4f8624bd4142d38a8a6e66c0579e51aab589621e",
+      "oldPositionsAndInventoryRestored": true
+    },
+    "productionReceiptReconciliation": true,
+    "closeHash": "0xb9ed861f927afe4cf5e04596545b4523a9131e46af4486f7e54951157a99bfdb",
+    "separateConversionHash": null,
+    "callDigest": "0x7095283fd1f695d94271bcb6c247ff67c9cf96535499909271b17084c61cbc97",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDG",
+        "amount": "0"
+      },
+      {
+        "symbol": "PONS",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": true,
+    "atomicRollbackHash": "0xa2e6dedfe1c16749c312a4225a78599d39fcc6060b676003c253fbcfba062f72"
+  }
+]

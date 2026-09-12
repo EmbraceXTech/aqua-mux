@@ -1,0 +1,27 @@
+{
+  "before": {
+    "chainId": 4663,
+    "evidence": "controlled isolated fork after funded two-pair LP entry and resolver fills",
+    "publicBroadcasts": 0,
+    "openHash": "0xc811a015e2185c9a28d7fc35f40dae644e88a55cac66b64c4bbb0a97061ed28b",
+    "token": "0x39dbed3a2bd333467115de45665cc57f813c4571",
+    "originalRuntimeHash": "0x16c3d3ede897688ddff79262606f13bead398332e65001f192460fbac4e1fb85",
+    "changedRuntimeHash": "0x1f37d2fe5b45c0df809f46a0ee9ea72cfc5d5dceca31461f9e68f4446cbf3250",
+    "noFundingRoutes": true,
+    "acceptedWithSuccessfulSimulation": true,
+    "refusal": null
+  },
+  "after": {
+    "chainId": 4663,
+    "evidence": "controlled isolated fork after funded two-pair LP entry and resolver fills",
+    "publicBroadcasts": 0,
+    "openHash": "0x6b399ffa5b20b3998e2c612a62665391ffe79d7d009a86ec926f9068c3f9452f",
+    "closeWithChangedTokenRuntimeHash": "0x5f4646bd689220c72440b800a0242a44a1c8d91132c104221979c5f6264f615d",
+    "token": "0x39dbed3a2bd333467115de45665cc57f813c4571",
+    "originalRuntimeHash": "0x16c3d3ede897688ddff79262606f13bead398332e65001f192460fbac4e1fb85",
+    "changedRuntimeHash": "0x1f37d2fe5b45c0df809f46a0ee9ea72cfc5d5dceca31461f9e68f4446cbf3250",
+    "noFundingRoutes": true,
+    "acceptedWithSuccessfulSimulation": false,
+    "refusal": "Robinhood token source provenance runtime differs."
+  }
+}

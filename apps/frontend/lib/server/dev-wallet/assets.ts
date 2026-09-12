@@ -3,6 +3,8 @@ import { NATIVE, tokens } from "../../config";
 import { tokenSchema, type Token } from "../../managed";
 import type { DevBatchPlan } from "./batch";
 import { DevWalletError } from "./config";
+import { isDockOnly } from "../lifecycle/calls";
+import { verifyRobinhoodAssets } from "../route-policy/direct/assets";
 import { readProxyImplementation } from "../proxy-implementation";
 
 // Extra metadata comes only from authoritative stored plans or registry resolution.
@@ -32,7 +34,7 @@ export function devPlanAssets(plan: DevBatchPlan): Token[] {
 export async function verifyDevAssets(
   plan: DevBatchPlan,
   rpc: Pick<PublicClient, "getCode" | "readContract"> &
-    Partial<Pick<PublicClient, "getStorageAt">>,
+    Partial<Pick<PublicClient, "getStorageAt" | "getBlockNumber">>,
 ) {
   for (const deployment of plan.deploymentEvidence ?? []) {
     if (rpc.getStorageAt || deployment.implementation) {
@@ -59,6 +61,14 @@ export async function verifyDevAssets(
       (token) => token.address.toLowerCase(),
     ),
   );
+  if (!isDockOnly(plan.calls))
+    await verifyRobinhoodAssets(
+      plan.chainId,
+      approved
+        .filter((token) => selected.has(token.address))
+        .map((token) => token.address),
+      rpc,
+    );
   for (const token of approved.filter((token) => selected.has(token.address))) {
     if (token.address === NATIVE) {
       if (token.decimals !== 18)

@@ -1,11 +1,12 @@
 import {
+  decodeFunctionData,
   encodeFunctionData,
   erc20Abi,
   parseAbi,
   toHex,
   type Address,
 } from "viem";
-import { AQUA } from "../../config";
+import { AQUA, SWAP_VM } from "../../config";
 import type { Call } from "../../model";
 import type { LifecycleSnapshot, PreviousStrategy } from "./types";
 
@@ -13,6 +14,34 @@ export const aquaLifecycleAbi = parseAbi([
   "function dock(address app,bytes32 strategyHash,address[] tokens)",
   "function rawBalances(address maker,address app,bytes32 strategyHash,address token) view returns(uint248,uint8)",
 ]);
+/** Close-only authority touches Aqua accounting and never calls the token contract. */
+export function isDockOnly(calls: readonly Call[]): boolean {
+  return (
+    calls.length > 0 &&
+    calls.every((call) => {
+      try {
+        const decoded = decodeFunctionData({
+          abi: aquaLifecycleAbi,
+          data: call.data,
+        });
+        return (
+          call.to === AQUA &&
+          BigInt(call.value) === 0n &&
+          decoded.functionName === "dock" &&
+          decoded.args[0].toLowerCase() === SWAP_VM &&
+          encodeFunctionData({
+            abi: aquaLifecycleAbi,
+            functionName: "dock",
+            args: decoded.args,
+          }) === call.data
+        );
+      } catch {
+        return false;
+      }
+    })
+  );
+}
+
 export const wrappedAbi = parseAbi([
   "function deposit() payable",
   "function withdraw(uint256)",

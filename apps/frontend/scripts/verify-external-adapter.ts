@@ -34,6 +34,12 @@ import { delegatedAccountCode } from "../lib/server/external-adapter/account";
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
 const results: unknown[] = [];
 const ethereumOnly = process.argv.includes("--ethereum");
+const robinhoodOnly = process.argv.includes("--robinhood");
+const assetProvenance = process.argv.includes("--asset-provenance");
+if (assetProvenance && !robinhoodOnly)
+  throw new Error(
+    "Asset provenance probe requires the isolated Robinhood scenario.",
+  );
 const proxyUpgrade = process.argv.includes("--proxy-upgrade");
 const indirectDependency = process.argv.includes("--indirect");
 if (proxyUpgrade && !ethereumOnly)
@@ -42,12 +48,14 @@ if (proxyUpgrade && !ethereumOnly)
   );
 const scenarios = ethereumOnly
   ? [{ chainId: 1, bridged: false }]
-  : [
-      { chainId: 42161, bridged: false },
-      { chainId: 56, bridged: false },
-      { chainId: 4663, bridged: false },
-      { chainId: 42161, bridged: true },
-    ];
+  : robinhoodOnly
+    ? [{ chainId: 4663, bridged: false }]
+    : [
+        { chainId: 42161, bridged: false },
+        { chainId: 56, bridged: false },
+        { chainId: 4663, bridged: false },
+        { chainId: 42161, bridged: true },
+      ];
 for (const { chainId, bridged } of scenarios) {
   const setting = networks.find((network) => network.id === chainId)!;
   const upstream = process.env[setting.env]!;
@@ -296,21 +304,35 @@ for (const { chainId, bridged } of scenarios) {
       { ...store.get("group", groupId, maker)!, config },
       maker,
     );
+    const replacementRequest: LifecycleRequest = {
+      ...request,
+      id: `replace-${chainId}`,
+      config,
+      kind: "replace",
+      funding: undefined,
+      inventory: balances,
+      previous: opened.plan.registrations.map(({ hash, app, tokens }) => ({
+        hash,
+        app,
+        tokens,
+      })),
+      expiresAt: Date.now() + 120000,
+    };
+    if (assetProvenance) {
+      const { verifyRoutelessProvenance } =
+        await import("./fixtures/routeless-provenance");
+      await verifyRoutelessProvenance(
+        fork,
+        replacementRequest,
+        deps,
+        openReceipt.transactionHash,
+        save,
+        execute,
+      );
+      continue;
+    }
     const replaced = await buildLifecyclePlanWithRoutes(
-      {
-        ...request,
-        id: `replace-${chainId}`,
-        config,
-        kind: "replace",
-        funding: undefined,
-        inventory: balances,
-        previous: opened.plan.registrations.map(({ hash, app, tokens }) => ({
-          hash,
-          app,
-          tokens,
-        })),
-        expiresAt: Date.now() + 120000,
-      },
+      replacementRequest,
       deps,
     );
     const replacementRollback = await verifyReplacementRollback(
@@ -476,12 +498,14 @@ for (const { chainId, bridged } of scenarios) {
     process.env[setting.env] = upstream;
   }
 }
-if (!proxyUpgrade)
+if (!proxyUpgrade && !assetProvenance)
   writeFileSync(
     new URL(
       ethereumOnly
         ? "../../../references/ethglobal-competitive-analysis/ethereum-adapter-fork.json"
-        : "../../../references/ethglobal-competitive-analysis/external-adapter-fork.json",
+        : robinhoodOnly
+          ? "../../../references/ethglobal-competitive-analysis/robinhood-route-policy-fork.json"
+          : "../../../references/ethglobal-competitive-analysis/external-adapter-fork.json",
       import.meta.url,
     ),
     JSON.stringify(results, null, 2) + "\n",

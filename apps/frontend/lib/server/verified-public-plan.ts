@@ -1,5 +1,6 @@
 import { encodeFunctionData, erc20Abi, formatUnits, type Address } from "viem";
-import { NATIVE } from "../config";
+import { verifyRobinhoodAssets } from "./route-policy/direct/assets";
+import { NATIVE, wrapped } from "../config";
 import {
   basketSchema,
   splitAmount,
@@ -21,8 +22,19 @@ export async function buildVerifiedPublicPlan(
   input: unknown,
   account: Address,
 ): Promise<Plan> {
-  if (basketSchema.parse(input).mode === "liquidity")
+  const parsed = basketSchema.parse(input);
+  if (parsed.mode === "liquidity") {
+    await verifyRobinhoodAssets(
+      parsed.chainId,
+      [
+        parsed.source,
+        ...parsed.legs.map((leg) => leg.address),
+        ...(parsed.source === NATIVE ? [wrapped(parsed.chainId).address] : []),
+      ],
+      client(parsed.chainId),
+    );
     return buildPlan(input, account);
+  }
   const { basket, tokens, resolveToken } = await resolveLegacyBasket(input);
   const rpc = client(basket.chainId);
   if ((await rpc.getChainId()) !== basket.chainId)

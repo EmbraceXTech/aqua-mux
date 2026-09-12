@@ -4,6 +4,7 @@ import { AQUA, SWAP_VM, NATIVE } from "../../config";
 import { client } from "../rpc";
 import { readProxyImplementation } from "../proxy-implementation";
 import { aquaLifecycleAbi } from "./calls";
+import { verifyRobinhoodAssets } from "../route-policy/direct/assets";
 import { requestTokens, verifyLifecycleToken } from "./metadata";
 import type { LifecycleRequest, LifecycleSnapshot } from "./types";
 
@@ -33,6 +34,8 @@ export async function readLifecycleSnapshot(
   const blockNumber = block.number;
   const selectedTokens = requestTokens(request);
   const addresses = new Set<Address>(selectedTokens.map((t) => t.address));
+  if (request.kind !== "close")
+    await verifyRobinhoodAssets(chainId, [...addresses], rpc, blockNumber);
   await Promise.all(
     selectedTokens.map((t) => verifyLifecycleToken(t, rpc, blockNumber)),
   );

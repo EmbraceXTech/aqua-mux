@@ -45,6 +45,10 @@ The proxy-binding correction now captures the recognized legacy implementation s
 Changed provenance stays unknown with the retry lock retained, while all five full lifecycle scenarios continue to pass.
 See `proxy-binding-audit.md`.
 
+A Robinhood fork also reproduced changed token code being accepted for a replacement with no funding route.
+The routeless asset correction now applies the existing source-attested token boundary to entry, replacement, conversion and signing while preserving exact dock-only recovery.
+See `robinhood-routeless-provenance.md` for before/after and supported lifecycle evidence.
+
 ## Token and route coverage boundary
 
 The dynamic 1inch registry supports Ethereum, BNB, Arbitrum and Robinhood catalog discovery and search.
