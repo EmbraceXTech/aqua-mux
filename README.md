@@ -36,12 +36,15 @@ Each Aqua strategy references real inventory in the maker wallet, so a fill in o
 The managed LP workflow is designed for one managed group per execution wallet on one chain.
 
 The manual mode is designed for an external browser wallet and requires the owner to review and sign each supported transaction.
-Managed external-wallet execution remains unavailable until its account adapter and receipt recovery have been verified.
+Managed external-wallet execution is admitted only when the authenticated owner is the execution account and its runtime passes the named `simple7702-self-signed-v1` adapter checks for the verified Simple7702Account implementation.
+Controlled-fork lifecycle evidence covers this account path on Ethereum, Arbitrum, BNB Chain, and Robinhood Chain in the [external-adapter results](references/ethglobal-competitive-analysis/external-adapter-fork.json) and [Ethereum execution report](references/ethglobal-competitive-analysis/ethereum-managed-execution.md).
+These are isolated forks with synthetic accounts and no public broadcasts.
+They do not establish compatibility with MetaMask, Coinbase Wallet, or any other third-party wallet brand, and a wallet's generic EIP-5792 capability report is not sufficient evidence for this adapter.
 
 The local review runner can analyze a managed group and return a validated hold, fund-and-open, replace, close, or propose-conversion result, but model output is never transaction authorization.
 
 Explicit owner confirmation can submit supported original basket transactions through the external-wallet path or the optional local development signer.
-The managed workflow exposes review and close planning for external wallets while its execution adapter remains gated.
+The managed workflow exposes review and close planning for external wallets, while execution remains gated until the selected account passes the named adapter checks.
 Starting the app and running read-only verification do not submit transactions by themselves.
 The local development signer can use real funds when explicitly configured, and its setup and evidence are separate from external-wallet compatibility and local-fork fixtures.
 
@@ -106,7 +109,8 @@ PRIVATE_KEY=
 ```
 
 `ONEINCH_API_KEY` is required for live Classic Swap quotes and execution.
-`PRIVATE_KEY` is read only by the explicit development-wallet and live verification paths, and must never be committed or sent to the agent runner.
+`PRIVATE_KEY` is a server-side secret read only by explicitly invoked local development-wallet and live verification or funding paths.
+It is not required to start the frontend, use an external browser wallet, or run read-only verification, and must never be committed, exposed to browser code, sent to the agent runner, or configured on a public or production server.
 Starting the frontend and running read-only verification do not submit transactions by themselves.
 Explicit owner confirmation can submit through the connected external wallet, and the optional development-wallet adapter can sign real transactions when configured.
 
@@ -123,8 +127,9 @@ AQUAMUX_DEV_WALLET_MAX_FEE_WEI=300000000000000
 The development wallet requires `NODE_ENV=development`, an exact origin matching the browser URL, and the existing server-only `PRIVATE_KEY` and RPC settings.
 The fee cap is 0.0003 native units, and managed plans also apply their configured gas budget.
 Keep this server bound to loopback and require explicit owner confirmation for every submission.
-The adapter supports Arbitrum, BNB Chain, and Robinhood Chain in the recorded evidence.
-This opt-in does not establish Ethereum support or general external-wallet compatibility.
+The adapter supports Ethereum, Arbitrum, BNB Chain, and Robinhood Chain in the current configuration and recorded controlled-fork evidence.
+Production mode rejects the opt-in, and forwarded or non-loopback requests are rejected.
+This opt-in does not establish third-party wallet-brand compatibility or live public-chain execution.
 See the [development-wallet results](references/ethglobal-competitive-analysis/dev-wallet-results.md) for the setup boundary and evidence.
 
 ## Local ReviewService runner
