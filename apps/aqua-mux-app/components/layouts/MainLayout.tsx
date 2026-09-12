@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Layers3 } from "lucide-react";
 
 type MainLayoutProps = {
-  activePage: "swap" | "liquidity" | "strategies";
+  activePage: "swap" | "liquidity" | "strategies" | "portfolio";
   actions?: ReactNode;
   children: ReactNode;
 };
@@ -47,6 +47,12 @@ export function MainLayout({ activePage, actions, children }: MainLayoutProps) {
             href="/strategies"
           >
             Strategies
+          </Link>
+          <Link
+            className={activePage === "portfolio" ? "active" : ""}
+            href="/portfolio"
+          >
+            Portfolio
           </Link>
         </nav>
         {actions && <div className="header-actions">{actions}</div>}

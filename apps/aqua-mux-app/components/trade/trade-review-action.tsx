@@ -3,7 +3,15 @@ import { Button } from "@/components/ui/button";
 import type { TradeWorkspace } from "@/hooks/useTradeWorkspace";
 import { transactionState } from "@/lib/utils/swap";
 
-export function LiquidityReviewAction({ trade }: { trade: TradeWorkspace }) {
+export function TradeReviewAction({
+  trade,
+  reviewLabel,
+  reviewUnavailable = false,
+}: {
+  trade: TradeWorkspace;
+  reviewLabel: string;
+  reviewUnavailable?: boolean;
+}) {
   const {
     account,
     amount,
@@ -19,7 +27,12 @@ export function LiquidityReviewAction({ trade }: { trade: TradeWorkspace }) {
       className="main-action"
       onClick={reviewPlan}
       disabled={
-        busy || blocked || total !== 10000 || !amount || Number(amount) <= 0
+        busy ||
+        blocked ||
+        total !== 10000 ||
+        !amount ||
+        Number(amount) <= 0 ||
+        reviewUnavailable
       }
     >
       {busy ? (
@@ -34,7 +47,7 @@ export function LiquidityReviewAction({ trade }: { trade: TradeWorkspace }) {
           "Transaction pending"
         )
       ) : account ? (
-        "Review liquidity positions"
+        reviewLabel
       ) : (
         "Connect wallet"
       )}

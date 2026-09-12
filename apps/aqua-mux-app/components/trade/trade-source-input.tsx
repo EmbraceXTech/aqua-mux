@@ -3,13 +3,20 @@ import { TokenIcon } from "@/components/managed/token-icon";
 import type { TradeWorkspace } from "@/hooks/useTradeWorkspace";
 import { compact } from "@/lib/utils/swap";
 
-export function LiquiditySourceInput({ trade }: { trade: TradeWorkspace }) {
+export function TradeSourceInput({
+  trade,
+  label,
+  description,
+}: {
+  trade: TradeWorkspace;
+  label: string;
+  description: string;
+}) {
   const {
     account,
     amount,
     balances,
     change,
-    legs,
     n,
     setAmount,
     setPicker,
@@ -21,7 +28,7 @@ export function LiquiditySourceInput({ trade }: { trade: TradeWorkspace }) {
   return (
     <div className="input-panel">
       <div className="field-top">
-        <label htmlFor="source-amount">Your shared base</label>
+        <label htmlFor="source-amount">{label}</label>
         <span>on {n.name}</span>
       </div>
       <div className="input-main">
@@ -49,7 +56,7 @@ export function LiquiditySourceInput({ trade }: { trade: TradeWorkspace }) {
         </button>
       </div>
       <div className="field-bottom">
-        <span>Shared across {legs.length} pairs</span>
+        <span>{description}</span>
         {account ? (
           <button
             className="balance-button"

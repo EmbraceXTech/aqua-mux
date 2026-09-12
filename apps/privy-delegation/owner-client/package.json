@@ -1,0 +1,25 @@
+{
+  "name": "privy-delegation-owner-client",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 3410",
+    "build": "tsc -b && vite build",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@privy-io/react-auth": "3.42.0",
+    "@privy-io/node": "0.34.0",
+    "jose": "6.1.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@types/node": "22.7.0",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
+    "@vitejs/plugin-react": "4.6.0",
+    "typescript": "5.6.3",
+    "vite": "6.1.0"
+  }
+}
