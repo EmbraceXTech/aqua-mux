@@ -1,0 +1,2121 @@
+{
+  "generatedAt": "2026-09-12T02:59:36.689903+00:00",
+  "scope": {
+    "browser": "Orca embedded browser only",
+    "publicTransactions": 0,
+    "publicChain": "Arbitrum reads, quote and eth_call simulation only",
+    "forkTransactions": "Existing controlled fork fixtures; no public broadcast",
+    "externalWallet": "No MetaMask or other installed external wallet exercised"
+  },
+  "proposalRequestId": "8653e82a-a81f-423d-876b-e19e9939d02e",
+  "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+  "config": {
+    "version": 1,
+    "recipeVersion": 1,
+    "chainId": 42161,
+    "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+    "policy": {
+      "id": "policy:8653e82a-a81f-423d-876b-e19e9939d02e",
+      "version": 1,
+      "intervalMs": {
+        "value": 900000,
+        "enforcedBy": "execution-broker"
+      },
+      "cooldownMs": {
+        "value": 900000,
+        "enforcedBy": "execution-broker"
+      },
+      "maxActions": {
+        "value": 1,
+        "enforcedBy": "advisory-display"
+      },
+      "spendBudgets": {
+        "value": [
+          {
+            "token": {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            "amount": "100000000000000"
+          }
+        ],
+        "enforcedBy": "advisory-display"
+      },
+      "gasBudgetWei": {
+        "value": "500000000000000",
+        "enforcedBy": "advisory-display"
+      },
+      "allowedAssets": {
+        "value": [
+          "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+          "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+        ],
+        "enforcedBy": "execution-broker"
+      },
+      "allowedRoutes": {
+        "value": [
+          "0x111111125421ca6dc452d289314280a0f8842a65"
+        ],
+        "enforcedBy": "execution-broker"
+      },
+      "maxSlippageBps": {
+        "value": 50,
+        "enforcedBy": "execution-broker"
+      },
+      "maxReferenceAgeMs": {
+        "value": 60000,
+        "enforcedBy": "execution-broker"
+      },
+      "expiresAt": {
+        "value": 1789785993408,
+        "enforcedBy": "execution-broker"
+      },
+      "allowedActions": {
+        "value": [
+          "hold",
+          "fund-and-open",
+          "replace",
+          "close",
+          "propose-conversion"
+        ],
+        "enforcedBy": "execution-broker"
+      },
+      "triggers": {
+        "value": {
+          "rangeExit": true,
+          "inventoryDriftBps": 10000,
+          "upwardOnly": false
+        },
+        "enforcedBy": "execution-broker"
+      }
+    },
+    "family": "lp",
+    "recipeId": "managed-concentrated-lp",
+    "pairs": [
+      {
+        "baseToken": {
+          "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "decimals": 18,
+          "symbol": "WETH"
+        },
+        "quoteToken": {
+          "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+          "decimals": 6,
+          "symbol": "USDC"
+        },
+        "baseAmount": "25000000000000",
+        "quoteAmount": "62367",
+        "feeBps": 5,
+        "openingPrice": {
+          "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "quoteToken": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+          "numerator": "160266250000000000",
+          "denominator": "65439111786413"
+        },
+        "range": {
+          "kind": "bounded",
+          "lower": {
+            "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+            "quoteToken": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "numerator": "498936000",
+            "denominator": "250000"
+          },
+          "upper": {
+            "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+            "quoteToken": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "numerator": "748404000",
+            "denominator": "250000"
+          }
+        },
+        "programExpiresAt": 1789785993000
+      },
+      {
+        "baseToken": {
+          "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "decimals": 18,
+          "symbol": "WETH"
+        },
+        "quoteToken": {
+          "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+          "decimals": 6,
+          "symbol": "USDC"
+        },
+        "baseAmount": "25000000000000",
+        "quoteAmount": "62372",
+        "feeBps": 5,
+        "openingPrice": {
+          "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+          "numerator": "2289700000000000",
+          "denominator": "934844453911"
+        },
+        "range": {
+          "kind": "bounded",
+          "lower": {
+            "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+            "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+            "numerator": "498976000",
+            "denominator": "250000"
+          },
+          "upper": {
+            "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+            "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+            "numerator": "748464000",
+            "denominator": "250000"
+          }
+        },
+        "programExpiresAt": 1789785993000
+      }
+    ]
+  },
+  "plan": {
+    "version": 1,
+    "id": "e0bf8d53-3319-4f06-a468-66ecd8097877",
+    "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+    "owner": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+    "chainId": 42161,
+    "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+    "kind": "fund-and-open",
+    "configDigest": "0xf70285609f939548a10ca75e32599f7b33ac65864e4a515b811112408eef2fcb",
+    "snapshotDigest": "0x37427aad28b1203644fb8654ff322963c77211c57f79eae6f77c7a0b2bf67915",
+    "routesDigest": "0xf6e9b12d51b9887b827b2e143c847855ad02138d59cadd09739f36c8e2498132",
+    "deploymentEvidence": [
+      {
+        "address": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+        "codeHash": "0x720bc02d220db318164dc3bade86eec1f3655bdc00fc1174de7d816a95c341f8"
+      },
+      {
+        "address": "0x111111338c5091e8440b67b168bae16a668ac0de",
+        "codeHash": "0x7cb8785de84b35bced79fbecbbc6336f473623568cba28b7af3ed001b20d580e"
+      },
+      {
+        "address": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "codeHash": "0xaae25d52ea3e7bbb8cc826b589060f063c7f6ca2c2da88bc9b3b0e0a57bd8fb6"
+      },
+      {
+        "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        "codeHash": "0x2d240bb4510ed1acfeaba905eb4bcc4524d63c8ae66e48fcccac55ea714db7a7",
+        "implementation": "0x8b194beae1d3e0788a1a35173978001acdfba668"
+      },
+      {
+        "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+        "codeHash": "0xad30d819dbc47814b7e6cb837fd7cc57fcb591479a38596ee93de4fc52e8c435"
+      },
+      {
+        "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+        "codeHash": "0x2d240bb4510ed1acfeaba905eb4bcc4524d63c8ae66e48fcccac55ea714db7a7",
+        "implementation": "0x1efb3f88bc88f03fd1804a5c53b7141bbef5ded8"
+      },
+      {
+        "address": "0x8b194beae1d3e0788a1a35173978001acdfba668",
+        "codeHash": "0x0d1c20f9ed551efe8f402bc9aa1a9b5058f925ec615284c5b4a7a4623c3b2dcd"
+      },
+      {
+        "address": "0x1efb3f88bc88f03fd1804a5c53b7141bbef5ded8",
+        "codeHash": "0x391447ee520d8187660b4014cb7236ad755e0a1274cb8312d94b497dcf360744"
+      }
+    ],
+    "policyDigest": "0x78f721efc06b5f2fd09a85bd56737d65fe58c381e073a885f81dda450f0d18e8",
+    "runGeneration": 0,
+    "calls": [
+      {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "value": "0x16befc9077ac",
+        "label": "Swap through verified 1inch single-pool route",
+        "dataSha256": "1e457721d4de060a809477b118f20e2555792c2f23ba424218011c6dd2f9a857"
+      },
+      {
+        "to": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "value": "0x16bcce45e5d4",
+        "label": "Swap through verified 1inch single-pool route",
+        "dataSha256": "791b01a52beb465915d50d80baffb28b6cc00e7857f41e38293a75ab0ca8ddd6"
+      },
+      {
+        "to": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        "value": "0x16bcc41e9000",
+        "label": "Wrap selected native inventory",
+        "dataSha256": "5cd92c6d850367a4db763ab4a4c33567ade46ebfddfdd73cd31d130db24c6b0f"
+      },
+      {
+        "to": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        "value": "0x0",
+        "label": "Approve 25000000000000 raw units for 0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+        "dataSha256": "e13a9e149f82dedcbfda2e6b6dd362683683ba6c0304486ec956d9b15458b248"
+      },
+      {
+        "to": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+        "value": "0x0",
+        "label": "Approve 62367 raw units for 0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+        "dataSha256": "32d228d00b968dff11578a9b6341796b1326e41d325783de2e2f35e60d403c54"
+      },
+      {
+        "to": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+        "value": "0x0",
+        "label": "Approve 62372 raw units for 0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+        "dataSha256": "962c6073cbd4bc2ea477297946c6fc084edc2102698e276265c752e579d193c9"
+      },
+      {
+        "to": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+        "value": "0x0",
+        "label": "Register WETH / USDC",
+        "dataSha256": "6de8fc9006575e9e0d8a040cf4cbae24374e2c60be36094eac1ea14ca54cba3f"
+      },
+      {
+        "to": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+        "value": "0x0",
+        "label": "Register WETH / USDC",
+        "dataSha256": "aead0fb940547c96c9f22ef431f2352f8c718f87f55a9c38138078c1eb0fa71b"
+      }
+    ],
+    "inventoryBefore": [
+      {
+        "token": {
+          "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "decimals": 18,
+          "symbol": "ETH"
+        },
+        "amount": "100000000000000"
+      }
+    ],
+    "conservativeInventoryAfter": [
+      {
+        "token": {
+          "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "decimals": 18,
+          "symbol": "WETH"
+        },
+        "amount": "25000000000000"
+      },
+      {
+        "token": {
+          "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+          "decimals": 6,
+          "symbol": "USDC"
+        },
+        "amount": "62530"
+      },
+      {
+        "token": {
+          "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "decimals": 18,
+          "symbol": "ETH"
+        },
+        "amount": "24990292726400"
+      },
+      {
+        "token": {
+          "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+          "decimals": 6,
+          "symbol": "USDC"
+        },
+        "amount": "62498"
+      }
+    ],
+    "registrations": [
+      {
+        "hash": "0xe1099adb442db54a568482a2a972a47d4a6851b0456d222ff41d1ffabb563069",
+        "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+        "tokens": [
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "0xaf88d065e77c8cc2239327c5edb3a432268e5831"
+        ],
+        "amounts": [
+          "25000000000000",
+          "62367"
+        ],
+        "program": "0x0d05006aadf789211426ffc7d378e8e49be2c483295a3e3e511f96a4681240000000000000000000000000000000000000000000000000000028a16b0a49ad000000000000000000000000000000000000000000000000000031c31560902815040007a12011001408c1b6ed9bce77cbb1",
+        "strategy": "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000992a6a939579e10ad47c347a5be3788c94992dd44000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000710d05006aadf789211426ffc7d378e8e49be2c483295a3e3e511f96a4681240000000000000000000000000000000000000000000000000000028a16b0a49ad000000000000000000000000000000000000000000000000000031c31560902815040007a12011001408c1b6ed9bce77cbb1000000000000000000000000000000"
+      },
+      {
+        "hash": "0xacdbf6dc06f51657f217b8bc6c0534d1814fdc90d78cb682854c5f138410c942",
+        "app": "0x111111338c5091e8440b67b168bae16a668ac0de",
+        "tokens": [
+          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+        ],
+        "amounts": [
+          "25000000000000",
+          "62372"
+        ],
+        "program": "0x0d05006aadf789211426ffc7d378e8e49be2c483295a3e3e511f96a4681240000000000000000000000000000000000000000000000000000028a1d5c694b9000000000000000000000000000000000000000000000000000031c39819d9dc15040007a1201100140819cd44339a63f085",
+        "strategy": "0x0000000000000000000000000000000000000000000000000000000000000020000000000000000000000000992a6a939579e10ad47c347a5be3788c94992dd44000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000710d05006aadf789211426ffc7d378e8e49be2c483295a3e3e511f96a4681240000000000000000000000000000000000000000000000000000028a1d5c694b9000000000000000000000000000000000000000000000000000031c39819d9dc15040007a1201100140819cd44339a63f085000000000000000000000000000000"
+      }
+    ],
+    "retirements": [],
+    "gasReserveWei": "500000000000000",
+    "estimatedGasWei": "31351985004000",
+    "simulation": {
+      "blockNumber": "504255039",
+      "blockHash": "0xab00e1a5ec7be65976a013c7ab6bfcb11a4cecc20f2a7ee0ca2f28b8e3aaf4b6",
+      "simulatedAt": 1789181221080,
+      "callsDigest": "0x445f6961394f6aee5b9c12c81366db692782fbea908f55447ef2d0a1e44fc1de"
+    },
+    "expectedEffects": [
+      "Execute the complete batch atomically.",
+      "0 strategies retire; 2 strategies register.",
+      "Real inventory is counted once; virtual strategy claims compete for this backing.",
+      "Excess swap receipts remain in the maker wallet and require post-transaction reconciliation."
+    ],
+    "minimumReceipts": [
+      {
+        "token": {
+          "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+          "decimals": 6,
+          "symbol": "USDC"
+        },
+        "amount": "62530"
+      },
+      {
+        "token": {
+          "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+          "decimals": 6,
+          "symbol": "USDC"
+        },
+        "amount": "62498"
+      }
+    ],
+    "createdAt": 1789181218202,
+    "expiresAt": 1789181249149,
+    "atomicRequired": true
+  },
+  "browser": {
+    "intent": {
+      "at": "2026-09-12T02:45:40.700Z",
+      "selected": [
+        "Remove USDC 0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+        "Remove USDC_1 0xff970a61a04b1ca14834a43f5de4533ebddb5cc8"
+      ],
+      "inputs": [
+        {
+          "label": "Funding budget",
+          "value": "0.0001"
+        },
+        {
+          "label": "Native gas reserve",
+          "value": "0.0005"
+        },
+        {
+          "label": "Review interval, minutes",
+          "value": "15"
+        },
+        {
+          "label": "Holding period, days",
+          "value": "7"
+        }
+      ],
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nFRESH WALLET ANALYSIS\nManaged concentrated LP\n\nChoose the inventory this group may use. The agent must use current balances and supported routes.\n\nAll strategies\nFunding and permitted assets\nNetwork\nArbitrum\nEthereum\nRobinhood Chain\nBNB Chain\nFunding token\nETH (0xeeee...eeee)\nFunding budget ETH\nNative gas reserve\nAdd permitted paired asset\nChoose a token\nUSDC / 8e5831 / Remove\nUSDC_1 / db5cc8 / Remove\n\nNative funding permits wrapping into WETH for LP reserves. The final review shows the exact wrap amount.\n\nTokens listed in the registry may have no usable route. The proposal must verify metadata, balances, and route availability before preparing transactions.\nReview behavior\nReview interval, minutes\nHolding period, days\n\nEvery transaction requires your confirmation. A review may recommend holding, reducing size, or doing nothing.\n\nExecution wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nGas reserve remains outside the selected trade budget.\n\nDevelopment reviews are uncharged. Delegated execution and paid Hedera reviews are unavailable.\n\nGenerate fresh proposal\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua"
+    },
+    "running": {
+      "at": "2026-09-12T02:50:21.960Z",
+      "events": [
+        {
+          "at": "2026-09-12T02:46:31.389Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:46:32.227Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:46:55.527Z",
+          "path": "/api/managed/proposals",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "reviewId": "8653e82a-a81f-423d-876b-e19e9939d02e",
+          "decision": "fund-and-open",
+          "reviewStatus": "succeeded",
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:46:55.904Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:00.666Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:02.599Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/plans",
+          "status": 200,
+          "planId": "e0bf8d53-3319-4f06-a468-66ecd8097877"
+        },
+        {
+          "at": "2026-09-12T02:47:02.725Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:05.743Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:10.878Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:15.836Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:20.925Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:25.815Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:30.880Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:35.837Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:40.886Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:45.850Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:50.926Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:55.837Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:00.911Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:05.813Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:10.900Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:15.925Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:20.843Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:25.945Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:30.825Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:35.891Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:40.818Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:45.884Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:50.852Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:55.882Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:00.813Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:05.953Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:10.816Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:15.888Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:20.900Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:25.862Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:30.894Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:35.838Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:40.899Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:45.808Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:50.890Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:53.239Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:49:53.553Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:03.711Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:13.588Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        }
+      ],
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nRunning\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: 9/12/2026, 9:50:38 AM. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\nTake over reviews in this tab\n\nThere is no recorded stop reason.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stops management and prepares a transaction to dock this group's positions. Tokens remain in the maker wallet after confirmation.\n\nReview close positions\nClose and convert\n\nChoose exact quantities from the latest wallet balances. Review minimum receipts, gas reserve, and residuals before confirming.\n\nConversion destination\nChoose a token\n\nWallet balances may include unrelated assets. Attribution is incomplete, so enter only the quantities you choose to convert. No amounts are selected automatically.\n\nRefresh wallet quantiti"
+    },
+    "stopped": {
+      "at": "2026-09-12T02:50:45.455Z",
+      "events": [
+        {
+          "at": "2026-09-12T02:46:31.389Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:46:32.227Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:46:55.527Z",
+          "path": "/api/managed/proposals",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "reviewId": "8653e82a-a81f-423d-876b-e19e9939d02e",
+          "decision": "fund-and-open",
+          "reviewStatus": "succeeded",
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:46:55.904Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:00.666Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:02.599Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/plans",
+          "status": 200,
+          "planId": "e0bf8d53-3319-4f06-a468-66ecd8097877"
+        },
+        {
+          "at": "2026-09-12T02:47:02.725Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:05.743Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:10.878Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:15.836Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:20.925Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:25.815Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:30.880Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:35.837Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:40.886Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:45.850Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:50.926Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:47:55.837Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:00.911Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:05.813Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:10.900Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:15.925Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:20.843Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:25.945Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:30.825Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:35.891Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:40.818Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:45.884Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:50.852Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:48:55.882Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:00.813Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:05.953Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:10.816Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:15.888Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:20.900Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:25.862Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:30.894Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:35.838Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:40.899Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:45.808Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:50.890Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "idle",
+          "generation": 0
+        },
+        {
+          "at": "2026-09-12T02:49:53.239Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:49:53.553Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:03.711Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:13.588Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:23.570Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:33.095Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/reviews",
+          "status": 200,
+          "reviewId": "f1c9b7be-48a6-4ac3-84da-2fcf513e75f4",
+          "decision": "hold",
+          "reviewStatus": "succeeded"
+        },
+        {
+          "at": "2026-09-12T02:50:33.430Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:43.526Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:43.888Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "running",
+          "generation": 1
+        },
+        {
+          "at": "2026-09-12T02:50:45.276Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda/bot",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "stopped",
+          "generation": 2
+        },
+        {
+          "at": "2026-09-12T02:50:45.416Z",
+          "path": "/api/managed/groups/d1048340-e530-40fa-bec8-4241e6c94bda",
+          "status": 200,
+          "groupId": "d1048340-e530-40fa-bec8-4241e6c94bda",
+          "pairs": 2,
+          "botState": "stopped",
+          "generation": 2
+        }
+      ],
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nStopped\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: Unavailable. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\n\nStopped by owner. Passive positions remain open.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stops management and prepares a transaction to dock this group's positions. Tokens remain in the maker wallet after confirmation.\n\nReview close positions\nClose and convert\n\nChoose exact quantities from the latest wallet balances. Review minimum receipts, gas reserve, and residuals before confirming.\n\nConversion destination\nChoose a token\n\nWallet balances may include unrelated assets. Attribution is incomplete, so enter only the quantities you choose to convert. No amounts are selected automatically.\n\nRefresh wallet quantities\nReview close and conve"
+    },
+    "recovery": {
+      "at": "2026-09-12T02:58:30.187Z",
+      "fixtureRemoved": true,
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nStopped\nAll strategies\nStrategy\nPositions\nActivity\nControls\nEdit proposal\nRegenerate fresh review\nNo executable review\nCurrent strategy\nRecipe\nManaged concentrated LP v1\nReview mode\nEvery transaction requires confirmation\nReview interval\n15 minutes\nNext review due\nManagement is not running\nLast decision\nHold\nPolicy expiry\n9/19/2026, 9:46:33 AM\n\nNo indexed position or backing reconciliation is available to justify changing the configured LP strategy.\n\n9/12/2026, 9:50:03 AM / codex / gpt-6-astra\n\nPair parameters\nPair\tOpening price\tRange\tVirtual reserves\tFee\nWETH / USDC\t2449.08962889 USDC per WETH\t1995.744 to 2993.616 USDC\t0.000025 WETH\n0.062367 USDC\t0.05%\nWETH / USDC\t2449.28446697 USDC per WETH\t1995.904 to 2993.856 USDC\t0.000025 WETH\n0.062372 USDC\t0.05%\n\nVirtual allocations share real inventory. Adding the allocations does not measure the capital in this group.\n\nManagement limits\nSpend budgets\n0.0001 ETH / advisory-display\nGas budget, raw native units\n500000000000000 / advisory-display\nMaximum reference age\n60 seconds / execution-broker\nReview triggers\nRange exit: enabled. Inventory drift: 100%. Upward-only: no. / execution-broker\nAllowed actions\nHold, Fund and open, Replace, Close, Propose conversion\nAction limit\n1 / advisory-display\nCooldown\n15 minutes / execution-broker\nMaximum slippage\n0.5% / execution-broker\nPermitted token and route addresses\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua"
+    },
+    "duplicateRefusal": {
+      "at": "2026-09-12T02:42:07.499Z",
+      "events": [
+        {
+          "at": "2026-09-12T02:30:54.508Z",
+          "path": "/api/tokens?chainId=42161&q=ETH&limit=50",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:31:24.745Z",
+          "path": "/api/tokens?chainId=42161&q=&limit=50",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:31:41.640Z",
+          "path": "/api/tokens?chainId=42161&q=0xaf88d065e77c8cc2239327c5edb3a432268e5831&limit=50",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:31:42.610Z",
+          "path": "/api/tokens?chainId=42161&q=0xaf88d065e77c8cc2239327c5edb3a432268e5831&limit=50",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:31:57.244Z",
+          "path": "/api/tokens?chainId=42161&q=0xff970a61a04b1ca14834a43f5de4533ebddb5cc8&limit=50",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:31:58.960Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:31:59.982Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:32:00.642Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:32:01.264Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:32:34.117Z",
+          "path": "/api/managed/proposals",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:33:12.181Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:33:12.779Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:33:13.089Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:33:13.660Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:33:49.204Z",
+          "path": "/api/managed/proposals",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:35:23.401Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:35:23.958Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:35:24.216Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:35:24.774Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:35:57.530Z",
+          "path": "/api/managed/proposals",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:36:50.515Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:36:51.009Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:36:51.273Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:36:51.757Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:37:14.695Z",
+          "path": "/api/managed/proposals",
+          "status": 200,
+          "decision": "fund-and-open"
+        },
+        {
+          "at": "2026-09-12T02:39:44.281Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:39:45.643Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:39:45.922Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:39:46.423Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:40:10.990Z",
+          "path": "/api/managed/proposals",
+          "status": 200,
+          "decision": "fund-and-open"
+        },
+        {
+          "at": "2026-09-12T02:41:52.479Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:41:53.469Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:41:53.724Z",
+          "path": "/api/tokens/validate",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:41:54.232Z",
+          "path": "/api/managed/funding-route",
+          "status": 200
+        },
+        {
+          "at": "2026-09-12T02:41:54.240Z",
+          "path": "/api/managed/proposals",
+          "status": 409,
+          "code": "group_exists",
+          "error": "This wallet already has a managed group on this chain. Open the existing group before creating another."
+        }
+      ],
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nThis wallet already has a managed group on this chain. Open the existing group before creating another.\nRecover a managed group\nManaged concentrated LP / draft / 5ad10409\n\nGroups load from authenticated backend records. Reconcile current chain state before resuming.\n\nFRESH WALLET ANALYSIS\nManaged concentrated LP\n\nChoose the inventory this group may use. The agent must use current balances and supported routes.\n\nAll strategies\nFunding and permitted assets\nNetwork\nArbitrum\nEthereum\nRobinhood Chain\nBNB Chain\nFunding token\nETH (0xeeee...eeee)\nFunding budget ETH\nNative gas reserve\nAdd permitted paired asset\nChoose a token\nUSDC / 8e5831 / Remove\nUSDC_1 / db5cc8 / Remove\n\nNative funding permits wrapping into WETH for LP reserves. The final review shows the exact wrap amount.\n\nTokens listed in the registry may have no usable route. The proposal must verify metadata, balances, and route availability before preparing transactions.\nReview behavior\nReview interval, minutes\nHolding period, days\n\nEvery transaction requires your confirmation. A review may recommend holding, reducing size, or doing nothing.\n\nExecution wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nGas reserve remains outside the selected trade budget.\n\nDevelopment reviews are uncharged. Delegated execution and paid Hedera reviews are unavailable.\n\nGenerate fresh proposal\nMetadata and funding route checks\nETH to USDC\n\nSource metadata: verified. Destination metadata: verified. Verified execution route: available.\n\nQuoted output 0.251294 USDC\n\nChecked 9/12/2026, 9:41:53 AM for 0.0001 ETH. This probes the selected funding budget; the final plan must quote each allocated purchase and bind minimum receipts.\n\nETH to USDC_1\n\nSource metadata: verified. Destination metadata: mismatch. Verified execution route: available.\n\nQuoted output 0.251318 USDC_1\n\nChecked 9/12/2026, 9:41:53 AM for 0.0001 ETH. This probes the selected funding budget; the final plan must quote each allocated purchase and bind minimum receipts.\n\nRegistry symbol differs from the token contract.\n\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua"
+    },
+    "addressRenderFixture": {
+      "scope": "UI-only replay of expired captured plan with current display generation; no backend mutation or signature",
+      "text": "Review fund and open\n\nConfirm the exact plan below. An agent proposal alone does not authorize execution.\n\nLOCAL DEVELOPMENT WALLET\n0x992a6a939579e10ad47c347a5be3788c94992dd4\nChain ID 42161. 8 calls in an atomic batch.\nDevelopment signer fee cap, native\n0.0003\nPlan expires\n9/12/2026, 9:47:29 AM\nRun generation\n2\nEstimated gas cost, native\n0.000031351985004\nReserved gas funds, native\n0.0005\nSimulation\nBlock 504255039 / 9/12/2026, 9:47:01 AM\nSelected inventory before execution\n0.0001 ETH\n0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\nConservative inventory after execution\n0.000025 WETH\n0x82af49447d8a07e3bd95bd0d56f35241523fbab1\n0.06253 USDC\n0xaf88d065e77c8cc2239327c5edb3a432268e5831\n0.0000249902927264 ETH\n0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\n0.062498 USDC\n0xff970a61a04b1ca14834a43f5de4533ebddb5cc8\n\nExcess swap output may remain in the maker wallet. Reconciliation must verify actual balances and residual inventory.\n\nExpected effects\nExecute the complete batch atomically.\n0 strategies retire; 2 strategies register.\nReal inventory is counted once; virtual strategy claims compete for this backing.\nExcess swap receipts remain in the maker wallet and require post-transaction reconciliation.\nMinimum receipts\n0.06253 USDC\n0xaf88d065e77c8cc2239327c5edb3a432268e5831\n0.062498 USDC\n0xff970a61a04b1ca14834a43f5de4533ebddb5cc8\nReview calls and binding\nI confirm this maker, chain, plan, and minimum receipts. I authorize the local development signer to submit this reviewed action.\nThis plan has expired. Close this review and request a fresh plan.\nConfirm with development wallet",
+      "disabled": true
+    }
+  },
+  "runner": [
+    {
+      "request_id": "b4f95a70-1d67-4f2f-86b7-5adfc936aa71",
+      "status": "succeeded",
+      "created_at": 1789180322412,
+      "updated_at": 1789180354109,
+      "error_code": null,
+      "purpose": "proposal",
+      "durationMs": 31697,
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "usage": {
+        "inputTokens": "28672",
+        "outputTokens": "641",
+        "cost": null
+      },
+      "decision": "fund-and-open",
+      "rationale": "The preview is suitable for owner review: it conserves the 0.0001 ETH funding budget, preserves the 0.0005 ETH gas reserve, and compiles two managed concentrated LP pairs using permitted assets. The 5 bps fee and 20% range bounds are editable starting parameters, not optimized recommendations.",
+      "tools": [
+        "tool:proposal_preview"
+      ]
+    },
+    {
+      "request_id": "474d9426-4168-445f-a392-45bc9f8681df",
+      "status": "succeeded",
+      "created_at": 1789180394815,
+      "updated_at": 1789180429200,
+      "error_code": null,
+      "purpose": "proposal",
+      "durationMs": 34385,
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "usage": {
+        "inputTokens": "28649",
+        "outputTokens": "552",
+        "cost": null
+      },
+      "decision": "fund-and-open",
+      "rationale": "The available preview is suitable for owner review: its two managed-concentrated LP pairs fit the 0.0001 ETH funding budget while preserving the 0.0005 ETH gas reserve. Compiler bounds and exact rational opening prices are supplied; the 5-bps fee and 20% bounds remain editable starting parameters, not optimized recommendations.",
+      "tools": [
+        "tool:proposal_preview"
+      ]
+    },
+    {
+      "request_id": "e65aee2a-be7e-4d85-95a8-6a17bb6ad6a4",
+      "status": "succeeded",
+      "created_at": 1789180525933,
+      "updated_at": 1789180557526,
+      "error_code": null,
+      "purpose": "proposal",
+      "durationMs": 31593,
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "usage": {
+        "inputTokens": "24613",
+        "outputTokens": "679",
+        "cost": null
+      },
+      "decision": "fund-and-open",
+      "rationale": "The available compiled preview is suitable for owner review: it allocates the 0.0001 ETH budget across two permitted WETH/USDC recipe pairs while preserving the 0.0005 ETH gas reserve. Starting fees and ranges are editable, not optimized recommendations. This is a proposal, not authorization to execute.",
+      "tools": [
+        "tool:proposal_preview"
+      ]
+    },
+    {
+      "request_id": "3c6a1ae3-ae3b-4244-9fb6-7da0cc2be751",
+      "status": "succeeded",
+      "created_at": 1789180612898,
+      "updated_at": 1789180634690,
+      "error_code": null,
+      "purpose": "proposal",
+      "durationMs": 21792,
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "usage": {
+        "inputTokens": "24703",
+        "outputTokens": "390",
+        "cost": null
+      },
+      "decision": "fund-and-open",
+      "rationale": "The available preview supports an editable Aqua SwapVM candidate within the funding budget and gas reserve, with compiled recipe bounds.",
+      "tools": [
+        "tool:proposal_preview"
+      ]
+    },
+    {
+      "request_id": "8653e82a-a81f-423d-876b-e19e9939d02e",
+      "status": "succeeded",
+      "created_at": 1789181193410,
+      "updated_at": 1789181215513,
+      "error_code": null,
+      "purpose": "proposal",
+      "durationMs": 22103,
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "usage": {
+        "inputTokens": "24679",
+        "outputTokens": "375",
+        "cost": null
+      },
+      "decision": "fund-and-open",
+      "rationale": "The available preview supports an editable owner-review candidate within the funding budget and gas reserve, with compiled recipe bounds.",
+      "tools": [
+        "tool:proposal_preview"
+      ],
+      "snapshot": {
+        "tokenMetadata": {
+          "chainId": 42161,
+          "tokens": [
+            {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            }
+          ]
+        },
+        "observedAt": 1789181192642,
+        "blockNumber": "504254931",
+        "blockHash": "0x84c65434d7417f6cfa0a482afb5640de81f6807968d3b80f89951b796fc2fedd",
+        "blockTimestamp": 1789181192000,
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "nativeBalanceWei": "1500000000000000",
+        "balances": [
+          {
+            "token": {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "amount": "0"
+          }
+        ],
+        "allowances": [
+          {
+            "token": {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          }
+        ],
+        "coverage": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789181192000,
+            "status": "complete"
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789181193408,
+            "status": "partial",
+            "detail": "Known application groups are included. Strategies registered outside this application and unindexed fills remain unknown; an empty known list does not establish zero external exposure."
+          }
+        ],
+        "managedStrategies": [],
+        "routeQuotes": [
+          {
+            "source": "1inch-route-quote",
+            "fromToken": {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            "toToken": {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amountIn": "25000000000000",
+            "amountOut": "62681",
+            "observedAt": 1789181192772,
+            "expiresAt": 1789181222772
+          },
+          {
+            "source": "1inch-route-quote",
+            "fromToken": {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            "toToken": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amountIn": "25000000000000",
+            "amountOut": "62686",
+            "observedAt": 1789181193029,
+            "expiresAt": 1789181223029
+          }
+        ]
+      },
+      "result": {
+        "version": 1,
+        "decision": "fund-and-open",
+        "rationale": "The available preview supports an editable owner-review candidate within the funding budget and gas reserve, with compiled recipe bounds.",
+        "evidence": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789181192000,
+            "status": "complete",
+            "detail": "Verified wallet observation supports the preview funding and gas reserve."
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789181193408,
+            "status": "partial",
+            "detail": "No known application strategies; external exposure and unindexed fills remain unknown."
+          },
+          {
+            "source": "1inch-route-quote",
+            "observedAt": 1789181192772,
+            "status": "complete",
+            "detail": "First destination has an amount-specific funding observation."
+          },
+          {
+            "source": "1inch-route-quote",
+            "observedAt": 1789181193029,
+            "status": "complete",
+            "detail": "Second destination has an amount-specific funding observation."
+          }
+        ],
+        "proposedConfig": {
+          "version": 1,
+          "recipeVersion": 1,
+          "chainId": 42161,
+          "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+          "policy": {
+            "id": "policy:8653e82a-a81f-423d-876b-e19e9939d02e",
+            "version": 1,
+            "intervalMs": {
+              "value": 900000,
+              "enforcedBy": "execution-broker"
+            },
+            "cooldownMs": {
+              "value": 900000,
+              "enforcedBy": "execution-broker"
+            },
+            "maxActions": {
+              "value": 1,
+              "enforcedBy": "advisory-display"
+            },
+            "spendBudgets": {
+              "value": [
+                {
+                  "token": {
+                    "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                    "decimals": 18,
+                    "symbol": "ETH"
+                  },
+                  "amount": "100000000000000"
+                }
+              ],
+              "enforcedBy": "advisory-display"
+            },
+            "gasBudgetWei": {
+              "value": "500000000000000",
+              "enforcedBy": "advisory-display"
+            },
+            "allowedAssets": {
+              "value": [
+                "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+                "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "allowedRoutes": {
+              "value": [
+                "0x111111125421ca6dc452d289314280a0f8842a65"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "maxSlippageBps": {
+              "value": 50,
+              "enforcedBy": "execution-broker"
+            },
+            "maxReferenceAgeMs": {
+              "value": 60000,
+              "enforcedBy": "execution-broker"
+            },
+            "expiresAt": {
+              "value": 1789785993408,
+              "enforcedBy": "execution-broker"
+            },
+            "allowedActions": {
+              "value": [
+                "hold",
+                "fund-and-open",
+                "replace",
+                "close",
+                "propose-conversion"
+              ],
+              "enforcedBy": "execution-broker"
+            },
+            "triggers": {
+              "value": {
+                "rangeExit": true,
+                "inventoryDriftBps": 10000,
+                "upwardOnly": false
+              },
+              "enforcedBy": "execution-broker"
+            }
+          },
+          "family": "lp",
+          "recipeId": "managed-concentrated-lp",
+          "pairs": [
+            {
+              "baseToken": {
+                "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "decimals": 18,
+                "symbol": "WETH"
+              },
+              "quoteToken": {
+                "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+                "decimals": 6,
+                "symbol": "USDC"
+              },
+              "baseAmount": "25000000000000",
+              "quoteAmount": "62367",
+              "feeBps": 5,
+              "openingPrice": {
+                "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "quoteToken": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+                "numerator": "160266250000000000",
+                "denominator": "65439111786413"
+              },
+              "range": {
+                "kind": "bounded",
+                "lower": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+                  "numerator": "498936000",
+                  "denominator": "250000"
+                },
+                "upper": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+                  "numerator": "748404000",
+                  "denominator": "250000"
+                }
+              },
+              "programExpiresAt": 1789785993000
+            },
+            {
+              "baseToken": {
+                "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "decimals": 18,
+                "symbol": "WETH"
+              },
+              "quoteToken": {
+                "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "decimals": 6,
+                "symbol": "USDC"
+              },
+              "baseAmount": "25000000000000",
+              "quoteAmount": "62372",
+              "feeBps": 5,
+              "openingPrice": {
+                "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                "numerator": "2289700000000000",
+                "denominator": "934844453911"
+              },
+              "range": {
+                "kind": "bounded",
+                "lower": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                  "numerator": "498976000",
+                  "denominator": "250000"
+                },
+                "upper": {
+                  "baseToken": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+                  "quoteToken": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+                  "numerator": "748464000",
+                  "denominator": "250000"
+                }
+              },
+              "programExpiresAt": 1789785993000
+            }
+          ]
+        },
+        "expectedEffects": [
+          "Presents the bound LP candidate for owner review without signing or executing, pending fresh routes, estimates and whole-batch simulation."
+        ],
+        "uncertainties": [
+          "External strategy exposure and unindexed fills are not fully discovered.",
+          "Starting fee and range parameters are editable defaults, not demonstrated optima.",
+          "Observed quotes do not guarantee opening prices or future receipts; gas costs, future fills and returns remain unknown."
+        ]
+      }
+    },
+    {
+      "request_id": "f1c9b7be-48a6-4ac3-84da-2fcf513e75f4",
+      "status": "succeeded",
+      "created_at": 1789181405359,
+      "updated_at": 1789181433086,
+      "error_code": null,
+      "purpose": "interval",
+      "durationMs": 27727,
+      "provider": "codex",
+      "model": "gpt-6-astra",
+      "usage": {
+        "inputTokens": "44512",
+        "outputTokens": "321",
+        "cost": null
+      },
+      "decision": "hold",
+      "rationale": "No indexed position or backing reconciliation is available to justify changing the configured LP strategy.",
+      "tools": [
+        "tool:wallet_snapshot",
+        "tool:indexed_positions"
+      ],
+      "snapshot": {
+        "tokenMetadata": {
+          "chainId": 42161,
+          "tokens": [
+            {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            }
+          ]
+        },
+        "observedAt": 1789181404649,
+        "blockNumber": "504255767",
+        "blockHash": "0x20292a7ba1bd507aabc350e5e353e7543f970fa47dfd6a5c1f0aa5c96ba99f5b",
+        "blockTimestamp": 1789181404000,
+        "chainId": 42161,
+        "maker": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+        "nativeBalanceWei": "1500000000000000",
+        "balances": [
+          {
+            "token": {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "amount": "0"
+          }
+        ],
+        "allowances": [
+          {
+            "token": {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          },
+          {
+            "token": {
+              "address": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              "decimals": 18,
+              "symbol": "WETH"
+            },
+            "spender": "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a",
+            "amount": "0"
+          }
+        ],
+        "coverage": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789181404000,
+            "status": "complete"
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789181405347,
+            "status": "partial",
+            "detail": "Known application groups are included. Strategies registered outside this application and unindexed fills remain unknown; an empty known list does not establish zero external exposure."
+          }
+        ],
+        "managedStrategies": [],
+        "routeQuotes": [
+          {
+            "source": "1inch-route-quote",
+            "fromToken": {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            "toToken": {
+              "address": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amountIn": "25000000000000",
+            "amountOut": "62668",
+            "observedAt": 1789181404767,
+            "expiresAt": 1789181434767
+          },
+          {
+            "source": "1inch-route-quote",
+            "fromToken": {
+              "address": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+              "decimals": 18,
+              "symbol": "ETH"
+            },
+            "toToken": {
+              "address": "0xff970a61a04b1ca14834a43f5de4533ebddb5cc8",
+              "decimals": 6,
+              "symbol": "USDC"
+            },
+            "amountIn": "25000000000000",
+            "amountOut": "62686",
+            "observedAt": 1789181405044,
+            "expiresAt": 1789181435044
+          }
+        ]
+      },
+      "result": {
+        "version": 1,
+        "decision": "hold",
+        "rationale": "No indexed position or backing reconciliation is available to justify changing the configured LP strategy.",
+        "evidence": [
+          {
+            "source": "direct-rpc-wallet",
+            "observedAt": 1789181404000,
+            "status": "complete",
+            "detail": "Wallet amounts verified; configured LP assets have no wallet balances."
+          },
+          {
+            "source": "maker-position-discovery",
+            "observedAt": 1789181405347,
+            "status": "partial",
+            "detail": "No known strategies returned; backing reconciliation is unavailable and external exposure remains unknown."
+          }
+        ],
+        "expectedEffects": [
+          "Leave the configuration unchanged without proposing funding or position changes."
+        ],
+        "uncertainties": [
+          "External strategies and unindexed fills may exist despite the empty known-position list.",
+          "Without reconciled position state and current reserve prices, range-exit and inventory-drift triggers cannot be established."
+        ]
+      }
+    }
+  ],
+  "fixtureSources": [
+    {
+      "path": "apps/frontend/scripts/verify-app-integration.ts",
+      "sha256": "d2f9451a8345ed8e753dbbc535067205f2c14af526d0c1984a1b035eafdd0dc5",
+      "modification": "Temporary adjacent copy changed only evidence output path; removed after run"
+    },
+    {
+      "path": "apps/frontend/scripts/verify-external-adapter.ts",
+      "sha256": "c1c273e6c5478af748c99b799fd6f31c1e588d1e3627e2bf51016fa2edcb92b1",
+      "modification": "Temporary adjacent copy changed only evidence output path; removed after run"
+    }
+  ]
+}

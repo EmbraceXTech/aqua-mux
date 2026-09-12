@@ -1,0 +1,68 @@
+{
+  "generatedAt": "2026-09-12T03:01:49.537578+00:00",
+  "checks": [
+    {
+      "log": "/tmp/final-schema-tests.log",
+      "result": "passed",
+      "sha256": "9053290bcb0b08855a58b93e67c595e79f42bd2d042288af1dd143fe5b1a3272"
+    },
+    {
+      "log": "/tmp/final-schema-typecheck.log",
+      "result": "passed",
+      "sha256": "37faad1b92060213d0d8aca5655e7578839c831d6f1f8eec60800211c3982acb"
+    },
+    {
+      "log": "/tmp/final-proposal-app-lint.log",
+      "result": "passed",
+      "sha256": "1ae7b07530c0ce5f1fbe1cd01baa1efc39c065b290936ec1d26932434b905fa1"
+    },
+    {
+      "log": "/tmp/final-proposal-app-typecheck.log",
+      "result": "passed",
+      "sha256": "0cfec1827489d14f529333f142fcfcb3123a7c82b316e010343c7da1a9d8881b"
+    },
+    {
+      "log": "/tmp/final-proposal-app-tests.log",
+      "result": "160 passed, 1 skipped",
+      "sha256": "d4b6206119dc5f526370e64e5730f5f2aa411956e92296595a58092ea3d72ff5"
+    },
+    {
+      "log": "/tmp/final-plan-label-lint.log",
+      "result": "passed",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "log": "/tmp/final-plan-label-typecheck.log",
+      "result": "passed",
+      "sha256": "0cfec1827489d14f529333f142fcfcb3123a7c82b316e010343c7da1a9d8881b"
+    },
+    {
+      "log": "/tmp/integrated-final-lint.log",
+      "result": "passed",
+      "sha256": "1ae7b07530c0ce5f1fbe1cd01baa1efc39c065b290936ec1d26932434b905fa1"
+    },
+    {
+      "log": "/tmp/integrated-final-typecheck.log",
+      "result": "passed",
+      "sha256": "0cfec1827489d14f529333f142fcfcb3123a7c82b316e010343c7da1a9d8881b"
+    },
+    {
+      "log": "/tmp/integrated-final-tests.log",
+      "result": "158 passed, 2 failed, 1 skipped; concurrent Ethereum assertion changes pending",
+      "sha256": "51cf64e6570178f89f8f3bec876e0aa043d4cadc0dc755130a1ada305fd9f4c3"
+    },
+    {
+      "log": "/tmp/integrated-final-build.log",
+      "result": "passed",
+      "sha256": "9b58c4e895053d861e84a741515dc577757538a2d580e3d992965b57e2f406c7"
+    }
+  ],
+  "newUnitTests": 0,
+  "browserAutomation": "Orca only",
+  "frontendRestored": true,
+  "health": {
+    "runnerAuthenticated": true,
+    "frontendReady": true
+  },
+  "independentReview": "requested, pending"
+}

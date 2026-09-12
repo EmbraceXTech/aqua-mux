@@ -1,0 +1,214 @@
+[
+  {
+    "chainId": 42161,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "localSigner": {
+      "hash": "0xb8bcd4f877a72631996557b3a837c2797add313c533551ec5f59443c9573a346",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0x805ab1d300bcb643f2c8a0adca96bd9b30bdbf12825332ec14a89ddc4b015ff3",
+    "fills": {
+      "forward": "0x94d8078bf752de5a8d26550dcfea968c43c3e0e259a979126f3946234c2f5f67",
+      "reverse": "0x7e3b70fa4c505cd25828aaa03b2abb5e24fb9705969477cf99452223aea1a311",
+      "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
+      "credentialFixtureOnly": true,
+      "sharedBaseBefore": "1050000000000000",
+      "sharedBaseAfter": "1024415594041061"
+    },
+    "replacementHash": "0xc53d9c7a302815f36524b8fc5865884abf5c2abaa55c1aac616318ccbcb4366f",
+    "replacementRollback": {
+      "hash": "0x8164263035a5e98a4828de17cdd4d84be71df3a5c9de06bf91f933c63c426402",
+      "oldPositionsAndInventoryRestored": true
+    },
+    "productionReceiptReconciliation": true,
+    "closeHash": "0x446a52d797e3d7e73db286db51e7052f689bddaf1ecac2b4e7d6ad48c15561ee",
+    "separateConversionHash": null,
+    "callDigest": "0x0ef52d2243fb49a6058bb7ede3478978bdbc5f66ebbbe91237ac5f86a69387a7",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "19744631940941"
+      },
+      {
+        "symbol": "USDC",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDT",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
+    "atomicRollbackHash": "0x7486eb010b4f948c59ad957c38402b583412526683eeb17f58d3d37d37a26380"
+  },
+  {
+    "chainId": 56,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "localSigner": {
+      "hash": "0xd6c0170eb33c95d512ce554e781d07a2b4e5dbeb9470d9fd89c90907ddae6586",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0x03d10b62d448cf1cb0c00d879b9e0eebd8c429e4b908871f1d060b9a83781747",
+    "fills": {
+      "forward": "0xda905e47274f362601a2bf37bd365e00851ed920e90d6e40691f422c3cacc7b4",
+      "reverse": "0xd13f9e05e6252eb363ca40777c6f72baec643ce2b931402e3e451dcce8764654",
+      "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
+      "credentialFixtureOnly": true,
+      "sharedBaseBefore": "1050000000000000",
+      "sharedBaseAfter": "1024415223393161"
+    },
+    "replacementHash": "0x6eb39b867c8e80b847c1b0bc8e636c21706c15af735f37c6fe32b6669ebfffd3",
+    "replacementRollback": {
+      "hash": "0xb0b5953d2e7c2826fbd6c6ba140b4f911d5661a435f78a6dcf158e782e05a8c8",
+      "oldPositionsAndInventoryRestored": true
+    },
+    "productionReceiptReconciliation": true,
+    "closeHash": "0xc2a395693fa6d4b773159f09c6069f282202fa67b1e0ce7a038e6127d204b720",
+    "separateConversionHash": null,
+    "callDigest": "0x26006fb10409b8e408c58d2e55bedd0ca88ff77a1f689bc24cbbfedf80c0044c",
+    "residual": [
+      {
+        "symbol": "WBNB",
+        "amount": "19745885284722"
+      },
+      {
+        "symbol": "USDC",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDT",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
+    "atomicRollbackHash": "0x357c8e9fa73e88d083393cf1457e31d36e0ab9541cc7a084d575b886b74e4168"
+  },
+  {
+    "chainId": 4663,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "localSigner": {
+      "hash": "0x696ce6be1b51683b89005a8f418506e65515788d3d4dc53782894981aa823b8d",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0xf8883075314e2625238181a49d32b250900cbe1bd55223a3685659bdffa392ca",
+    "fills": {
+      "forward": "0x9dce475e762423035f4104b48b6a26a108aa751d57390bf326c6512ae8f92dc5",
+      "reverse": "0x695f3be5eb529716b89fdd7f856651599cbf25fd270cccd00a67ce146e955c1f",
+      "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
+      "credentialFixtureOnly": true,
+      "sharedBaseBefore": "52500000000000",
+      "sharedBaseAfter": "51221163183536"
+    },
+    "replacementHash": "0xb69bc24465ee4548c896901aa382f14da5498a2df69e7997e8de408089f97cb2",
+    "replacementRollback": {
+      "hash": "0xdad7db3615db7635d208891571501d4b126ac014341457ea9dc70575b4413ff6",
+      "oldPositionsAndInventoryRestored": true
+    },
+    "productionReceiptReconciliation": true,
+    "closeHash": "0x127f63b9c3996bd54d05e18a312727d695ef4747f611356e876e2e4a49fca93d",
+    "separateConversionHash": null,
+    "callDigest": "0x8b83ec3054abf2879b55399c537f5a458511df654c68ff622b0ee1bb3145f8ca",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDG",
+        "amount": "0"
+      },
+      {
+        "symbol": "PONS",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": true,
+    "atomicRollbackHash": "0x9148a57b4bef9da8837b5346117d9d7fb4c7d408b2505d45ec417e09d9af6cc9"
+  },
+  {
+    "chainId": 42161,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": true,
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "localSigner": {
+      "hash": "0xf125159db009817aaea70e27b00fe0cd6afcf420eccd2d1e44763fb126b81194",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0x266f206cb60ddbbe317b52ba88d6f865fde1df801f880b8c286c1aa480aa4bf3",
+    "fills": {
+      "forward": "0x36ed99abd78b573d969f2aaa8a52d168713fddc14a9202bb115a405ff4e17577",
+      "reverse": "0x40cb0af3b5294174d84b34cb2f8c6a88ab40b4f9a5cc6aea34079a486313856c",
+      "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
+      "credentialFixtureOnly": true,
+      "sharedBaseBefore": "1050000000000000",
+      "sharedBaseAfter": "1024415775282158"
+    },
+    "replacementHash": "0x1f70cc138da1a95d8ed9701b340d92c27170efbed7e179955ddbb216d64a5751",
+    "replacementRollback": {
+      "hash": "0x2079de971d15a6d3db9e11f8b1a09c00789e534558678c55a9ba6df8bb2ced25",
+      "oldPositionsAndInventoryRestored": true
+    },
+    "productionReceiptReconciliation": true,
+    "closeHash": "0x8f6ffc458c78aad535ff2b63fc6b750cecf397047e72cbccc0589f195482489b",
+    "separateConversionHash": "0x54e80362927cbf562f923899f8c0ab94daedf2262114c3ae6ebc0250cbc1dc9d",
+    "callDigest": "0xcf48f885537401a9f1cf13c6644a8cd36d14c051b4e81665d756a5613d09238f",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "19744630986248"
+      },
+      {
+        "symbol": "USDC.e",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDT",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
+    "atomicRollbackHash": "0xeeb508008b597a55115a43eea198a83330bb10d947ee4490336f12a3d5ba0dfa"
+  }
+]
