@@ -1,0 +1,55 @@
+[
+  {
+    "chainId": 1,
+    "evidence": "controlled EIP1193 provider on isolated fork",
+    "bridgedUsdc": false,
+    "publicBroadcasts": 0,
+    "registrations": 2,
+    "localSigner": {
+      "hash": "0x81adc38790a5ddf1a7ac8c08717df73354bf3bd6693e33194c796981b60770e2",
+      "initialSelfAuthorizationProved": true,
+      "changedCodeAndNonceRefused": true
+    },
+    "unavailableRpcRefusedBeforeJournaling": true,
+    "openHash": "0x34591b404041e5ad3463541c103420d043fbfe50e4eeb9defbb2ca451ac38e6e",
+    "fills": {
+      "forward": "0xaa26d600aadec4519fe4368247c07e1dd0ea16e6cc43420da2a4c493912758f9",
+      "reverse": "0xae78e41b60411b9d7ab87e7e062055cbb819842d31abfb679b488a5472b5ad79",
+      "uncredentialedOriginRejected": true,
+      "credentialRevert": "TxOriginTokenBalanceIsZero(address,address)",
+      "credentialFixtureOnly": true,
+      "sharedBaseBefore": "1050000000000000",
+      "sharedBaseAfter": "1024415758519288"
+    },
+    "replacementHash": "0xd9e50fd67b5ecd68a6cfd233bc265369a9ee295bfedc85b01e9f9a1a7340b96d",
+    "replacementRollback": {
+      "hash": "0x3302d4500a625114efde2139cf56afd6b7f3a6c7d87e990358bb36d0bfa3b656",
+      "oldPositionsAndInventoryRestored": true
+    },
+    "productionReceiptReconciliation": true,
+    "closeHash": "0x293a75373c6bca9b584015559d8df354e1e6d27342c44a2c409904395c479327",
+    "separateConversionHash": null,
+    "callDigest": "0x4c0b9b8cafc176aef3dd0b6f0e87fb126682fa480593d9be223939cb9e58d38d",
+    "residual": [
+      {
+        "symbol": "WETH",
+        "amount": "19744632292805"
+      },
+      {
+        "symbol": "USDC",
+        "amount": "0"
+      },
+      {
+        "symbol": "USDT",
+        "amount": "0"
+      }
+    ],
+    "unsupportedAccountJournalEntries": 0,
+    "exactTransactionAndPrestateProof": true,
+    "ambiguousRelayRecovered": true,
+    "alteredSignedCalldataRejectedBeforeBroadcast": true,
+    "expiryAfterWalletApprovalRefused": true,
+    "directRouteMinimumReceiverAmountCallbackAndExtraCallRefused": false,
+    "atomicRollbackHash": "0x97c917d59d0b8918c21b181d7e8091c93bca61f7eeead63a6835c364e270e8f2"
+  }
+]

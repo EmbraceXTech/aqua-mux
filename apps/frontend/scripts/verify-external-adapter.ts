@@ -31,12 +31,15 @@ import { delegatedAccountCode } from "../lib/server/external-adapter/account";
 
 process.loadEnvFile(new URL("../.env", import.meta.url).pathname);
 const results: unknown[] = [];
-const scenarios = [
-  { chainId: 42161, bridged: false },
-  { chainId: 56, bridged: false },
-  { chainId: 4663, bridged: false },
-  { chainId: 42161, bridged: true },
-];
+const ethereumOnly = process.argv.includes("--ethereum");
+const scenarios = ethereumOnly
+  ? [{ chainId: 1, bridged: false }]
+  : [
+      { chainId: 42161, bridged: false },
+      { chainId: 56, bridged: false },
+      { chainId: 4663, bridged: false },
+      { chainId: 42161, bridged: true },
+    ];
 for (const { chainId, bridged } of scenarios) {
   const setting = networks.find((network) => network.id === chainId)!;
   const upstream = process.env[setting.env]!;
@@ -444,7 +447,9 @@ for (const { chainId, bridged } of scenarios) {
 }
 writeFileSync(
   new URL(
-    "../../../references/ethglobal-competitive-analysis/external-adapter-fork.json",
+    ethereumOnly
+      ? "../../../references/ethglobal-competitive-analysis/ethereum-adapter-fork.json"
+      : "../../../references/ethglobal-competitive-analysis/external-adapter-fork.json",
     import.meta.url,
   ),
   JSON.stringify(results, null, 2) + "\n",

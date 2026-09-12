@@ -2,6 +2,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import type { Hex } from "viem";
 
 export const devNetworks = [
+  { chainId: 1, name: "Ethereum mainnet", testnet: false },
   { chainId: 56, name: "BNB Chain mainnet", testnet: false },
   { chainId: 42161, name: "Arbitrum One mainnet", testnet: false },
   { chainId: 4663, name: "Robinhood Chain mainnet", testnet: false },

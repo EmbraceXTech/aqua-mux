@@ -17,7 +17,7 @@ export async function verifyExternalAccount(
 ) {
   if (
     owner.toLowerCase() !== maker.toLowerCase() ||
-    ![56, 42161, 4663].includes(chainId)
+    ![1, 56, 42161, 4663].includes(chainId)
   )
     throw new ManagedError(
       "external_account_unsupported",
