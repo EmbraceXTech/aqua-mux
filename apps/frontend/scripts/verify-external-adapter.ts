@@ -265,6 +265,12 @@ for (const { chainId, bridged } of scenarios) {
       continue;
     }
     const openReceipt = await execute(opened.plan.id);
+    if (process.argv.includes("--review-observations")) {
+      const { verifyReviewObservations } =
+        await import("./fixtures/review-observations");
+      await verifyReviewObservations(fork, store, maker, groupId);
+      continue;
+    }
     const fills = await verifyResolverFills(
       fork,
       opened.plan,
@@ -498,7 +504,11 @@ for (const { chainId, bridged } of scenarios) {
     process.env[setting.env] = upstream;
   }
 }
-if (!proxyUpgrade && !assetProvenance)
+if (
+  !proxyUpgrade &&
+  !assetProvenance &&
+  !process.argv.includes("--review-observations")
+)
   writeFileSync(
     new URL(
       ethereumOnly

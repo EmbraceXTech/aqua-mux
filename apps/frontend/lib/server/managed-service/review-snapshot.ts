@@ -1,3 +1,5 @@
+import { attachActiveRouteObservations } from "./active-route-observations";
+import { assertReviewSnapshotFresh } from "./freshness";
 import type { StrategyGroup } from "../../managed";
 import type { ManagedStore } from "../store";
 import {
@@ -33,11 +35,25 @@ export async function groupReviewSnapshot(
           pair.quoteToken,
         ]),
       });
+  if (!intent) await attachActiveRouteObservations(snapshot, group);
   await attachKnownExposure(snapshot, store);
-  if (snapshot.coverage.some((source) => source.status === "unavailable"))
+  const requiresMarket =
+    group.config.policy.allowedActions.value.includes("replace");
+  if (
+    snapshot.coverage.some(
+      (source) =>
+        source.status === "unavailable" &&
+        (!source.source.startsWith("verified-pair:") || requiresMarket),
+    )
+  )
     throw new ManagedError(
       "stale_data",
-      "Current maker position backing is unavailable. Review paused.",
+      "Current market observations or maker position backing are unavailable. Review paused.",
     );
+  assertReviewSnapshotFresh(
+    snapshot,
+    group.config.policy.maxReferenceAgeMs.value,
+    Date.now(),
+  );
   return snapshot;
 }
