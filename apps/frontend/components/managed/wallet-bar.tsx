@@ -1,3 +1,4 @@
+import { OwnerExport } from "./owner-export";
 import { Wallet } from "lucide-react";
 import type { ManagedSession } from "@/lib/managed-client/api";
 import { Button } from "../ui/button";
@@ -39,13 +40,16 @@ export function WalletBar({
       </div>
       <div className="managed-actions">
         {session ? (
-          <Button
-            variant="ghost"
-            disabled={busy}
-            onClick={() => void onDisconnect()}
-          >
-            Disconnect managed wallet
-          </Button>
+          <>
+            <OwnerExport key={session.sessionId} session={session} />
+            <Button
+              variant="ghost"
+              disabled={busy}
+              onClick={() => void onDisconnect()}
+            >
+              Disconnect managed wallet
+            </Button>
+          </>
         ) : (
           <>
             <Button disabled={busy} onClick={() => void onConnect("external")}>

@@ -44,7 +44,7 @@ export function proposalPolicy(
       "close",
       "propose-conversion",
     ]),
-    triggers: rule({
+    triggers: advisory({
       rangeExit: intent.recipeId !== "wide-range-lp",
       inventoryDriftBps: 10000,
       upwardOnly: intent.recipeId === "upward-only-lp",

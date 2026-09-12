@@ -148,7 +148,7 @@ export function StrategyView({ detail }: { detail: GroupDetail }) {
             </dd>
           </div>
           <div>
-            <dt>Review triggers</dt>
+            <dt>Advisory review signals</dt>
             <dd>
               Range exit:{" "}
               {group.config.policy.triggers.value.rangeExit
@@ -156,9 +156,16 @@ export function StrategyView({ detail }: { detail: GroupDetail }) {
                 : "disabled"}
               . Inventory drift:{" "}
               {group.config.policy.triggers.value.inventoryDriftBps / 100}%.
-              Upward-only:{" "}
-              {group.config.policy.triggers.value.upwardOnly ? "yes" : "no"}. /{" "}
-              {group.config.policy.triggers.enforcedBy}
+              These signals inform reviews; the broker does not enforce their
+              thresholds.
+            </dd>
+          </div>
+          <div>
+            <dt>Replacement direction</dt>
+            <dd>
+              {group.config.policy.triggers.value.upwardOnly
+                ? "Upward-only, enforced by the execution broker."
+                : "Upward-only restriction is disabled."}
             </dd>
           </div>
           <div>
