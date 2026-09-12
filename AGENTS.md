@@ -2,8 +2,8 @@
 
 This file is the project's committed home for project-intrinsic agent knowledge: build, test, release, architecture, and sharp-edge notes that should travel with the code.
 
-- Add durable project-specific notes here as they are discovered through real work.
 - The frontend's wallet-mode adapters and local development-wallet availability check are in `apps/frontend/lib/managed-client/wallet-execution.ts` and `apps/frontend/lib/server/dev-wallet/config.ts`.
+- Managed review integration: `apps/frontend/lib/server/managed-service/runner.ts` invokes the local Claude Code subscription only in development. Run `cd apps/frontend && npm run test:review`; the attended check and prerequisites are in `apps/frontend/verification/INLINE_DEVELOPMENT_REVIEW.md`.
 
 ## Maintaining this file
 

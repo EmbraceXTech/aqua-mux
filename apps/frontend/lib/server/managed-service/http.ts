@@ -37,6 +37,7 @@ import {
   reconcileManagedTransactions,
 } from "./reconciliation";
 import { proposeIntent } from "./proposals";
+import { requireDevelopmentReview } from "./runner";
 import { BROWSER_LEASE_MS } from "../automation/lease";
 import {
   externalExecutionCapabilities,
@@ -72,6 +73,7 @@ export async function managedApi(
       segments.length === 1 &&
       method === "POST"
     ) {
+      requireDevelopmentReview();
       const input = z
         .strictObject({ idempotencyKey: idSchema, intent: intentSchema })
         .parse(await body(request));
@@ -224,6 +226,7 @@ export async function managedApi(
       return ok(result);
     }
     if (action === "reviews" && segments.length === 3) {
+      requireDevelopmentReview();
       const input = reviewInputSchema.parse(await body(request));
       return ok({
         review: await runGroupReview(owner, id, {
@@ -233,6 +236,7 @@ export async function managedApi(
       });
     }
     if (action === "proposals" && segments.length === 3) {
+      requireDevelopmentReview();
       const input = z
         .strictObject({ idempotencyKey: idSchema })
         .parse(await body(request));

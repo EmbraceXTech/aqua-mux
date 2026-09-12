@@ -14,7 +14,7 @@ npm run dev
 
 Open [http://127.0.0.1:3100](http://127.0.0.1:3100). The development server binds to localhost on port 3100 and fails if that port is occupied.
 
-Populate `.env` with RPC URLs for each desired network. `ONEINCH_API_KEY` is required for live Classic Swap quotes and execution. Environment variables are consumed only by server modules and are excluded from Git. Do not commit secrets.
+Populate `.env` with RPC URLs for each desired network. `ONEINCH_API_KEY` is required for live Classic Swap quotes and execution. Environment variables are consumed only by server modules and are excluded from Git. Do not commit secrets. Development reviews use the locally installed Claude Code subscription session, not an Anthropic API key.
 
 ```dotenv
 ETHEREUM_RPC_URL=
@@ -35,13 +35,26 @@ Run all commands from `apps/frontend`.
 | `npm run start` | Serve the production build on `127.0.0.1:3100`. |
 | `npm run typecheck` | Type-check without emitting files. |
 | `npm run lint` | Run ESLint with warnings treated as failures. |
-| `npm test` | Run unit tests. |
+| `npm test` | Run unit tests, including development and non-development review behavior. |
+| `npm run test:review` | Run the review runner and cancellation tests. |
+| `npm run test:review:live` | Make one synthetic, read-only review request against a running local app. |
 | `npm run test:e2e` | Run Playwright browser tests. |
 | `npm run sync:tokens` | Refresh the curated token catalog and images from 1inch token lists. |
 | `npm run format` | Format application, test, script, and configuration files. |
 | `npm run verify:fork` | Run isolated Anvil-fork integration verification. |
 | `npm run verify:live` | Read-only verification of recorded live receipts and positions. |
 | `npm run test:live -- --execute` | Submit bounded, small live transactions; requires `PRIVATE_KEY` in `.env`. |
+
+## Local development reviews
+
+With `NODE_ENV=development`, managed proposal and review requests invoke the local Claude Code CLI directly. Install Claude Code and authenticate its subscription for the operating-system user that starts Next.js:
+
+```sh
+claude auth login
+npm run dev
+```
+
+No runner service, Docker engine, API key, or review token is required. The app runs Claude Code with tools and inherited application secrets disabled. Other environments return `501 review_not_implemented` and never start the CLI. The [recorded inline check](verification/INLINE_DEVELOPMENT_REVIEW.md) lists the exact prerequisites and redacted result.
 
 ## Verification notes
 
