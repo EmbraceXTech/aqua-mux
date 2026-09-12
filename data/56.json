@@ -1,0 +1,563 @@
+{
+  "name": "AquaMux curated tokens 56",
+  "timestamp": "2026-09-12T14:48:37.357Z",
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  },
+  "tokens": [
+    {
+      "chainId": 56,
+      "address": "0x6c5FE6e99D2484db7E4BF34F365ABA42d0E4dC20",
+      "decimals": 18,
+      "name": "Absorber",
+      "symbol": "ABS",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x6c5FE6e99D2484db7E4BF34F365ABA42d0E4dC20/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x4197C6EF3879a08cD51e5560da5064B773aa1d29",
+      "decimals": 18,
+      "name": "ACryptoS",
+      "symbol": "ACS",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x4197C6EF3879a08cD51e5560da5064B773aa1d29/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
+      "decimals": 18,
+      "name": "Cardano",
+      "symbol": "ADA",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x016CF83732f1468150D87dCC5BdF67730B3934D3",
+      "decimals": 18,
+      "name": "AirNFT Token",
+      "symbol": "AIRT",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x016CF83732f1468150D87dCC5BdF67730B3934D3/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xa1faa113cbE53436Df28FF0aEe54275c13B40975",
+      "decimals": 18,
+      "name": "Alpha Finance",
+      "symbol": "ALPHA",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xa1faa113cbE53436Df28FF0aEe54275c13B40975/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x6679eB24F59dFe111864AEc72B443d1Da666B360",
+      "decimals": 8,
+      "name": "ARIVA",
+      "symbol": "ARV",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x6679eB24F59dFe111864AEc72B443d1Da666B360/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x0Eb3a705fc54725037CC9e008bDede697f62F335",
+      "decimals": 18,
+      "name": "Cosmos",
+      "symbol": "ATOM",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x0Eb3a705fc54725037CC9e008bDede697f62F335/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xa184088a740c695E156F91f5cC086a06bb78b827",
+      "decimals": 18,
+      "name": "AUTOv2",
+      "symbol": "AUTO",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xa184088a740c695E156F91f5cC086a06bb78b827/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xc748673057861a797275CD8A068AbB95A902e8de",
+      "decimals": 9,
+      "name": "Baby Doge Coin",
+      "symbol": "BabyDoge",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xc748673057861a797275CD8A068AbB95A902e8de/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x72fAa679E1008Ad8382959FF48E392042A8b06f7",
+      "decimals": 18,
+      "name": "AllianceBlock Token",
+      "symbol": "bALBT",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x72fAa679E1008Ad8382959FF48E392042A8b06f7/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xAD6cAEb32CD2c308980a548bD0Bc5AA4306c6c18",
+      "decimals": 18,
+      "name": "Band",
+      "symbol": "BAND",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xAD6cAEb32CD2c308980a548bD0Bc5AA4306c6c18/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x8fF795a6F4D97E7887C79beA79aba5cc76444aDf",
+      "decimals": 18,
+      "name": "Bitcoin Cash",
+      "symbol": "BCH",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x8fF795a6F4D97E7887C79beA79aba5cc76444aDf/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x190b589cf9Fb8DDEabBFeae36a813FFb2A702454",
+      "decimals": 18,
+      "name": "bDollar",
+      "symbol": "BDO",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x190b589cf9Fb8DDEabBFeae36a813FFb2A702454/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x81859801b01764D4f0Fa5E64729f5a6C3b91435b",
+      "decimals": 18,
+      "name": "bearn.fi",
+      "symbol": "BFI",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x81859801b01764D4f0Fa5E64729f5a6C3b91435b/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x63870A18B6e42b01Ef1Ad8A2302ef50B7132054F",
+      "decimals": 6,
+      "name": "BLinkToken",
+      "symbol": "BLINK",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x63870A18B6e42b01Ef1Ad8A2302ef50B7132054F/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x790Be81C3cA0e53974bE2688cDb954732C9862e1",
+      "decimals": 18,
+      "name": "CafeSwap Token",
+      "symbol": "BREW",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x790Be81C3cA0e53974bE2688cDb954732C9862e1/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x5Ac52EE5b2a633895292Ff6d8A89bB9190451587",
+      "decimals": 18,
+      "name": "BSCX",
+      "symbol": "BSCX",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x5Ac52EE5b2a633895292Ff6d8A89bB9190451587/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
+      "decimals": 18,
+      "name": "BNB pegged BTCB Token",
+      "symbol": "BTCB",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x78650B139471520656b9E7aA7A5e9276814a38e9",
+      "decimals": 17,
+      "name": "StandardBTCHashrateToken",
+      "symbol": "BTCST",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x78650B139471520656b9E7aA7A5e9276814a38e9/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xC9849E6fdB743d08fAeE3E34dd2D1bc69EA11a51",
+      "decimals": 18,
+      "name": "Bunny Token",
+      "symbol": "BUNNY",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xC9849E6fdB743d08fAeE3E34dd2D1bc69EA11a51/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+      "decimals": 18,
+      "name": "BUSD",
+      "symbol": "BUSD",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x0231f91e02DebD20345Ae8AB7D71A41f8E140cE7",
+      "decimals": 18,
+      "name": "Jupiter",
+      "symbol": "bwJUP",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x0231f91e02DebD20345Ae8AB7D71A41f8E140cE7/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+      "decimals": 18,
+      "name": "PancakeSwap",
+      "symbol": "CAKE",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xcc2E12a9b5b75360c6FBf23B584c275D52cDdb0E",
+      "decimals": 18,
+      "name": "Crow Token",
+      "symbol": "CROW",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xcc2E12a9b5b75360c6FBf23B584c275D52cDdb0E/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x97a30C692eCe9C317235d48287d23d358170FC40",
+      "decimals": 18,
+      "name": "CryptEx Token",
+      "symbol": "CRX",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x97a30C692eCe9C317235d48287d23d358170FC40/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xA8c2B8eec3d368C0253ad3dae65a5F2BBB89c929",
+      "decimals": 6,
+      "name": "Shentu",
+      "symbol": "CTK",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xA8c2B8eec3d368C0253ad3dae65a5F2BBB89c929/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
+      "decimals": 18,
+      "name": "Dai",
+      "symbol": "DAI",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x233d91A0713155003fc4DcE0AFa871b508B3B715",
+      "decimals": 9,
+      "name": "Ditto",
+      "symbol": "DITTO",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x233d91A0713155003fc4DcE0AFa871b508B3B715/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2",
+      "decimals": 18,
+      "name": "DODO",
+      "symbol": "DODO",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x67ee3Cb086F8a16f34beE3ca72FAD36F7Db929e2/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x95c91eEf65F50570cFC3f269961a00108Cf7BF59",
+      "decimals": 18,
+      "name": "The DONS",
+      "symbol": "DONS",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x95c91eEf65F50570cFC3f269961a00108Cf7BF59/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x7083609fCE4d1d8Dc0C979AAb8c869Ea2C873402",
+      "decimals": 18,
+      "name": "Polkadot",
+      "symbol": "DOT",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x7083609fCE4d1d8Dc0C979AAb8c869Ea2C873402/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xF952Fc3ca7325Cc27D15885d37117676d25BfdA6",
+      "decimals": 18,
+      "name": "Goose Golden Egg",
+      "symbol": "EGG",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xF952Fc3ca7325Cc27D15885d37117676d25BfdA6/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xbF7c81FFF98BbE61B40Ed186e4AfD6DDd01337fe",
+      "decimals": 18,
+      "name": "BNB pegged Elrond",
+      "symbol": "EGLD",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xbF7c81FFF98BbE61B40Ed186e4AfD6DDd01337fe/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x56b6fB708fC5732DEC1Afc8D8556423A2EDcCbD6",
+      "decimals": 18,
+      "name": "BNB pegged EOS Token",
+      "symbol": "EOS",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x56b6fB708fC5732DEC1Afc8D8556423A2EDcCbD6/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x2170Ed0880ac9A755fd29B2688956BD959F933F8",
+      "decimals": 18,
+      "name": "Ethereum",
+      "symbol": "ETH",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x2170Ed0880ac9A755fd29B2688956BD959F933F8/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153",
+      "decimals": 18,
+      "name": "Filecoin",
+      "symbol": "FIL",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x0D8Ce2A99Bb6e3B7Db580eD848240e4a0F9aE153/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x928e55daB735aa8260AF3cEDadA18B5f70C72f1b",
+      "decimals": 18,
+      "name": "Frontier Token",
+      "symbol": "FRONT",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x928e55daB735aa8260AF3cEDadA18B5f70C72f1b/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x2090c8295769791ab7A3CF1CC6e0AA19F35e441A",
+      "decimals": 18,
+      "name": "Fuel Token",
+      "symbol": "Fuel",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x2090c8295769791ab7A3CF1CC6e0AA19F35e441A/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xf79037F6f6bE66832DE4E7516be52826BC3cBcc4",
+      "decimals": 6,
+      "name": "Hard Protocol",
+      "symbol": "HARD",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xf79037F6f6bE66832DE4E7516be52826BC3cBcc4/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x948d2a81086A075b3130BAc19e4c6DEe1D2E3fE8",
+      "decimals": 18,
+      "name": "Helmet.insure Governance Token",
+      "symbol": "Helmet",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x948d2a81086A075b3130BAc19e4c6DEe1D2E3fE8/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xC7d8D35EBA58a0935ff2D5a33Df105DD9f071731",
+      "decimals": 6,
+      "name": "Hedget",
+      "symbol": "HGET",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xC7d8D35EBA58a0935ff2D5a33Df105DD9f071731/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xa2B726B1145A4773F68593CF171187d8EBe4d495",
+      "decimals": 18,
+      "name": "Injective",
+      "symbol": "INJ",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xa2B726B1145A4773F68593CF171187d8EBe4d495/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x7979F6C54ebA05E18Ded44C4F986F49a5De551c2",
+      "decimals": 18,
+      "name": "Kebab Token",
+      "symbol": "KEBAB",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x7979F6C54ebA05E18Ded44C4F986F49a5De551c2/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD",
+      "decimals": 18,
+      "name": "Chainlink",
+      "symbol": "LINK",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xb59490aB09A0f526Cc7305822aC65f2Ab12f9723",
+      "decimals": 18,
+      "name": "Litentry",
+      "symbol": "LIT",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xb59490aB09A0f526Cc7305822aC65f2Ab12f9723/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x4338665CBB7B2485A8855A139b75D5e34AB0DB94",
+      "decimals": 18,
+      "name": "Litecoin",
+      "symbol": "LTC",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x4338665CBB7B2485A8855A139b75D5e34AB0DB94/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xC3137c696796D69F783CD0Be4aB4bB96814234Aa",
+      "decimals": 9,
+      "name": "Pepa Inu",
+      "symbol": "PEPA",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xC3137c696796D69F783CD0Be4aB4bB96814234Aa/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xC7FB8c5eFE8564205eE5CbA4dE8eeA8a086a4bd2",
+      "decimals": 9,
+      "name": "PocketRocket",
+      "symbol": "POCROC",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xC7FB8c5eFE8564205eE5CbA4dE8eeA8a086a4bd2/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xF21768cCBC73Ea5B6fd3C687208a7c2def2d966e",
+      "decimals": 18,
+      "name": "Reef.finance",
+      "symbol": "REEF",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xF21768cCBC73Ea5B6fd3C687208a7c2def2d966e/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xD41FDb03Ba84762dD66a0af1a6C8540FF1ba5dfb",
+      "decimals": 18,
+      "name": "SafePal",
+      "symbol": "SFP",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xD41FDb03Ba84762dD66a0af1a6C8540FF1ba5dfb/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x37Ac4D6140e54304D77437A5c11924f61a2D976f",
+      "decimals": 18,
+      "name": "SparkPoint Fuel",
+      "symbol": "SFUEL",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x37Ac4D6140e54304D77437A5c11924f61a2D976f/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x3aabCf53A1930A42E18D938C019E83Ebee50a849",
+      "decimals": 9,
+      "name": "SPONGE",
+      "symbol": "SPG",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x3aabCf53A1930A42E18D938C019E83Ebee50a849/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xE40255C5d7fa7ceEc5120408C78C787CECB4cfdb",
+      "decimals": 18,
+      "name": "SWGb",
+      "symbol": "SWGb",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xE40255C5d7fa7ceEc5120408C78C787CECB4cfdb/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x47BEAd2563dCBf3bF2c9407fEa4dC236fAbA485A",
+      "decimals": 18,
+      "name": "Swipe",
+      "symbol": "SXP",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x47BEAd2563dCBf3bF2c9407fEa4dC236fAbA485A/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x9798dF2f5d213a872c787bD03b2b91F54D0D04A1",
+      "decimals": 18,
+      "name": "TeraBlock Token",
+      "symbol": "TBC",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x9798dF2f5d213a872c787bD03b2b91F54D0D04A1/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x4B0F1812e5Df2A09796481Ff14017e6005508003",
+      "decimals": 18,
+      "name": "Trust Wallet",
+      "symbol": "TWT",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x4B0F1812e5Df2A09796481Ff14017e6005508003/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x728C5baC3C3e370E372Fc4671f9ef6916b814d8B",
+      "decimals": 18,
+      "name": "UNFI",
+      "symbol": "UNFI",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x728C5baC3C3e370E372Fc4671f9ef6916b814d8B/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xBf5140A22578168FD562DCcF235E5D43A02ce9B1",
+      "decimals": 18,
+      "name": "Uniswap",
+      "symbol": "UNI",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xBf5140A22578168FD562DCcF235E5D43A02ce9B1/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x55d398326f99059fF775485246999027B3197955",
+      "decimals": 18,
+      "name": "Tether USD",
+      "symbol": "USDT",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x55d398326f99059fF775485246999027B3197955/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x734D66f635523D7ddb7d2373C128333DA313041b",
+      "decimals": 9,
+      "name": "ZEDXION",
+      "symbol": "USDZ",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x734D66f635523D7ddb7d2373C128333DA313041b/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x23396cF899Ca06c4472205fC903bDB4de249D6fC",
+      "decimals": 18,
+      "name": "TerraClassicUSD",
+      "symbol": "UST",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x23396cF899Ca06c4472205fC903bDB4de249D6fC/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x4BD17003473389A42DAF6a0a729f6Fdb328BbBd7",
+      "decimals": 18,
+      "name": "VAI Stablecoin",
+      "symbol": "VAI",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x4BD17003473389A42DAF6a0a729f6Fdb328BbBd7/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+      "decimals": 18,
+      "name": "Wrapped BNB",
+      "symbol": "WBNB",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE",
+      "decimals": 18,
+      "name": "XRP",
+      "symbol": "XRP",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x1D2F0da169ceB9fC7B3144628dB156f3F6c60dBE/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x16939ef78684453bfDFb47825F8a5F714f12623a",
+      "decimals": 18,
+      "name": "BNB pegged Tezos Token",
+      "symbol": "XTZ",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x16939ef78684453bfDFb47825F8a5F714f12623a/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63",
+      "decimals": 18,
+      "name": "Venus",
+      "symbol": "XVS",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x88f1A5ae2A3BF98AEAF342D26B30a79438c9142e",
+      "decimals": 18,
+      "name": "Yearn",
+      "symbol": "YFI",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x88f1A5ae2A3BF98AEAF342D26B30a79438c9142e/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x7F70642d88cf1C4a3a7abb072B53B929b653edA5",
+      "decimals": 18,
+      "name": "BNB pegged YFII.finance Token",
+      "symbol": "YFII",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x7F70642d88cf1C4a3a7abb072B53B929b653edA5/logo.png"
+    },
+    {
+      "chainId": 56,
+      "address": "0x44754455564474A89358B2C2265883DF993b12F0",
+      "decimals": 18,
+      "name": "ZeroSwapToken",
+      "symbol": "ZEE",
+      "logoURI": "https://assets-cdn.trustwallet.com/blockchains/smartchain/assets/0x44754455564474A89358B2C2265883DF993b12F0/logo.png"
+    }
+  ]
+}

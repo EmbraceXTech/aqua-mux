@@ -1,0 +1,19 @@
+{
+  "name": "aqua-mux",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-wallet-balance": "tsx scripts/check-wallet-balance.ts",
+    "get-wallet-address": "tsx scripts/get-wallet-address.ts",
+    "refresh-token-list": "tsx scripts/refresh-token-list.ts"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "viem": "^2.56.3",
+    "wagmi": "^3.7.7"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.13"
+  }
+}
