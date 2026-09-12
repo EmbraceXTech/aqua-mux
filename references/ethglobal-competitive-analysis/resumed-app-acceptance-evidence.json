@@ -1,0 +1,170 @@
+{
+  "generatedAt": "2026-09-12T05:44:13.291244+00:00",
+  "scope": "Orca embedded browser only; no public transactions, no new unit tests",
+  "observations": {
+    "resumed-false-confirmation-before": {
+      "scope": "local malformed receipt fixture, no transaction",
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nRecent transactions\nMulti-swap\nArbitrum \u00b7 9/12/2026, 12:37:22 PM\nConfirmed\nArbitrum\nConnect wallet\nOne token. Many possibilities.\n\nBuild your basket with one transaction. You choose the mix.\n\nMulti-swap\nMulti-LP\nYou pay\non Arbitrum\nETH\nEnter the total to split\nWallet not connected\nYour token mix\nChoose tokens and set your allocation\nSplit equally\nUSDC\nUSD Coin\n--\nAwaiting quote\n%\nWBTC\nWrapped BTC\n--\nAwaiting quote\n%\nLINK\nChainLink Token\n--\nAwaiting quote\n%\nAdd a token\n3 / 6\nTotal allocation\n100%\nAll swaps in one atomic transaction\ni\nBatch status is unavailable. Check wallet activity before submitting again.\nConnect wallet\nPREVIEW\nOne in. Your mix out.\n\nSplit a single payment across the tokens you choose.\n\n1 ETH\nOne input\nUSDC\n50%\nWBTC\n30%\nLINK\n20%\n3 swaps\n1 transaction\nTransaction details\nNetwork\nArbitrum\nExecution\n1inch Swap\nSlippage tolerance\n0.5%\nNetwork fee\nCalculated by wallet\nNew to shared liquidity? See how it works\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua"
+    },
+    "resumed-false-confirmation-after": {
+      "scope": "local bare status 200 fixture without atomicity, receipts or hash",
+      "text": "Check transaction status\n\nCheck your wallet activity and transaction receipt.\n\nExecution is unknown. The wallet response does not prove a complete atomic result. Check its activity before retrying.\n\nCopy batch ID\nOpen managed liquidity"
+    },
+    "resumed-history-list": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDownload my records\nDisconnect managed wallet\nSaved proposal reviews (12)\nSucceeded / 9/12/2026, 9:43:26 AM\n\nThe available preview provides a budget-conserving, compiler-valid LP candidate with editable fee and range parameters for owner review.\n\nOpen reviewed group\nFailed / 9/12/2026, 9:39:46 AM\n\nA fresh authenticated proposal could not be completed.\n\nFailed / 9/12/2026, 9:36:51 AM\n\nA fresh authenticated proposal could not be completed.\n\nFailed / 9/12/2026, 9:35:24 AM\n\nA route quote expired while the review ran. Request a fresh review.\n\nFailed / 9/12/2026, 9:33:13 AM\n\nA route quote expired while the review ran. Request a fresh review.\n\nFailed / 9/12/2026, 9:32:01 AM\n\nA route quote expired while the review ran. Request a fresh review.\n\nSucceeded / 9/12/2026, 6:14:20 AM\n\nThe available preview provides a compiled, editable WETH/USDC LP candidate within the 0.0001 ETH funding budget while preserving the 0.0005 ETH gas reserve. Suitable for owner review, not execution authorization; the starting 5 bps fee and 20% bounds are not claimed to be optimal.\n\nOpen reviewed group\nFailed / 9/12/2026, 6:12:16 AM\n\nA route quote expired while the review ran. Request a fresh review.\n\nFailed / 9/12/2026, 6:05:26 AM\n\nWallet or source data became stale while the review ran. Request a fresh review.\n\nSucceeded / 9/12/2026, 6:04:06 AM\n\nThe supplied snapshot indicates sufficient native ETH for the requested budget and reserve, but a defensible initial LP candidate requires the verified wallet and position queries and a suitable proposal preview. Those tools are accessible here only through a shell invocation, which the review instructions prohibit. No configuration is proposed.\n\nSucceeded / 9/12/2026, 5:51:30 AM\n\nThe native balance covers the requested funding budget and gas reserve, but the supplied data does not support a defensible concentrated-LP opening. There is no pool fee, opening-price reference, justified bounded range, or verified funding route for both LP assets. The single conversion quote cannot establish those parameters.\n\nFailed / 9/12/2026, 5:46:50 AM\n\nThe authenticated review runner could not complete this request.\n\nRecover a managed group\nManaged concentrated LP / draft / 4754a8b7\nManaged concentrated LP / draft / 5ad10409\n\nGroups load from authenticated backend records. Reconcile current chain state before resuming.\n\nYOUR LIQUIDITY, ONE WORKSPACE\nChoose how you provide liquidity\n\nStart with a fresh wallet analysis. Review every allocation before it reaches your wallet.\n\nBrowser-bound reviews\nManual confirmation\nWide-range LP\n\nProvide wallet-backed liquidity across a broad price range, with one shared base inventory.\n\nManagement\nMonitor backing and review inventory. No automatic recentering.\nMarket conditions\nFor a longer holding period with room for price movement.\nInventory and availability\nBase and paired tokens on one supported chain. Wallet balances and route availability are checked in the proposal.\n\nInventory can lose value. Shared reserves compete across pairs, and registration does not guarantee fills.\n\nConfigure strategy\nExperimental\nManaged concentrated LP\n\nSet a range for each pair and review changes when prices move outside it.\n\nManagement\nPropose bounded replacements after cooldown and cost checks.\nMarket conditions\nFor active range management with regular browser reviews.\nInventory and availability\nBase and paired tokens on one supported chain. Wallet balances and route availability are checked in the proposal.\n\nA position can become inactive outside its range. Replacements incur costs and require approval.\n\nConfigure strategy\nExperimental\nUpward-only recenter LP\n\nReview upward range moves while keeping a defined inventory and action budget.\n\nManagement\nMove the reference upward only when the configured trigger permits.\nMarket conditions\nFor a directional approach that may hold or pause on decline.\nInventory and availability\nBase and paired tokens on one supported chain. Wallet balances and route availability are checked in the proposal.\n\nUpward-only management does not prevent losses and can leave positions inactive.\n\nConfigure strategy\nUnavailable\nInventory-aware MM\n\nBounded buy and sell quotes with inventory-dependent sizing and expiry.\n\nManagement\nRequires a separately verified quote compiler and fill lifecycle.\nMarket conditions\nA subsequent milestone, with no executable recipe available yet.\nInventory and availability\nBase and paired tokens on one supported chain. Wallet balances and route availability are checked in the proposal.\n\nSpread capture must cover execution costs and adverse selection.\n\nNot available yet\n\nRecurring reviews need an active browser lease. Existing positions can still fill after you stop management or close this tab. No performance estimates are shown without attributable data.\n\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua",
+    "resumed-open-reviewed-group": {
+      "at": "2026-09-12T05:35:59.127Z",
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDownload my records\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nIdle\nAll strategies\nStrategy\nPositions\nActivity\nControls\nEdit proposal\nRegenerate fresh review\nReview fund and open\nCurrent strategy\nRecipe\nManaged concentrated LP v1\nReview mode\nEvery transaction requires confirmation\nReview interval\n15 minutes\nNext review due\nManagement is not running\nLast decision\nFund and open\nPolicy expiry\n9/19/2026, 9:43:27 AM\n\nThe available preview provides a budget-conserving, compiler-valid LP candidate with editable fee and range parameters for owner review.\n\n9/12/2026, 9:43:26 AM / codex / gpt-6-astra\n\nPair parameters\nPair\tOpening price\tRange\tVirtual reserves\tFee\nWBNB / USDC\t709.82357309 USDC per WBNB\t578.42932861 to 867.64399291 USDC\t0.000033333333333333 WBNB\n0.024101222025525876 USDC\t0.05%\n\nVirtual allocations share real inventory. Adding the allocations does not measure the capital in this group.\n\nManagement limits\nSpend budgets\n0.0001 BNB / advisory-display\nGas budget, raw native units\n500000000000000 / advisory-display\nMaximum reference age\n60 seconds / execution-broker\nAdvisory review signals\nRange exit: enabled. Inventory drift: 100%. These signals inform reviews; the broker does not enforce their thresholds.\nReplacement direction\nUpward-only restriction is disabled.\nAllowed actions\nHold, Fund and open, Replace, Close, Propose conversion\nAction limit\n1 / advisory-display\nCooldown\n15 minutes / execution-broker\nMaximum slippage\n0.5% / execution-broker\nPermitted token and route addresses\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua"
+    },
+    "resumed-history-run": {
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDownload my records\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nRunning\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: 9/12/2026, 12:37:06 PM. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\nTake over reviews in this tab\n\nThere is no recorded stop reason.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stops management and prepares a transaction to dock this group's positions. Tokens remain in the maker wallet after confirmation.\n\nReview close positions\nClose and convert\n\nChoose exact quantities from the latest wallet balances. Review minimum receipts, gas reserve, and residuals before confirming.\n\nConversion destination\nChoose a token\n\nWallet balances may include unrelated assets. Attribution is incomplete, so enter only the quantities you choose to convert. No amounts are selected automatically.\n\nRefresh wallet quantities\nReview close and convert\n\nIf conversion is unavailable, close-only remains a separate choice. A combined request is never silently split into multiple transactions.\n\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua",
+      "events": [
+        {
+          "path": "/api/managed/groups/4754a8b7-2063-4184-9a12-223d5baf7e61/bot",
+          "status": 200,
+          "state": "running",
+          "generation": 1,
+          "at": "2026-09-12T05:36:21.151Z"
+        },
+        {
+          "path": "/api/managed/groups/4754a8b7-2063-4184-9a12-223d5baf7e61",
+          "status": 200,
+          "state": "running",
+          "generation": 1,
+          "at": "2026-09-12T05:36:21.268Z"
+        }
+      ]
+    },
+    "resumed-history-stop": {
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDownload my records\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nStopped\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: Unavailable. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\n\nStopped by owner. Passive positions remain open.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stops management and prepares a transaction to dock this group's positions. Tokens remain in the maker wallet after confirmation.\n\nReview close positions\nClose and convert\n\nChoose exact quantities from the latest wallet balances. Review minimum receipts, gas reserve, and residuals before confirming.\n\nConversion destination\nChoose a token\n\nWallet balances may include unrelated assets. Attribution is incomplete, so enter only the quantities you choose to convert. No amounts are selected automatically.\n\nRefresh wallet quantities\nReview close and convert\n\nIf conversion is unavailable, close-only remains a separate choice. A combined request is never silently split into multiple transactions.\n\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua",
+      "events": [
+        {
+          "path": "/api/managed/groups/4754a8b7-2063-4184-9a12-223d5baf7e61/bot",
+          "status": 200,
+          "state": "running",
+          "generation": 1,
+          "at": "2026-09-12T05:36:21.151Z"
+        },
+        {
+          "path": "/api/managed/groups/4754a8b7-2063-4184-9a12-223d5baf7e61",
+          "status": 200,
+          "state": "running",
+          "generation": 1,
+          "at": "2026-09-12T05:36:21.268Z"
+        },
+        {
+          "path": "/api/managed/groups/4754a8b7-2063-4184-9a12-223d5baf7e61/bot",
+          "status": 200,
+          "state": "stopped",
+          "generation": 2,
+          "at": "2026-09-12T05:36:30.467Z"
+        },
+        {
+          "path": "/api/managed/groups/4754a8b7-2063-4184-9a12-223d5baf7e61",
+          "status": 200,
+          "state": "stopped",
+          "generation": 2,
+          "at": "2026-09-12T05:36:30.728Z"
+        }
+      ]
+    },
+    "resumed-history-recovery": {
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDownload my records\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nStopped\nAll strategies\nStrategy\nPositions\nActivity\nControls\nEdit proposal\nRegenerate fresh review\nNo executable review\nCurrent strategy\nRecipe\nManaged concentrated LP v1\nReview mode\nEvery transaction requires confirmation\nReview interval\n15 minutes\nNext review due\nManagement is not running\nLast decision\nFund and open\nPolicy expiry\n9/19/2026, 9:43:27 AM\n\nThe available preview provides a budget-conserving, compiler-valid LP candidate with editable fee and range parameters for owner review.\n\n9/12/2026, 9:43:26 AM / codex / gpt-6-astra\n\nPair parameters\nPair\tOpening price\tRange\tVirtual reserves\tFee\nWBNB / USDC\t709.82357309 USDC per WBNB\t578.42932861 to 867.64399291 USDC\t0.000033333333333333 WBNB\n0.024101222025525876 USDC\t0.05%\n\nVirtual allocations share real inventory. Adding the allocations does not measure the capital in this group.\n\nManagement limits\nSpend budgets\n0.0001 BNB / advisory-display\nGas budget, raw native units\n500000000000000 / advisory-display\nMaximum reference age\n60 seconds / execution-broker\nAdvisory review signals\nRange exit: enabled. Inventory drift: 100%. These signals inform reviews; the broker does not enforce their thresholds.\nReplacement direction\nUpward-only restriction is disabled.\nAllowed actions\nHold, Fund and open, Replace, Close, Propose conversion\nAction limit\n1 / advisory-display\nCooldown\n15 minutes / execution-broker\nMaximum slippage\n0.5% / execution-broker\nPermitted token and route addresses\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua",
+      "at": "2026-09-12T05:36:47.523Z"
+    },
+    "resumed-export-completeness": {
+      "owner": "0x992a6a939579e10ad47c347a5be3788c94992dd4",
+      "proposalCount": 12,
+      "withoutManagedGroup": [
+        {
+          "id": "ece34518-4173-49a1-9c9d-d1670cb3d4f9",
+          "status": "succeeded"
+        },
+        {
+          "id": "1925099c-189a-4eae-bc47-710b81436028",
+          "status": "failed"
+        },
+        {
+          "id": "44040189-acd1-419d-9655-ada3ae69c943",
+          "status": "failed"
+        },
+        {
+          "id": "474d9426-4168-445f-a392-45bc9f8681df",
+          "status": "failed"
+        },
+        {
+          "id": "3c6a1ae3-ae3b-4244-9fb6-7da0cc2be751",
+          "status": "failed"
+        },
+        {
+          "id": "b4f95a70-1d67-4f2f-86b7-5adfc936aa71",
+          "status": "failed"
+        },
+        {
+          "id": "f15402bc-852b-48bf-b5a5-76d788a3f65f",
+          "status": "failed"
+        },
+        {
+          "id": "ad4063d8-711e-4978-9e1c-827782df9235",
+          "status": "succeeded"
+        },
+        {
+          "id": "bd693501-6c36-4bdd-80f0-797ef2dcc6d8",
+          "status": "failed"
+        },
+        {
+          "id": "e65aee2a-be7e-4d85-95a8-6a17bb6ad6a4",
+          "status": "failed"
+        }
+      ],
+      "snapshotsExcluded": true,
+      "internalDocumentsExcluded": true
+    },
+    "resumed-export-anonymous": {
+      "scope": "actual anonymous API request from Orca app page",
+      "status": 401,
+      "error": "Authentication required.",
+      "exportedRecords": false
+    },
+    "resume-label-export-browser": {
+      "export": {
+        "keys": [
+          "schemaVersion",
+          "owner",
+          "exportedAt",
+          "records",
+          "events"
+        ],
+        "bytes": 253280,
+        "containsCredential": false
+      },
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDownload my records\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nStopped\nAll strategies\nStrategy\nPositions\nActivity\nControls\nEdit proposal\nRegenerate fresh review\nNo executable review\nCurrent strategy\nRecipe\nManaged concentrated LP v1\nReview mode\nEvery transaction requires confirmation\nReview interval\n15 minutes\nNext review due\nManagement is not running\nLast decision\nHold\nPolicy expiry\n9/19/2026, 6:14:21 AM\n\nNo managed position or backing reconciliation is available to establish a range-exit or inventory-drift trigger for this interval review. Keep the current configuration unchanged; partial discovery does not establish zero exposure or justify a new opening.\n\n9/12/2026, 7:03:44 AM / codex / gpt-6-astra\n\nPair parameters\nPair\tOpening price\tRange\tVirtual reserves\tFee\nWETH / USDC\t2449.26632036 USDC per WETH\t1995.888 to 2993.832 USDC\t0.000033333333333333 WETH\n0.083162 USDC\t0.06%\n\nVirtual allocations share real inventory. Adding the allocations does not measure the capital in this group.\n\nManagement limits\nSpend budgets\n0.0001 ETH / advisory-display\nGas budget, raw native units\n500000000000000 / advisory-display\nMaximum reference age\n60 seconds / execution-broker\nAdvisory review signals\nRange exit: enabled. Inventory drift: 100%. These signals inform reviews; the broker does not enforce their thresholds.\nReplacement direction\nUpward-only restriction is disabled.\nAllowed actions\nHold, Fund and open, Replace, Close, Propose conversion\nAction limit\n1 / advisory-display\nCooldown\n15 minutes / execution-broker\nMaximum slippage\n0.5% / execution-broker\nPermitted token and route addresses\n\u00a9 AquaMux 2026\nPowered by\n1inch Aqua"
+    }
+  },
+  "validation": [
+    {
+      "path": "/tmp/integration-resume-tests.log",
+      "sha256": "ec6b815e54b00cd2f2e532723e40130534e8af3c7095ebc90c51db72e3676e21",
+      "result": "passed"
+    },
+    {
+      "path": "/tmp/resume-export-complete-lint.log",
+      "sha256": "1ae7b07530c0ce5f1fbe1cd01baa1efc39c065b290936ec1d26932434b905fa1",
+      "result": "passed"
+    },
+    {
+      "path": "/tmp/resume-export-complete-types.log",
+      "sha256": "0cfec1827489d14f529333f142fcfcb3123a7c82b316e010343c7da1a9d8881b",
+      "result": "passed"
+    },
+    {
+      "path": "/tmp/resume-final-tests.log",
+      "sha256": "39045abb20b16c2fe37529179d5a7fc6ebce1c2547588afc82477d3163014f65",
+      "result": "passed"
+    },
+    {
+      "path": "/tmp/resume-final-build.log",
+      "sha256": "b8091f0dcca76676feee86beff4b0fbffc211c09e24612a9d8c2c3b94ac04ec5",
+      "result": "passed"
+    }
+  ]
+}
