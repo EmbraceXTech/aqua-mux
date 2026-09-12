@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "@fontsource-variable/geist";
 import "./globals.css";
+import { QueryProvider } from "@/components/providers/query-provider";
 export const metadata: Metadata = {
   title: "AquaMux | One token. Many possibilities.",
   description:
@@ -11,7 +12,9 @@ export default function Layout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <QueryProvider>{children}</QueryProvider>
+      </body>
     </html>
   );
 }

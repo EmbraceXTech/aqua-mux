@@ -38,10 +38,17 @@ export function NetworkIcon({
   size?: number;
 }) {
   const net = network(chainId);
-  const logo =
-    "logo" in net
-      ? net.logo
-      : tokens(chainId).find((item) => item.address === NATIVE)!.logo;
+  const logo = tokens(chainId).find((item) => item.address === NATIVE)!.logo;
+  if (!logo)
+    return (
+      <span
+        className="network-icon network-initial"
+        style={{ width: size, height: size }}
+        aria-label={`${net.name} network icon`}
+      >
+        {net.mark}
+      </span>
+    );
   return (
     <Image
       className="network-icon"

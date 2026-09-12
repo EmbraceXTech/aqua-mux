@@ -16,6 +16,14 @@
   font-size: 12px;
   font-weight: 600;
 }
+.network-initial {
+  display: inline-grid;
+  place-items: center;
+  background: #edf2ff;
+  color: var(--blue);
+  font-size: 9px;
+  font-weight: 700;
+}
 .token-picker .managed-address {
   max-width: 245px;
   font-size: 9px;

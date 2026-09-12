@@ -1,5 +1,5 @@
 import type { Address } from "viem";
-import catalog from "./token-catalog.json";
+import { dataTokens, type DataChainId } from "./data-token-list";
 export const NATIVE = "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" as Address;
 export const AQUA = "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a" as Address;
 export const SWAP_VM = "0x111111338c5091e8440b67b168bae16a668ac0de" as Address;
@@ -23,7 +23,6 @@ export const networks = [
     explorer: "https://arbiscan.io",
     color: "#337bb6",
     mark: "A",
-    logo: "/tokens/42161-0x912ce59144191c1204e64559fe8253a0e49e6548.png",
   },
   {
     id: 1,
@@ -42,7 +41,6 @@ export const networks = [
     explorer: "https://robinhoodchain.blockscout.com",
     color: "#bdf600",
     mark: "R",
-    logo: "/networks/4663-robinhood-chain.png",
   },
   {
     id: 56,
@@ -68,16 +66,108 @@ export function network(id: number) {
   if (!n) throw new Error("Unsupported network.");
   return n;
 }
-export function tokens(id: number): Token[] {
-  network(id);
-  return catalog.chains[String(id) as keyof typeof catalog.chains] as Token[];
+const REQUIRED_TOKENS: Record<ChainId, Token[]> = {
+  1: [],
+  56: [
+    {
+      address: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+      symbol: "USDC",
+      name: "USD Coin",
+      decimals: 18,
+      logo: "",
+      source: "AquaMux required asset",
+    },
+  ],
+  42161: [],
+  4663: [
+    {
+      address: "0x0bd7d308f8e1639fab988df18a8011f41eacad73",
+      symbol: "WETH",
+      name: "Wrapped Ether",
+      decimals: 18,
+      logo: "",
+      source: "AquaMux required asset",
+    },
+    {
+      address: "0x5fc5360d0400a0fd4f2af552add042d716f1d168",
+      symbol: "USDG",
+      name: "Global Dollar",
+      decimals: 6,
+      logo: "",
+      source: "AquaMux required asset",
+    },
+    {
+      address: "0x39dbed3a2bd333467115de45665cc57f813c4571",
+      symbol: "PONS",
+      name: "PONS",
+      decimals: 18,
+      logo: "",
+      source: "AquaMux required asset",
+    },
+  ],
+};
+
+const tokenCache = new Map<ChainId, Token[]>();
+
+function nativeToken(chainId: ChainId): Token {
+  const wrappedSymbol = chainId === 56 ? "WBNB" : "WETH";
+  const wrapped = dataTokens(chainId).find(
+    (candidate) => candidate.symbol === wrappedSymbol,
+  );
+  return {
+    address: NATIVE,
+    symbol: network(chainId).symbol,
+    name: chainId === 56 ? "BNB" : "Ether",
+    decimals: 18,
+    logo: wrapped?.logoURI ?? "",
+    source: "Native asset",
+  };
 }
+
+function appToken(
+  chainId: ChainId,
+  candidate: ReturnType<typeof dataTokens>[number],
+): Token {
+  return {
+    address: candidate.address.toLowerCase() as Address,
+    symbol: candidate.symbol,
+    name: candidate.name,
+    decimals: candidate.decimals,
+    logo: candidate.logoURI ?? "",
+    source: `data/${chainId}.json`,
+  };
+}
+
+export function tokens(id: number): Token[] {
+  const chainId = network(id).id as DataChainId;
+  const existing = tokenCache.get(chainId);
+  if (existing) return existing;
+
+  const listed = [
+    nativeToken(chainId),
+    ...dataTokens(chainId).map((candidate) => appToken(chainId, candidate)),
+    ...REQUIRED_TOKENS[chainId],
+  ];
+  const unique = new Map(
+    listed.map((candidate) => [candidate.address, candidate]),
+  );
+  const result = [...unique.values()];
+  tokenCache.set(chainId, result);
+  return result;
+}
+
 export function token(id: number, address: string) {
   const t = tokens(id).find((t) => t.address === address.toLowerCase());
   if (!t)
     throw new Error("Token is not in the verified list for this network.");
   return t;
 }
+
 export function wrapped(id: number) {
-  return tokens(id).find((t) => t.symbol === (id === 56 ? "WBNB" : "WETH"))!;
+  const chainId = network(id).id;
+  const token = tokens(chainId).find(
+    (candidate) => candidate.symbol === (chainId === 56 ? "WBNB" : "WETH"),
+  );
+  if (!token) throw new Error("Wrapped native token is not configured.");
+  return token;
 }

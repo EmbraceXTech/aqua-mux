@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   CircleDollarSign,
   Layers3,
@@ -9,95 +10,20 @@ import {
   Wallet,
 } from "lucide-react";
 import { networks, network, tokens, type ChainId } from "@/lib/config";
-import type { StrategyGroup, Token as ManagedToken } from "@/lib/managed";
 import {
-  managedRequest,
-  type GroupDetail,
-  type ManagedSession,
-} from "@/lib/managed-client/api";
+  amountLabel,
+  positionStateLabel,
+  shortAddress,
+} from "@/lib/utils/portfolio";
 import { useManagedSession } from "@/lib/managed-client/use-managed-session";
+import {
+  fetchRecordedPositions,
+  fetchWalletBalances,
+} from "@/services/portfolio";
+import type { PortfolioHeaderActionsProps } from "@/types/portfolio";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import { NetworkIcon } from "@/components/managed/token-icon";
 import { Button } from "@/components/ui/button";
-
-type Balances = Record<string, string | null>;
-
-type RecordedPosition = {
-  id: string;
-  groupId: string;
-  chainId: number;
-  state: "pending" | "active" | "docked" | "unknown";
-  groupState: StrategyGroup["state"];
-  registrationBlock: string | null;
-  tokens: ManagedToken[];
-  range: string;
-  feeBps: number | null;
-};
-
-function shortAddress(address: string) {
-  return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
-
-function amountLabel(value: string) {
-  const [whole, fraction = ""] = value.split(".");
-  const grouped = whole.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  const displayedFraction = fraction.slice(0, 6).replace(/0+$/, "");
-  return displayedFraction ? `${grouped}.${displayedFraction}` : grouped;
-}
-
-function positionStateLabel(state: RecordedPosition["state"]) {
-  return state.charAt(0).toUpperCase() + state.slice(1);
-}
-
-function positionFromDetail(detail: GroupDetail): RecordedPosition[] {
-  if (detail.group.config.family !== "lp") return [];
-
-  return (detail.strategies ?? []).map((strategy) => {
-    const pair = detail.group.config.pairs.find(
-      (candidate) =>
-        strategy.tokens.some(
-          (token) => token.address === candidate.baseToken.address,
-        ) &&
-        strategy.tokens.some(
-          (token) => token.address === candidate.quoteToken.address,
-        ),
-    );
-
-    return {
-      id: strategy.id,
-      groupId: detail.group.id,
-      chainId: detail.group.chainId,
-      state: strategy.state,
-      groupState: detail.group.state,
-      registrationBlock: strategy.registrationBlock,
-      tokens: strategy.tokens,
-      range:
-        pair?.range.kind === "full"
-          ? "Full range"
-          : pair
-            ? "Custom range"
-            : "Range unavailable",
-      feeBps: pair?.feeBps ?? null,
-    };
-  });
-}
-
-async function readBalances(
-  account: string,
-  chainId: ChainId,
-  signal: AbortSignal,
-) {
-  const response = await fetch(
-    `/api/balances?chainId=${chainId}&address=${account}`,
-    { cache: "no-store", signal },
-  );
-  const result = (await response.json().catch(() => null)) as
-    | { balances?: Balances; error?: string }
-    | null;
-  if (!response.ok || !result?.balances)
-    throw new Error(result?.error ?? "Wallet balances could not be loaded.");
-  return result.balances;
-}
 
 function PortfolioHeaderActions({
   session,
@@ -105,13 +31,7 @@ function PortfolioHeaderActions({
   localWalletAvailable,
   onConnect,
   onDisconnect,
-}: {
-  session?: ManagedSession;
-  busy: boolean;
-  localWalletAvailable: boolean;
-  onConnect: (mode: "external" | "local-development") => void;
-  onDisconnect: () => void;
-}) {
+}: PortfolioHeaderActionsProps) {
   if (session)
     return (
       <>
@@ -147,100 +67,48 @@ export function PortfolioView() {
   const wallet = useManagedSession(42161);
   const session = wallet.session;
   const [chainId, setChainId] = useState<ChainId>(42161);
-  const [balances, setBalances] = useState<Balances>();
-  const [positions, setPositions] = useState<RecordedPosition[]>();
-  const [balanceError, setBalanceError] = useState("");
-  const [positionError, setPositionError] = useState("");
-  const [balancesLoading, setBalancesLoading] = useState(false);
-  const [positionsLoading, setPositionsLoading] = useState(false);
-  const [revision, setRevision] = useState(0);
+  const balanceQuery = useQuery({
+    queryKey: ["portfolio", "balances", session?.owner, chainId],
+    queryFn: ({ signal }) =>
+      fetchWalletBalances({ account: session!.owner, chainId }, signal),
+    enabled: !!session,
+    staleTime: 5 * 60_000,
+    gcTime: 30 * 60_000,
+  });
+  const positionQuery = useQuery({
+    queryKey: ["portfolio", "positions", session?.owner, session?.sessionId],
+    queryFn: ({ signal }) => fetchRecordedPositions(session!, signal),
+    enabled: !!session,
+  });
 
-  useEffect(() => {
-    if (!session) {
-      setBalances(undefined);
-      setBalanceError("");
-      setBalancesLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    setBalancesLoading(true);
-    setBalanceError("");
-    readBalances(session.owner, chainId, controller.signal)
-      .then((result) => setBalances(result))
-      .catch((cause: unknown) => {
-        if (controller.signal.aborted) return;
-        setBalances(undefined);
-        setBalanceError(
-          cause instanceof Error
-            ? cause.message
-            : "Wallet balances could not be loaded.",
-        );
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setBalancesLoading(false);
-      });
-
-    return () => controller.abort();
-  }, [chainId, revision, session]);
-
-  useEffect(() => {
-    if (!session) {
-      setPositions(undefined);
-      setPositionError("");
-      setPositionsLoading(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    setPositionsLoading(true);
-    setPositionError("");
-    managedRequest<{ groups: StrategyGroup[] }>(
-      "/groups",
-      session,
-      undefined,
-      undefined,
-      controller.signal,
-    )
-      .then(async ({ groups }) => {
-        const details = await Promise.all(
-          groups
-            .filter((group) => group.config.family === "lp")
-            .map((group) =>
-              managedRequest<GroupDetail>(
-                `/groups/${group.id}`,
-                session,
-                undefined,
-                undefined,
-                controller.signal,
-              ),
-            ),
-        );
-        if (!controller.signal.aborted)
-          setPositions(details.flatMap(positionFromDetail));
-      })
-      .catch((cause: unknown) => {
-        if (controller.signal.aborted) return;
-        setPositions(undefined);
-        setPositionError(
-          cause instanceof Error
-            ? cause.message
-            : "Aqua LP positions could not be loaded.",
-        );
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setPositionsLoading(false);
-      });
-
-    return () => controller.abort();
-  }, [revision, session]);
-
+  const balances = balanceQuery.data;
+  const positions = positionQuery.data;
+  const balanceErrorMessage =
+    balanceQuery.error instanceof Error
+      ? balanceQuery.error.message
+      : balanceQuery.isError
+        ? "Wallet balances could not be loaded."
+        : "";
+  const positionErrorMessage =
+    positionQuery.error instanceof Error
+      ? positionQuery.error.message
+      : positionQuery.isError
+        ? "Aqua LP positions could not be loaded."
+        : "";
+  const balancesLoading = balanceQuery.isPending;
+  const positionsLoading = positionQuery.isPending;
   const listedTokens = tokens(chainId).filter((token) => {
     const balance = balances?.[token.address];
-    return balance !== null && balance !== undefined && !/^0(?:\.0+)?$/.test(balance);
+    return (
+      balance !== null && balance !== undefined && !/^0(?:\.0+)?$/.test(balance)
+    );
   });
   const selectedNetwork = network(chainId);
-  const loading = balancesLoading || positionsLoading;
+  const loading = balanceQuery.isFetching || positionQuery.isFetching;
+
+  function refresh() {
+    void Promise.all([balanceQuery.refetch(), positionQuery.refetch()]);
+  }
 
   return (
     <MainLayout
@@ -260,16 +128,10 @@ export function PortfolioView() {
           <div>
             <span className="portfolio-kicker">PORTFOLIO</span>
             <h1>Your wallet, at a glance.</h1>
-            <p>
-              Wallet balances and AquaMux-recorded Aqua LP positions.
-            </p>
+            <p>Wallet balances and AquaMux-recorded Aqua LP positions.</p>
           </div>
           {session && (
-            <Button
-              variant="outline"
-              disabled={loading}
-              onClick={() => setRevision((value) => value + 1)}
-            >
+            <Button variant="outline" disabled={loading} onClick={refresh}>
               <RefreshCw size={15} className={loading ? "spin" : ""} />
               Refresh
             </Button>
@@ -292,7 +154,10 @@ export function PortfolioView() {
               Sign in to read supported wallet balances and AquaMux-managed LP
               records. Connecting does not send a transaction.
             </p>
-            <Button disabled={wallet.busy} onClick={() => void wallet.connect("external")}>
+            <Button
+              disabled={wallet.busy}
+              onClick={() => void wallet.connect("external")}
+            >
               <Wallet size={17} />
               {wallet.busy ? "Waiting for wallet" : "Connect wallet"}
             </Button>
@@ -312,7 +177,11 @@ export function PortfolioView() {
                 </div>
               </div>
 
-              <div className="portfolio-network-tabs" role="tablist" aria-label="Balance network">
+              <div
+                className="portfolio-network-tabs"
+                role="tablist"
+                aria-label="Balance network"
+              >
                 {networks.map((item) => (
                   <button
                     key={item.id}
@@ -332,9 +201,9 @@ export function PortfolioView() {
                 <div className="portfolio-loading" role="status">
                   <Loader2 size={18} className="spin" /> Reading balances
                 </div>
-              ) : balanceError ? (
+              ) : balanceErrorMessage ? (
                 <div className="error-box" role="alert">
-                  {balanceError}
+                  {balanceErrorMessage}
                 </div>
               ) : listedTokens.length ? (
                 <ul className="portfolio-balance-list">
@@ -355,7 +224,8 @@ export function PortfolioView() {
                 </ul>
               ) : (
                 <p className="portfolio-empty">
-                  No non-zero supported asset balances on {selectedNetwork.name}.
+                  No non-zero supported asset balances on {selectedNetwork.name}
+                  .
                 </p>
               )}
             </section>
@@ -375,11 +245,12 @@ export function PortfolioView() {
 
               {positionsLoading ? (
                 <div className="portfolio-loading" role="status">
-                  <Loader2 size={18} className="spin" /> Reading position records
+                  <Loader2 size={18} className="spin" /> Reading position
+                  records
                 </div>
-              ) : positionError ? (
+              ) : positionErrorMessage ? (
                 <div className="error-box" role="alert">
-                  {positionError}
+                  {positionErrorMessage}
                 </div>
               ) : positions?.length ? (
                 <ul className="portfolio-position-list">
@@ -387,7 +258,10 @@ export function PortfolioView() {
                     <li key={position.id}>
                       <div className="portfolio-position-topline">
                         <span className="portfolio-pair">
-                          <span className="portfolio-pair-icons" aria-hidden="true">
+                          <span
+                            className="portfolio-pair-icons"
+                            aria-hidden="true"
+                          >
                             {position.tokens.slice(0, 2).map((token) => (
                               <span key={token.address}>
                                 {token.symbol.slice(0, 1)}
@@ -395,7 +269,9 @@ export function PortfolioView() {
                             ))}
                           </span>
                           <strong>
-                            {position.tokens.map((token) => token.symbol).join(" / ")}
+                            {position.tokens
+                              .map((token) => token.symbol)
+                              .join(" / ")}
                           </strong>
                         </span>
                         <span className={`portfolio-status ${position.state}`}>

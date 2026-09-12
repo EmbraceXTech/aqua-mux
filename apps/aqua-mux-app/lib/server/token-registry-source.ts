@@ -1,4 +1,5 @@
-import catalog from "../token-catalog.json";
+import { dataTokenList } from "../data-token-list";
+import { tokens } from "../config";
 import {
   parseTokenRegistry,
   tokenRegistryChainId,
@@ -55,23 +56,20 @@ function fallbackSnapshot(
   chainId: TokenRegistryChainId,
   nowMs: number,
 ): TokenRegistrySnapshot {
-  const entries =
-    catalog.chains[String(chainId) as keyof typeof catalog.chains];
+  const list = dataTokenList(chainId);
   const parsed = parseTokenRegistry(
     chainId,
-    entries.map((token) => ({
+    tokens(chainId).map((token) => ({
       ...token,
       chainId,
-      logoURI: token.source,
-      tags: token.tags,
-      providers: token.providers,
+      ...(token.logo ? { logoURI: token.logo } : {}),
     })),
   );
   return {
     chainId,
-    source: catalog.source,
-    fetchedAt: catalog.capturedAt,
-    stale: nowMs - Date.parse(catalog.capturedAt) > REGISTRY_STALE_MS,
+    source: `data/${chainId}.json`,
+    fetchedAt: list.timestamp,
+    stale: nowMs - Date.parse(list.timestamp) > REGISTRY_STALE_MS,
     degraded: true,
     rejected: parsed.rejected,
     tokens: parsed.tokens,
