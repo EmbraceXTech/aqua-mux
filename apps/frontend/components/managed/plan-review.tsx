@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { formatUnits } from "viem";
-import type { LifecyclePlan } from "@/lib/managed";
+import type { LifecyclePlan, TokenAmount } from "@/lib/managed";
 import { Button } from "../ui/button";
 import { Modal } from "../ui/modal";
 import { amountLabel, dateLabel, titleLabel } from "./format";
@@ -96,13 +96,17 @@ export function PlanReview({
           <h3>Selected inventory before execution</h3>
           <ul>
             {plan.inventoryBefore.map((item) => (
-              <li key={item.token.address}>{amountLabel(item)}</li>
+              <li key={item.token.address}>
+                <ReviewedAmount item={item} />
+              </li>
             ))}
           </ul>
           <h3>Conservative inventory after execution</h3>
           <ul>
             {plan.conservativeInventoryAfter.map((item) => (
-              <li key={item.token.address}>{amountLabel(item)}</li>
+              <li key={item.token.address}>
+                <ReviewedAmount item={item} />
+              </li>
             ))}
           </ul>
           <p className="managed-footnote">
@@ -123,7 +127,9 @@ export function PlanReview({
           {plan.minimumReceipts.length ? (
             <ul>
               {plan.minimumReceipts.map((item) => (
-                <li key={item.token.address}>{amountLabel(item)}</li>
+                <li key={item.token.address}>
+                  <ReviewedAmount item={item} />
+                </li>
               ))}
             </ul>
           ) : (
@@ -184,5 +190,16 @@ export function PlanReview({
         </Button>
       </div>
     </Modal>
+  );
+}
+
+function ReviewedAmount({ item }: { item: TokenAmount }) {
+  return (
+    <>
+      <span>{amountLabel(item)}</span>
+      <div className="managed-address">
+        <small>{item.token.address}</small>
+      </div>
+    </>
   );
 }
