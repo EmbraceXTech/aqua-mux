@@ -59,6 +59,24 @@
       "probe": "native destination payload sent by current UI",
       "publicTransactions": 0,
       "status": 200
+    },
+    {
+      "probe": "other tab stopped while wallet signed",
+      "publicTransactions": 0,
+      "attempts": [
+        {
+          "status": "failed",
+          "hasHash": false
+        }
+      ],
+      "methodCalls": [
+        "eth_chainId",
+        "eth_accounts",
+        "eth_chainId",
+        "eth_signTransaction",
+        "eth_accounts",
+        "eth_chainId"
+      ]
     }
   ]
 }

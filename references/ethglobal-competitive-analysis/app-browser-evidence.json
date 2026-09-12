@@ -1,0 +1,192 @@
+{
+  "environment": "Actual Orca embedded pages on localhost33127 and actual HarnessAgent runner33128",
+  "sourceRevision": "89c24d64d730818a18fff0af3bccd2b66538ad86",
+  "publicTransactions": 0,
+  "groupId": "5ad10409-d5fb-4541-891f-c18148bf5754",
+  "beforeHeartbeatCorrection": [
+    {
+      "at": "2026-09-11T23:51:40.931Z",
+      "action": "resume",
+      "status": 200,
+      "state": "running",
+      "generation": 9
+    },
+    {
+      "at": "2026-09-11T23:51:51.073Z",
+      "action": "heartbeat",
+      "status": 409,
+      "code": "stale_generation"
+    },
+    {
+      "at": "2026-09-11T23:52:01.083Z",
+      "action": "heartbeat",
+      "status": 409,
+      "code": "stale_generation"
+    },
+    {
+      "at": "2026-09-11T23:52:11.078Z",
+      "action": "heartbeat",
+      "status": 409,
+      "code": "stale_generation"
+    },
+    {
+      "at": "2026-09-11T23:52:21.083Z",
+      "action": "heartbeat",
+      "status": 409,
+      "code": "stale_generation"
+    },
+    {
+      "at": "2026-09-11T23:52:21.458Z",
+      "action": "stop",
+      "status": 200,
+      "state": "stopped",
+      "generation": 11
+    }
+  ],
+  "afterHeartbeatCorrection": {
+    "at": "2026-09-12T00:05:26.766Z",
+    "events": [
+      {
+        "at": "2026-09-12T00:01:10.381Z",
+        "action": "resume",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:01:20.547Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:01:30.564Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:01:40.562Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:01:50.547Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:02:00.700Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:02:10.702Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:02:20.699Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:02:30.698Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:02:40.698Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:02:50.692Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:03:00.691Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:03:10.701Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:03:20.697Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:03:30.697Z",
+        "action": "heartbeat",
+        "status": 200,
+        "state": "running",
+        "generation": 14
+      },
+      {
+        "at": "2026-09-12T00:03:40.696Z",
+        "action": "heartbeat",
+        "status": 409,
+        "code": "stale_generation"
+      }
+    ],
+    "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nRunning\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: 9/12/2026, 7:06:06 AM. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\nTake over reviews in this tab\n\nThere is no recorded stop reason.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stops management and prepares a transaction to dock this group's positions. Tokens remain in the maker wallet after confirmation.\n\nReview close positions\nClose and convert\n\nChoose"
+  },
+  "leaseLoss": {
+    "method": "Navigate the owning page to about:blank; visible other page polls the real server",
+    "displayedExpiry": "2026-09-11T23:59:34Z",
+    "observed": {
+      "at": "2026-09-11T23:59:44.464Z",
+      "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nPaused\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: Unavailable. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\n\nBrowser lease expired. Reconcile current positions before resuming.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stops management and prepares a transaction to dock this group's positions. Tokens remain in the maker wallet after confirmation.\n\nReview close positions\nClose and convert\n\nChoose exact quantities from the latest wallet balances. Review"
+    }
+  },
+  "reloadRecovery": {
+    "at": "2026-09-12T00:00:38.081Z",
+    "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nPaused\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: Unavailable. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\n\nBrowser lease expired. Reconcile current positions before resuming.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stops management and prepares a transaction to dock this group's positions. Tokens remain in the maker wallet after confirmation.\n\nReview close positions\nClose and convert\n\nChoose exact quantities from the latest wallet balances. Review"
+  },
+  "stopDuringActualModel": {
+    "request_id": "53e1dc98-34a1-4bfd-a170-17df1c36aaa0",
+    "status": "cancelled",
+    "error_code": "review_cancelled",
+    "created_at": 1789170713922,
+    "updated_at": 1789170741459
+  },
+  "boundaries": [
+    "No public transaction confirmation",
+    "No physical device sleep",
+    "No MetaMask compatibility claim",
+    "Controls operate actual ephemeral app records"
+  ],
+  "finalStopped": {
+    "at": "2026-09-12T00:05:52.851Z",
+    "text": "AquaMux\nSwap\nLiquidity\nStrategies\nLocal development wallet\n0x992A6a939579e10Ad47C347a5be3788c94992Dd4\nDisconnect managed wallet\nMANAGED LIQUIDITY\nManaged concentrated LP\n\nOne maker wallet. One inventory group. Every action recorded.\n\nStopped\nAll strategies\nStrategy\nPositions\nActivity\nControls\nBrowser management\n\nRun starts periodic agent reviews while this tab maintains the backend lease. Every proposed transaction still needs your confirmation.\n\nLease timeout: 45 seconds. Lease expiry: Unavailable. Background tabs and device sleep can pause reviews. Stop does not cancel submitted transactions or close positions.\nI want this browser to request recurring reviews under the displayed policy. I understand positions can remain fillable after management stops.\nRun bot\nStop bot\nReconcile and recover\n\nStopped by owner. Passive positions remain open.\n\nAutomation authorization\n\nDelegated automation is unavailable for this wallet. Every transaction requires owner confirmation.\n\nRevoke automation unavailable\n\nNo delegated signer is enabled by this workspace. Owner-confirmed closing remains a separate action.\n\nClose managed positions\n\nClose stop"
+  }
+}

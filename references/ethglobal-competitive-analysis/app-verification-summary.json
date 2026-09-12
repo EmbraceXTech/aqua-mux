@@ -1,0 +1,56 @@
+{
+  "sourceRevision": "89c24d64d730818a18fff0af3bccd2b66538ad86",
+  "environment": "shared worktree with preserved original chart overlay",
+  "checks": {
+    "frontendLint": {
+      "exitCode": 0,
+      "logSha256": "1ae7b07530c0ce5f1fbe1cd01baa1efc39c065b290936ec1d26932434b905fa1"
+    },
+    "frontendTypecheck": {
+      "exitCode": 0,
+      "logSha256": "0cfec1827489d14f529333f142fcfcb3123a7c82b316e010343c7da1a9d8881b"
+    },
+    "frontendTests": {
+      "exitCode": 0,
+      "logSha256": "dd015efc70977383d9d4b0ea31d19bfc2845b365e98921d6675d4c908ae9d4a9",
+      "suiteTotals": [
+        {
+          "tests": 161,
+          "pass": 160,
+          "fail": 0,
+          "skipped": 1
+        }
+      ]
+    },
+    "frontendWebpackBuild": {
+      "exitCode": 0,
+      "logSha256": "be273ef506a9bb077fd72f3796519c1941851f3050b30b4c784a02e064bc4a05",
+      "reason": "Production webpack build; also matches independent archived source verification."
+    },
+    "runnerTests": {
+      "exitCode": 0,
+      "logSha256": "52af02fe973268af1b23033915e3c994860defc60dd86d0ab31171c893d1b1ca",
+      "suiteTotals": [
+        {
+          "tests": 16,
+          "pass": 13,
+          "fail": 0,
+          "skipped": 3
+        },
+        {
+          "tests": 16,
+          "pass": 16,
+          "fail": 0,
+          "skipped": 0
+        }
+      ]
+    }
+  },
+  "independentCommittedFrontendTests": {
+    "pass": 156,
+    "fail": 0,
+    "skipped": 1,
+    "report": "consolidated-quality-review.md"
+  },
+  "publicTransactions": 0
+}
