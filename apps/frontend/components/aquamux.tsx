@@ -49,6 +49,7 @@ import {
 import {
   submitPlan,
   batchStatus,
+  normalizeBatchStatus,
   type BatchStatus,
 } from "@/lib/wallet";
 type Leg = { address: Address; bps: number; amount: string };
@@ -361,24 +362,9 @@ export function AquaMux() {
       try {
         const s = await batchStatus(batch.id);
         if (!alive) return;
-        if (
-          s.status === 200 &&
-          (s.atomic === false || s.receipts?.some((r) => r.status !== "0x1"))
-        ) {
-          const failed = { ...s, status: 500 } as BatchStatus;
-          setStatus(failed);
-          setTransactions((old) =>
-            old.map((transaction) =>
-              transaction.id === batch.id
-                ? { ...transaction, status: failed }
-                : transaction,
-            ),
-          );
-          setError(
-            "The wallet returned an inconsistent receipt. Check its activity before retrying.",
-          );
-          return;
-        }
+        const outcome = normalizeBatchStatus(s);
+        if (outcome === "unknown")
+          setError("The wallet response is incomplete. Execution is unknown; check wallet activity before retrying.");
         setStatus(s);
         setTransactions((old) =>
           old.map((transaction) =>
@@ -387,7 +373,7 @@ export function AquaMux() {
               : transaction,
           ),
         );
-        if (s.status === 100) timer = setTimeout(poll, 2500);
+        if (outcome === "pending" || outcome === "unknown") timer = setTimeout(poll, outcome === "unknown" ? 8000 : 2500);
         else setRevision((v) => v + 1);
       } catch {
         if (alive) {
@@ -562,7 +548,7 @@ export function AquaMux() {
         .toLowerCase()
         .includes(search.toLowerCase()),
   );
-  const blocked = !!batch && status?.status === 100;
+  const blocked = !!batch && ["pending", "unknown"].includes(normalizeBatchStatus(status));
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -648,11 +634,11 @@ export function AquaMux() {
                           </span>
                         </span>
                         <small
-                          className={`transaction-state state-${transaction.status?.status ?? 100}`}
+                          className={`transaction-state state-${normalizeBatchStatus(transaction.status) === "confirmed" ? 200 : normalizeBatchStatus(transaction.status) === "pending" ? 100 : 500}`}
                         >
-                          {transaction.status?.status === 200
+                          {normalizeBatchStatus(transaction.status) === "confirmed"
                             ? "Confirmed"
-                            : transaction.status?.status === 100
+                            : normalizeBatchStatus(transaction.status) === "pending"
                               ? "Pending"
                               : "Check status"}
                         </small>
@@ -1062,7 +1048,7 @@ export function AquaMux() {
                   Preparing transaction
                 </>
               ) : blocked ? (
-                "Transaction pending"
+                normalizeBatchStatus(status) === "unknown" ? "Check unresolved transaction" : "Transaction pending"
               ) : account ? (
                 mode === "swap" ? (
                   "Review multi-swap"
@@ -1409,16 +1395,16 @@ export function AquaMux() {
         open={receiptOpen}
         onOpenChange={setReceiptOpen}
         title={
-          status?.status === 200
+          normalizeBatchStatus(status) === "confirmed"
             ? "Transaction confirmed"
-            : status?.status === 100
+            : normalizeBatchStatus(status) === "pending"
               ? "Transaction submitted"
               : "Check transaction status"
         }
         description={
-          status?.status === 200
+          normalizeBatchStatus(status) === "confirmed"
             ? "Review the transaction receipt and its confirmation status."
-            : status?.status === 100
+            : normalizeBatchStatus(status) === "pending"
               ? "Your transaction is submitted. Waiting for confirmation."
               : "Check your wallet activity and transaction receipt."
         }
@@ -1426,19 +1412,19 @@ export function AquaMux() {
         {batch && (
           <>
             <div className="receipt-status">
-              {status?.status === 200 ? (
+              {normalizeBatchStatus(status) === "confirmed" ? (
                 <Check size={35} />
-              ) : status?.status === 100 ? (
+              ) : normalizeBatchStatus(status) === "pending" ? (
                 <Loader2 className="spin" size={35} />
               ) : (
                 <X size={35} />
               )}
               <p>
-                {status?.status === 200
+                {normalizeBatchStatus(status) === "confirmed"
                   ? "Your wallet reported successful execution."
-                  : status?.status === 100
+                  : normalizeBatchStatus(status) === "pending"
                     ? "Waiting for on-chain confirmation."
-                    : "The wallet reported a failed or incomplete batch. Check its activity before retrying."}
+                    : normalizeBatchStatus(status) === "reverted" ? "The wallet reported a reverted batch. Check the transaction receipt." : "Execution is unknown. The wallet response does not prove a complete atomic result. Check its activity before retrying."}
               </p>
             </div>
             <button

@@ -95,9 +95,23 @@ export async function batchStatus(id: string) {
 export type WalletOutcome = "pending" | "confirmed" | "reverted" | "unknown";
 
 /** An incomplete or unfamiliar wallet response never means a safe retry. */
-export function normalizeBatchStatus(batch: BatchStatus): WalletOutcome {
+export function normalizeBatchStatus(batch?: BatchStatus): WalletOutcome {
+  if (!batch) return "pending";
+  if (!Number.isInteger(batch.status)) return "unknown";
   if (batch.status >= 100 && batch.status < 200) return "pending";
-  if (batch.atomic !== true) return "unknown";
+  if (
+    batch.atomic !== true ||
+    !Array.isArray(batch.receipts) ||
+    batch.receipts.length === 0 ||
+    !batch.receipts.every(
+      (receipt) =>
+        receipt &&
+        /^0x[0-9a-fA-F]{64}$/.test(receipt.transactionHash) &&
+        /[1-9a-fA-F]/.test(receipt.transactionHash.slice(2)) &&
+        (receipt.status === "0x0" || receipt.status === "0x1"),
+    )
+  )
+    return "unknown";
   if (batch.receipts?.some((receipt) => receipt.status === "0x0"))
     return "reverted";
   if (
