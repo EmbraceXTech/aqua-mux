@@ -13,6 +13,7 @@ import { ProposalForm, type ProposalIntent } from "./proposal-form";
 import { WalletBar } from "./wallet-bar";
 import { GroupController } from "./group-controller";
 import { ReviewResultCard } from "./review-result";
+import { ProposalHistory } from "./proposal-history";
 import { titleLabel } from "./format";
 
 export function ManagedWorkspace({
@@ -25,7 +26,9 @@ export function ManagedWorkspace({
       <WalletBar
         session={wallet.session}
         busy={wallet.busy}
-        onConnect={async (mode) => { await wallet.connect(mode); }}
+        onConnect={async (mode) => {
+          await wallet.connect(mode);
+        }}
         onDisconnect={wallet.disconnect}
       />
       {wallet.error && (
@@ -118,6 +121,15 @@ function ManagedContent({ session }: { session?: ManagedSession }) {
         <div className="managed-notice managed-error" role="alert">
           {error}
         </div>
+      )}
+      {session && !groupId && !recipe && (
+        <ProposalHistory
+          session={session}
+          onOpen={(id) => {
+            leave();
+            setGroupId(id);
+          }}
+        />
       )}
       {session && !groupId && groups.length > 0 && (
         <section className="managed-panel" style={{ marginBottom: 28 }}>

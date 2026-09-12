@@ -1,3 +1,4 @@
+import { proposalHistory } from "./proposal-history";
 import { checkManagedFundingRoute } from "./funding-route";
 import { attemptApi } from "./attempt-http";
 import { body, ok } from "./http-body";
@@ -59,6 +60,8 @@ export async function managedApi(
       });
     const { owner } = requireOwner(request),
       store = openManagedStore();
+    if (segments.join("/") === "proposals" && method === "GET")
+      return ok({ proposals: proposalHistory(store, owner) });
     if (
       segments[0] === "proposals" &&
       segments.length === 1 &&
