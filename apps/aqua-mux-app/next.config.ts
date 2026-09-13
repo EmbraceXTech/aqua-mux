@@ -14,6 +14,9 @@ const tokenImageHosts = [
 
 const config: NextConfig = {
   devIndicators: false,
+  turbopack: {
+    root: process.cwd(),
+  },
   images: {
     remotePatterns: tokenImageHosts.map((hostname) => ({
       protocol: "https",

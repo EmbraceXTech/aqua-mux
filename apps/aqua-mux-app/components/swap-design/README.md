@@ -53,7 +53,7 @@ The UI script launches an isolated browser with a synthetic wallet and mocked qu
 
 Live read-only testing verified real Arbitrum quotes in all four combinations and connected MetaMask balances. Mainnet execution has not been proven successful. MetaMask's status tooltip reported `cancelled, originalTransactionStatus: FAILED_WOULD_REVERT`. Its Smart Transaction service cancelled the request before broadcast, and neither queried Arbitrum RPC endpoint had the transaction or receipt. The tooltip did not identify the underlying contract revert reason. Deadline expiry is reproducible on the fork, but cannot be established as the cause of this particular wallet cancellation.
 
-The targeted unit tests and lint checks pass. Repository-wide typechecking currently fails because the existing `lib/server/dev-wallet/managed-plan.test.ts` imports the absent `test/lifecycle-fixtures` module.
+The targeted unit tests, lint checks, and repository-wide typechecking pass.
 
 ## Contract references
 

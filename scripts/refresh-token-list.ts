@@ -10,7 +10,10 @@ import {
 } from "../lib/token-list.ts";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const defaultOutputDirectory = resolve(root, "data");
+const defaultOutputDirectory = resolve(
+  root,
+  "apps/aqua-mux-app/public/token-data",
+);
 
 function usage(): void {
   console.error("Usage: npm run refresh-token-list -- [--output-dir <path>] [--chain <id[,id...]>] [--dry-run]");

@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/sainytk/Documents/projects/personal/aqua-mux/apps/aqua-mux-app/components/providers/query-provider.tsx"],"sourcesContent":["\"use client\";\n\nimport { QueryClient, QueryClientProvider } from \"@tanstack/react-query\";\nimport { useState, type ReactNode } from \"react\";\n\nexport function QueryProvider({ children }: { children: ReactNode }) {\n  const [queryClient] = useState(\n    () =>\n      new QueryClient({\n        defaultOptions: {\n          queries: {\n            staleTime: 60_000,\n            gcTime: 10 * 60_000,\n            refetchOnWindowFocus: false,\n            retry: 1,\n          },\n        },\n      }),\n  );\n\n  return (\n    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>\n  );\n}\n"],"names":["QueryProvider","children","queryClient","defaultOptions","queries","staleTime","gcTime","refetchOnWindowFocus","retry","client"],"mappings":";;;;;AAEA;AAAA;AACA;;;AAHA;;;AAKO,SAASA,cAAc,EAAEC,QAAQ,EAA2B;;IACjE,MAAM,CAACC,YAAY,GAAG,IAAA,uMAAQ;kCAC5B,IACE,IAAI,6NAAW,CAAC;gBACdC,gBAAgB;oBACdC,SAAS;wBACPC,WAAW;wBACXC,QAAQ,KAAK;wBACbC,sBAAsB;wBACtBC,OAAO;oBACT;gBACF;YACF;;IAGJ,qBACE,2NAAC,8OAAmB;QAACC,QAAQP;kBAAcD;;;;;;AAE/C;GAlBgBD;KAAAA"}}]
+}

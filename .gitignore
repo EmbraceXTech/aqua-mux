@@ -1,6 +1,4 @@
 .env
 node_modules/
 .substreams.env
-.claude
-.agents
 references
