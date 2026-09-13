@@ -2,3 +2,5 @@
 node_modules/
 .substreams.env
 references
+private.pem
+public.pem
