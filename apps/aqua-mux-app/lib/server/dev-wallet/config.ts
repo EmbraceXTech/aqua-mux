@@ -102,6 +102,9 @@ function devWalletOrigin() {
 }
 
 export function developmentWalletAvailability() {
+  // This endpoint is queried by the public wallet picker. Do not expose
+  // local-signer configuration or errors from a deployed environment.
+  if (process.env.NODE_ENV !== "development") return { available: false };
   try {
     assertDevMode();
     devAccount();

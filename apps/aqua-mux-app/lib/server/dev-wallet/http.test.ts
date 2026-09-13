@@ -138,6 +138,7 @@ test("connect proves core ownership without exposing a key or signature; request
       /expired or unavailable/,
     );
     Object.assign(process.env, { NODE_ENV: "production" });
+    assert.deepEqual(developmentWalletAvailability(), { available: false });
     const disabled = await handleDevWallet(request("connect", {}), "connect");
     assert.equal(disabled.status, 400);
     assert.deepEqual(await disabled.json(), {

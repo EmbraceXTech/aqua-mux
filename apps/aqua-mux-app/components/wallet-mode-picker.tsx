@@ -33,7 +33,7 @@ export function WalletModePicker({
           Use local development wallet
         </Button>
       )}
-      {developmentWallet && !developmentWallet.available && (
+      {!developmentWallet?.available && developmentWallet?.error && (
         <p className="muted small" role="status">
           Local development wallet unavailable. {developmentWallet.error}
         </p>
