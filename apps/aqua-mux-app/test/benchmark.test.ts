@@ -285,6 +285,13 @@ test("SQLite persistence is idempotent and single-writer locked", () => {
     store.unlock();
     assert.equal(store.lock(), true);
     assert.equal(store.renew(), true);
+    store.unlock();
+    store.db
+      .prepare(
+        "INSERT INTO benchmark_lock(id,expires_at,holder,pid) VALUES(1,?,?,?)",
+      )
+      .run(Date.now() + 60_000, "interrupted-worker", 999999);
+    assert.equal(store.lock(), true);
     store.saveScan("test", { block: 100, since: 1, skip: 20, days: 30 });
     assert.equal(store.scan("test")?.skip, 20);
     store.resetScan("test");

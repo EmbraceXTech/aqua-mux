@@ -26,7 +26,7 @@ export class BenchmarkStore {
       CREATE TABLE IF NOT EXISTS benchmark_pools(id TEXT PRIMARY KEY, source_id TEXT NOT NULL, body TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS benchmark_attempts(id TEXT PRIMARY KEY, updated_at INTEGER NOT NULL, reason TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS benchmark_scans(id TEXT PRIMARY KEY, body TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS benchmark_lock(id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, holder TEXT);
+      CREATE TABLE IF NOT EXISTS benchmark_lock(id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, holder TEXT, pid INTEGER);
     `);
     this.db.exec("BEGIN IMMEDIATE");
     try {
@@ -35,6 +35,8 @@ export class BenchmarkStore {
         .all() as { name: string }[];
       if (!columns.some((column) => column.name === "holder"))
         this.db.exec("ALTER TABLE benchmark_lock ADD COLUMN holder TEXT");
+      if (!columns.some((column) => column.name === "pid"))
+        this.db.exec("ALTER TABLE benchmark_lock ADD COLUMN pid INTEGER");
       this.db.exec("COMMIT");
     } catch (error) {
       this.db.exec("ROLLBACK");
@@ -42,29 +44,59 @@ export class BenchmarkStore {
       throw error;
     }
   }
+  private processIsAlive(pid: number | null) {
+    if (pid === null || !Number.isSafeInteger(pid) || pid < 1) return false;
+    try {
+      process.kill(pid, 0);
+      return true;
+    } catch (error) {
+      // A process we cannot signal may belong to another user. Do not steal its lease.
+      return !(
+        error instanceof Error &&
+        "code" in error &&
+        error.code === "ESRCH"
+      );
+    }
+  }
   lock() {
     const now = Date.now();
+    const expiresAt = now + 30 * 60_000;
+    const acquired =
+      this.db
+        .prepare(
+          "INSERT INTO benchmark_lock(id,expires_at,holder,pid) VALUES(1,?,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,holder=excluded.holder,pid=excluded.pid WHERE benchmark_lock.expires_at < ?",
+        )
+        .run(expiresAt, this.holder, process.pid, now).changes > 0;
+    if (acquired) return true;
+    const current = this.db
+      .prepare("SELECT holder,pid FROM benchmark_lock WHERE id=1")
+      .get() as { holder: string | null; pid: number | null } | undefined;
+    if (!current || this.processIsAlive(current.pid)) return false;
+    // SQLite is local-only in this application. A live lease without a live local PID
+    // can only have been left by an interrupted worker, so reclaim it atomically.
     return (
       this.db
         .prepare(
-          "INSERT INTO benchmark_lock(id,expires_at,holder) VALUES(1,?,?) ON CONFLICT(id) DO UPDATE SET expires_at=excluded.expires_at,holder=excluded.holder WHERE benchmark_lock.expires_at < ?",
+          "UPDATE benchmark_lock SET expires_at=?,holder=?,pid=? WHERE id=1 AND holder IS ? AND pid IS ?",
         )
-        .run(now + 30 * 60_000, this.holder, now).changes > 0
+        .run(expiresAt, this.holder, process.pid, current.holder, current.pid)
+        .changes > 0
     );
   }
   renew() {
     return (
       this.db
         .prepare(
-          "UPDATE benchmark_lock SET expires_at=? WHERE id=1 AND holder=? AND expires_at>?",
+          "UPDATE benchmark_lock SET expires_at=? WHERE id=1 AND holder=? AND pid=? AND expires_at>?",
         )
-        .run(Date.now() + 30 * 60_000, this.holder, Date.now()).changes > 0
+        .run(Date.now() + 30 * 60_000, this.holder, process.pid, Date.now())
+        .changes > 0
     );
   }
   unlock() {
     this.db
-      .prepare("DELETE FROM benchmark_lock WHERE holder=?")
-      .run(this.holder);
+      .prepare("DELETE FROM benchmark_lock WHERE holder=? AND pid=?")
+      .run(this.holder, process.pid);
   }
   coverage(row: Coverage) {
     this.db
