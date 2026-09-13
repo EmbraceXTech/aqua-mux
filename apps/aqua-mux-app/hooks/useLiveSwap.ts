@@ -37,6 +37,12 @@ type Holdings = Partial<
 >;
 type QuoteRouteError = { index: number; message: string };
 type ApiError = Error & { routeErrors?: QuoteRouteError[] };
+type ApprovalStep = {
+  symbol: Symbol;
+  label: string;
+  cap: bigint;
+  reset: boolean;
+};
 const message = (e: unknown) => {
   if (e && typeof e === "object" && "code" in e && e.code === 4001)
     return "Request rejected in wallet. Nothing was submitted.";
@@ -66,9 +72,9 @@ export function useLiveSwap(request: SwapRequest) {
   const [holdings, setHoldings] = useState<Holdings>({});
   const [quote, setQuote] = useState<LiveQuote>();
   const [quoteError, setQuoteError] = useState("");
-  const [routeErrors, setRouteErrors] = useState<Partial<Record<Symbol, string>>>(
-    {},
-  );
+  const [routeErrors, setRouteErrors] = useState<
+    Partial<Record<Symbol, string>>
+  >({});
   const [error, setError] = useState("");
   const [quoteBusy, setQuoteBusy] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -79,9 +85,15 @@ export function useLiveSwap(request: SwapRequest) {
     label: string;
     submittedAt: number;
     legIndex?: number;
+    planApprovalIndex?: number;
   }>();
   const [unlocated, setUnlocated] = useState(false);
   const [nextLeg, setNextLeg] = useState(0);
+  const [approvalPlan, setApprovalPlan] = useState<{
+    key: string;
+    approvals: ApprovalStep[];
+    next: number;
+  }>();
   const [awaitingWallet, setAwaitingWallet] = useState<{ deadline?: number }>();
   const [result, setResult] = useState<{
     hash: Hex;
@@ -210,8 +222,7 @@ export function useLiveSwap(request: SwapRequest) {
         const errors = (e as ApiError).routeErrors;
         if (Array.isArray(errors)) {
           const quoteRequest = JSON.parse(key) as SwapRequest;
-          const multi =
-            quoteRequest.mode === "multi-in" ? "input" : "output";
+          const multi = quoteRequest.mode === "multi-in" ? "input" : "output";
           const next = errors.reduce<Partial<Record<Symbol, string>>>(
             (all, error) => {
               const row = quoteRequest.draft[multi][error.index];
@@ -267,9 +278,27 @@ export function useLiveSwap(request: SwapRequest) {
             setResult({ ...pending, success: state === "confirmed" });
             setPending(undefined);
             setError("");
-            if (state === "confirmed" && pending.legIndex !== undefined) {
-              setNextLeg(pending.legIndex + 1);
+            if (
+              state === "confirmed" &&
+              pending.planApprovalIndex !== undefined
+            ) {
+              setApprovalPlan((plan) =>
+                plan && plan.key === key
+                  ? { ...plan, next: pending.planApprovalIndex! + 1 }
+                  : plan,
+              );
               void refreshHoldings();
+            } else if (
+              state === "confirmed" &&
+              pending.legIndex !== undefined
+            ) {
+              const next = pending.legIndex + 1;
+              setNextLeg(next);
+              void refreshHoldings();
+              if (quote && next >= quote.legs.length) {
+                setApprovalPlan(undefined);
+                setRevision((v) => v + 1);
+              }
             } else {
               setRevision((v) => v + 1);
             }
@@ -290,7 +319,7 @@ export function useLiveSwap(request: SwapRequest) {
       alive = false;
       clearInterval(timer);
     };
-  }, [pending, walletChain, refreshHoldings]);
+  }, [key, pending, quote, walletChain, refreshHoldings]);
   useEffect(() => {
     if (!result) return;
     saveSwapActivity({
@@ -320,24 +349,41 @@ export function useLiveSwap(request: SwapRequest) {
             : [];
         })
       : [];
-  const approvalsFor = (q?: LiveQuote) =>
-    q
-      ? q.request.draft.input.flatMap((r, i) => {
-          if (isNative(r.symbol)) return [];
-          const cap = tokenUnits(q.limits.input[i], r.symbol);
-          const allowance = holdings[r.symbol]?.allowance;
-          return allowance !== undefined && BigInt(allowance) < cap
-            ? [
-                {
-                  symbol: r.symbol,
-                  label: getToken(r.symbol).symbol,
-                  cap,
-                  reset: BigInt(allowance) > 0n,
-                },
-              ]
-            : [];
-        })
-      : [];
+  const approvalsFor = (q?: LiveQuote): ApprovalStep[] => {
+    if (!q) return [];
+    if (approvalPlan?.key === JSON.stringify(q.request))
+      return approvalPlan.approvals.slice(approvalPlan.next);
+    return q.request.draft.input.flatMap((r, i) => {
+      if (isNative(r.symbol)) return [];
+      const cap = tokenUnits(q.limits.input[i], r.symbol);
+      const allowance = holdings[r.symbol]?.allowance;
+      return allowance !== undefined && BigInt(allowance) < cap
+        ? [
+            {
+              symbol: r.symbol,
+              label: getToken(r.symbol).symbol,
+              cap,
+              reset: BigInt(allowance) > 0n,
+            },
+          ]
+        : [];
+    });
+  };
+  function createApprovalPlan(q: LiveQuote): ApprovalStep[] {
+    return q.request.draft.input.flatMap((r, i) => {
+      if (isNative(r.symbol)) return [];
+      const cap = tokenUnits(q.limits.input[i], r.symbol);
+      const allowance = BigInt(holdings[r.symbol]?.allowance ?? "0");
+      if (allowance >= cap) return [];
+      const step = { symbol: r.symbol, label: getToken(r.symbol).symbol, cap };
+      return allowance > 0n
+        ? [
+            { ...step, reset: true },
+            { ...step, reset: false },
+          ]
+        : [{ ...step, reset: false }];
+    });
+  }
   async function connect() {
     setBusy(true);
     setError("");
@@ -370,7 +416,8 @@ export function useLiveSwap(request: SwapRequest) {
   }
   async function send(
     reviewed: LiveQuote,
-    approval?: ReturnType<typeof approvalsFor>[number],
+    approval?: ApprovalStep,
+    planApprovalIndex?: number,
   ) {
     if (sending.current || pending || unknown) return;
     sending.current = true;
@@ -483,6 +530,7 @@ export function useLiveSwap(request: SwapRequest) {
           ? `${approval.reset ? "Reset" : "Approve"} ${approval.label}`
           : `Swap leg ${nextLeg + 1} of ${reviewed.legs.length}`,
         legIndex: approval ? undefined : nextLeg,
+        planApprovalIndex,
       });
       saveSwapActivity({
         hash: hash as Hex,
@@ -503,6 +551,20 @@ export function useLiveSwap(request: SwapRequest) {
       setAwaitingWallet(undefined);
       setBusy(false);
     }
+  }
+  async function run(reviewed: LiveQuote) {
+    const existing =
+      approvalPlan?.key === JSON.stringify(reviewed.request)
+        ? approvalPlan
+        : undefined;
+    const plan = existing ?? {
+      key: JSON.stringify(reviewed.request),
+      approvals: createApprovalPlan(reviewed),
+      next: 0,
+    };
+    if (!existing) setApprovalPlan(plan);
+    const approval = plan.approvals[plan.next];
+    return send(reviewed, approval, approval ? plan.next : undefined);
   }
   return {
     account,
@@ -526,7 +588,12 @@ export function useLiveSwap(request: SwapRequest) {
     connect,
     switchChain,
     send,
-    refresh: () => setRevision((v) => v + 1),
+    run,
+    refresh: () => {
+      setApprovalPlan(undefined);
+      setNextLeg(0);
+      setRevision((v) => v + 1);
+    },
     clock,
   };
 }

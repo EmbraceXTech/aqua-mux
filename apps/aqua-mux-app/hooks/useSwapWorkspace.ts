@@ -116,8 +116,7 @@ export function useSwapWorkspace() {
       return;
     }
     if (!canReview || !trade.quote) return;
-    const approval = trade.approvalsFor(trade.quote)[0];
-    await trade.send(trade.quote, approval);
+    await trade.run(trade.quote);
   }
   async function submit(
     approval?: ReturnType<typeof trade.approvalsFor>[number],
