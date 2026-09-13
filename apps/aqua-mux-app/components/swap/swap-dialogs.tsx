@@ -35,6 +35,7 @@ export function SwapDialogs({ workspace: w }: { workspace: SwapWorkspace }) {
           draft={w.draft}
           locked={w.locked}
           balances={w.trade.holdings}
+          account={w.trade.account}
           onPick={(symbol) =>
             w.edit({ type: "token", target: dialog.target, symbol })
           }

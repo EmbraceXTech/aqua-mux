@@ -1,10 +1,12 @@
-import type { Mode } from "@/lib/live-swap";
+import type { Mode, Side } from "@/lib/live-swap";
 import styles from "./swap.module.css";
 
 type Props = {
   mode: Mode;
+  exact?: Side;
   locked: boolean;
   onModeChange: (mode: Mode) => void;
+  onExactChange?: (side: Side) => void;
 };
 export function SwapModeControls({ mode, locked, onModeChange }: Props) {
   return (

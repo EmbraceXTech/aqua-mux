@@ -36,14 +36,7 @@ export function SwapStatus({
       )}
       {result && (
         <p role="status" className={styles.settingsNote}>
-          {result.label} {result.success ? "confirmed" : "reverted"}.{" "}
-          <a
-            href={`https://arbiscan.io/tx/${result.hash}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            View receipt
-          </a>
+          {result.label} {result.success ? "confirmed" : "reverted"}.
         </p>
       )}
       {unknown && (

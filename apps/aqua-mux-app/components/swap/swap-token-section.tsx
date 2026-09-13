@@ -16,6 +16,7 @@ type Props = {
   amounts?: string[];
   balances: Partial<Record<Row["symbol"], { balance: string } | null>>;
   quoteLabel: string;
+  routeErrors: Partial<Record<Row["symbol"], string>>;
   onEdit: (action: SwapDraftAction) => void;
   onPick: (target: TokenPickerTarget) => void;
 };
@@ -30,6 +31,7 @@ export function SwapTokenSection({
   amounts,
   balances,
   quoteLabel,
+  routeErrors,
   onEdit,
   onPick,
 }: Props) {
@@ -56,12 +58,14 @@ export function SwapTokenSection({
             index={index}
             side={side}
             exact={exact}
+            expanded={expanded}
             removable={expanded && rows.length > 1}
             locked={locked}
             connected={connected}
             balance={balances[item.symbol]?.balance}
             amount={exact ? item.amount : (amounts?.[index] ?? "")}
             quoteLabel={quoteLabel}
+            routeError={routeErrors[item.symbol]}
             onPick={() => onPick({ side, index })}
             onRemove={() => onEdit({ type: "remove", side, index })}
             onChange={(values) =>

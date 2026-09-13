@@ -30,7 +30,7 @@ import {
   type WalletMode,
 } from "@/lib/managed-client/wallet-execution";
 import { useTransactionHistory } from "@/hooks/useTransactionHistory";
-import { selectedChainId } from "@/lib/selected-chain";
+import { defaultChainId, selectedChainId } from "@/lib/selected-chain";
 import type { Health, Leg, TransactionRecord } from "@/types/swap";
 import {
   api,
@@ -41,11 +41,11 @@ import {
   transactionState,
 } from "@/lib/utils/swap";
 export function useTradeWorkspace(initialMode: "swap" | "liquidity") {
-  const [chainId, setChainId] = useState<ChainId>(selectedChainId),
+  const [chainId, setChainId] = useState<ChainId>(defaultChainId),
     mode = initialMode,
     [source, setSource] = useState<Address>(NATIVE),
     [amount, setAmount] = useState("1"),
-    [legs, setLegs] = useState<Leg[]>(() => initialLegs(42161));
+    [legs, setLegs] = useState<Leg[]>(() => initialLegs(defaultChainId));
   const wallet = useManagedSession(chainId);
   const session = wallet.session;
   const account = session?.owner;
@@ -84,6 +84,16 @@ export function useTradeWorkspace(initialMode: "swap" | "liquidity") {
     Record<number, Token[]>
   >({});
   const plan = reviewed?.plan;
+  const selectedChainInitialized = useRef(false);
+  useEffect(() => {
+    if (selectedChainInitialized.current) return;
+    selectedChainInitialized.current = true;
+
+    const savedChainId = selectedChainId();
+    if (savedChainId === chainId) return;
+    setChainId(savedChainId);
+    setLegs(initialLegs(savedChainId));
+  }, [chainId]);
   const onInitialTransaction = useCallback((transaction: TransactionRecord) => {
     setBatch(transaction);
     setStatus(transaction.status ?? { state: "pending" });

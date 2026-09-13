@@ -20,7 +20,6 @@ type Props = {
     | "clock"
     | "walletChain"
     | "insufficient"
-    | "nextLeg"
   >;
   onSubmit: SwapWorkspace["submit"];
   onClose: () => void;
@@ -35,8 +34,6 @@ function ReviewAction({
   onRefresh,
 }: Omit<Props, "account" | "onClose">) {
   const approval = trade.approvalsFor(quote)[0];
-  const totalLegs = quote.legs.length;
-  const finished = trade.nextLeg >= totalLegs;
   if (trade.awaitingWallet) {
     const deadline = trade.awaitingWallet.deadline;
     const expired = deadline !== undefined && trade.clock >= deadline;
@@ -82,8 +79,8 @@ function ReviewAction({
       <>
         <p className={styles.settingsNote}>
           {approval.reset
-            ? `Reset the existing ${approval.symbol} allowance to zero first.`
-            : `Approve only the reviewed maximum ${approval.symbol} spend.`}{" "}
+            ? `Reset the existing ${approval.label} allowance to zero first.`
+            : `Approve only the reviewed maximum ${approval.label} spend.`}{" "}
           Spender: {classicRouter(SWAP_CHAIN)}. Approval is separate from the
           swap. Refresh and review after confirmation.
         </p>
@@ -94,15 +91,9 @@ function ReviewAction({
         >
           {trade.busy
             ? "Check wallet…"
-            : `${approval.reset ? "Reset" : "Approve"} ${approval.symbol} in wallet`}
+            : `${approval.reset ? "Reset" : "Approve"} ${approval.label} in wallet`}
         </button>
       </>
-    );
-  if (finished)
-    return (
-      <p role="status" className={styles.settingsNote}>
-        All {totalLegs} 1inch swap legs are confirmed.
-      </p>
     );
   return (
     <button
@@ -114,9 +105,7 @@ function ReviewAction({
       }
       onClick={() => void onSubmit()}
     >
-      {trade.busy
-        ? "Check wallet…"
-        : `Confirm leg ${trade.nextLeg + 1} of ${totalLegs} in wallet`}
+      {trade.busy ? "Check wallet…" : "Confirm swap in wallet"}
       <ArrowRight size={17} />
     </button>
   );

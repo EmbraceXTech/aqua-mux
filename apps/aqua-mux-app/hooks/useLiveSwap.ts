@@ -18,6 +18,7 @@ import {
 } from "viem";
 import type { Provider } from "@/lib/wallet";
 import { classicRouter } from "@/lib/config";
+import { saveSwapActivity } from "@/lib/swap-activity";
 import { swapTransactionStatus } from "@/lib/swap-transaction-status";
 import {
   buildSwap,
@@ -34,6 +35,8 @@ import {
 type Holdings = Partial<
   Record<Symbol, { balance: string; allowance: string } | null>
 >;
+type QuoteRouteError = { index: number; message: string };
+type ApiError = Error & { routeErrors?: QuoteRouteError[] };
 const message = (e: unknown) => {
   if (e && typeof e === "object" && "code" in e && e.code === 4001)
     return "Request rejected in wallet. Nothing was submitted.";
@@ -44,7 +47,11 @@ const message = (e: unknown) => {
 async function api<T>(url: string, init?: RequestInit): Promise<T> {
   const response = await fetch(url, { ...init, cache: "no-store" });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Request failed.");
+  if (!response.ok) {
+    const error = new Error(data.error || "Request failed.") as ApiError;
+    if (Array.isArray(data.routeErrors)) error.routeErrors = data.routeErrors;
+    throw error;
+  }
   return data;
 }
 function provider(): Provider {
@@ -59,6 +66,9 @@ export function useLiveSwap(request: SwapRequest) {
   const [holdings, setHoldings] = useState<Holdings>({});
   const [quote, setQuote] = useState<LiveQuote>();
   const [quoteError, setQuoteError] = useState("");
+  const [routeErrors, setRouteErrors] = useState<Partial<Record<Symbol, string>>>(
+    {},
+  );
   const [error, setError] = useState("");
   const [quoteBusy, setQuoteBusy] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -77,6 +87,7 @@ export function useLiveSwap(request: SwapRequest) {
     hash: Hex;
     success: boolean;
     label: string;
+    submittedAt: number;
   }>();
   const [unknown, setUnknown] = useState(false);
   useEffect(() => {
@@ -170,6 +181,7 @@ export function useLiveSwap(request: SwapRequest) {
     const timer = setTimeout(async () => {
       setQuote(undefined);
       setQuoteError("");
+      setRouteErrors({});
       try {
         routeLegs(JSON.parse(key));
       } catch (e) {
@@ -194,7 +206,27 @@ export function useLiveSwap(request: SwapRequest) {
           setNextLeg(0);
         }
       } catch (e) {
-        if (alive) setQuoteError(message(e));
+        if (!alive) return;
+        const errors = (e as ApiError).routeErrors;
+        if (Array.isArray(errors)) {
+          const quoteRequest = JSON.parse(key) as SwapRequest;
+          const multi =
+            quoteRequest.mode === "multi-in" ? "input" : "output";
+          const next = errors.reduce<Partial<Record<Symbol, string>>>(
+            (all, error) => {
+              const row = quoteRequest.draft[multi][error.index];
+              if (row && typeof error.message === "string")
+                all[row.symbol] = error.message;
+              return all;
+            },
+            {},
+          );
+          if (Object.keys(next).length) {
+            setRouteErrors(next);
+            return;
+          }
+        }
+        setQuoteError(message(e));
       } finally {
         if (alive) setQuoteBusy(false);
       }
@@ -259,6 +291,15 @@ export function useLiveSwap(request: SwapRequest) {
       clearInterval(timer);
     };
   }, [pending, walletChain, refreshHoldings]);
+  useEffect(() => {
+    if (!result) return;
+    saveSwapActivity({
+      hash: result.hash,
+      label: result.label,
+      submittedAt: result.submittedAt,
+      state: result.success ? "confirmed" : "reverted",
+    });
+  }, [result]);
   const activeQuote =
     quote && JSON.stringify(quote.request) === key ? quote : undefined;
   const fresh = !!activeQuote && clock > 0 && activeQuote.expiresAt > clock;
@@ -286,7 +327,14 @@ export function useLiveSwap(request: SwapRequest) {
           const cap = tokenUnits(q.limits.input[i], r.symbol);
           const allowance = holdings[r.symbol]?.allowance;
           return allowance !== undefined && BigInt(allowance) < cap
-            ? [{ symbol: r.symbol, cap, reset: BigInt(allowance) > 0n }]
+            ? [
+                {
+                  symbol: r.symbol,
+                  label: getToken(r.symbol).symbol,
+                  cap,
+                  reset: BigInt(allowance) > 0n,
+                },
+              ]
             : [];
         })
       : [];
@@ -424,13 +472,23 @@ export function useLiveSwap(request: SwapRequest) {
           "Wallet returned no transaction hash. Check activity before retrying.",
         );
       setUnlocated(false);
+      const submittedAt = Date.now();
+      const label = approval
+        ? `${approval.reset ? "Reset" : "Approve"} ${approval.label}`
+        : "Swap";
       setPending({
         hash: hash as Hex,
-        submittedAt: Date.now(),
+        submittedAt,
         label: approval
-          ? `${approval.reset ? "Reset" : "Approve"} ${approval.symbol}`
+          ? `${approval.reset ? "Reset" : "Approve"} ${approval.label}`
           : `Swap leg ${nextLeg + 1} of ${reviewed.legs.length}`,
         legIndex: approval ? undefined : nextLeg,
+      });
+      saveSwapActivity({
+        hash: hash as Hex,
+        label,
+        submittedAt,
+        state: "pending",
       });
       return true;
     } catch (e) {
@@ -454,6 +512,7 @@ export function useLiveSwap(request: SwapRequest) {
     fresh,
     quoteBusy,
     quoteError,
+    routeErrors,
     error,
     busy,
     pending,

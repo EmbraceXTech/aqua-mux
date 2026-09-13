@@ -1,4 +1,4 @@
-import { ChevronDown, X } from "lucide-react";
+import { ChevronDown, Settings2, X } from "lucide-react";
 import { getToken, type Row, type Side } from "@/lib/live-swap";
 import { SwapTokenMark } from "./swap-token-mark";
 import styles from "./swap.module.css";
@@ -9,12 +9,14 @@ type Props = {
   side: Side;
   index: number;
   exact: boolean;
+  expanded: boolean;
   removable: boolean;
   locked: boolean;
   connected: boolean;
   balance?: string;
   amount: string;
   quoteLabel: string;
+  routeError?: string;
   onPick: () => void;
   onRemove: () => void;
   onChange: (values: Partial<Pick<Row, "amount" | "weight" | "fee">>) => void;
@@ -29,12 +31,14 @@ export function SwapTokenRow({
   side,
   index,
   exact,
+  expanded,
   removable,
   locked,
   connected,
   balance,
   amount,
   quoteLabel,
+  routeError,
   onPick,
   onRemove,
   onChange,
@@ -80,20 +84,19 @@ export function SwapTokenRow({
         )}
       </div>
       <div className={styles.rowMeta}>
-        <span>
-          Balance: {connected ? (balance ?? "Unavailable") : "Connect wallet"}
-          {side === "input" &&
-            exact &&
-            balance !== undefined &&
-            token.address !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
-              <button
-                disabled={locked}
-                onClick={() => onChange({ amount: balance })}
-              >
-                Max
-              </button>
-            )}
-        </span>
+        {exact && balance !== undefined ? (
+          <button
+            type="button"
+            className={styles.balanceButton}
+            disabled={locked}
+            aria-label={`Use full ${token.symbol} wallet balance`}
+            onClick={() => onChange({ amount: balance })}
+          >
+            Balance: {balance}
+          </button>
+        ) : connected ? (
+          <span>Balance: {balance ?? "Unavailable"}</span>
+        ) : null}
         {removable && !exact && (
           <label className={styles.allocation}>
             Allocation{" "}
@@ -108,6 +111,33 @@ export function SwapTokenRow({
           </label>
         )}
       </div>
+      {routeError && (
+        <p role="alert" className={styles.routeError}>
+          {routeError}
+        </p>
+      )}
+      {expanded && (
+        <div className={styles.rowFee}>
+          <span className={styles.feeLabel}>
+            <Settings2 size={12} />
+            Fee
+          </span>
+          <div className={styles.feePresets}>
+            {(["0.01", "0.05", "0.3", "1"] as const).map((fee) => (
+              <button
+                key={fee}
+                disabled={locked}
+                className={item.fee === fee ? styles.activeFee : ""}
+                aria-pressed={item.fee === fee}
+                aria-label={`${token.symbol} fee ${fee}%`}
+                onClick={() => onChange({ fee })}
+              >
+                {fee}%
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
