@@ -114,7 +114,7 @@ export function useSwapWorkspace() {
     approval?: ReturnType<typeof trade.approvalsFor>[number],
   ) {
     if (dialog?.type !== "review" || !reviewValid || locked) return;
-    if (await trade.send(dialog.quote, approval)) setDialog(null);
+    await trade.send(dialog.quote, approval);
   }
   return {
     mode: state.mode,

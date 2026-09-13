@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { MainLayout } from "@/components/layouts/MainLayout";
+import { classicRouter } from "@/lib/config";
 import { Modal } from "@/components/ui/modal";
 import { useLiveSwap } from "@/hooks/useLiveSwap";
 import {
@@ -25,7 +26,6 @@ import {
   liveTokens,
   row,
   SWAP_CHAIN,
-  V3_ROUTER,
   type Draft,
   type LiveQuote,
   type Mode,
@@ -721,11 +721,11 @@ export function SwapDesign() {
               <br />
               Router:{" "}
               <a
-                href={`https://arbiscan.io/address/${V3_ROUTER}`}
+                href={`https://arbiscan.io/address/${classicRouter(SWAP_CHAIN)}`}
                 target="_blank"
                 rel="noreferrer"
               >
-                {V3_ROUTER}
+                {classicRouter(SWAP_CHAIN)}
               </a>
               <br />
               Method: multicall. Network gas is additional and shown by
@@ -779,7 +779,7 @@ export function SwapDesign() {
                   {approvals[0].reset
                     ? `Reset the existing ${approvals[0].symbol} allowance to zero first.`
                     : `Approve only the reviewed maximum ${approvals[0].symbol} spend.`}{" "}
-                  Spender: {V3_ROUTER}. Approval is separate from the swap.
+                  Spender: {classicRouter(SWAP_CHAIN)}. Approval is separate from the swap.
                   Refresh and review after confirmation.
                 </p>
                 <button

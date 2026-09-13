@@ -1,20 +1,12 @@
-import type { Mode, Side } from "@/lib/live-swap";
+import type { Mode } from "@/lib/live-swap";
 import styles from "./swap.module.css";
 
 type Props = {
   mode: Mode;
-  exact: Side;
   locked: boolean;
   onModeChange: (mode: Mode) => void;
-  onExactChange: (side: Side) => void;
 };
-export function SwapModeControls({
-  mode,
-  exact,
-  locked,
-  onModeChange,
-  onExactChange,
-}: Props) {
+export function SwapModeControls({ mode, locked, onModeChange }: Props) {
   return (
     <div className={styles.builderControls}>
       <div className={styles.modeSwitch} role="group" aria-label="Swap mode">
@@ -30,32 +22,10 @@ export function SwapModeControls({
           </button>
         ))}
       </div>
-      <div className={styles.amountSettings}>
-        <div className={styles.exactControl}>
-          <span>Set amounts for</span>
-          <div>
-            {(["input", "output"] as const).map((side) => (
-              <button
-                key={side}
-                disabled={locked}
-                aria-pressed={exact === side}
-                className={exact === side ? styles.selectedExact : ""}
-                onClick={() => onExactChange(side)}
-              >
-                {side === "input" ? "You pay" : "You receive"}
-              </button>
-            ))}
-          </div>
-        </div>
-        <p className={styles.amountHint}>
-          {exact === "input"
-            ? "Fix what you spend. We'll quote what you receive."
-            : "Fix what you receive. We'll quote the maximum spend."}
-          {mode === "multi-in" && exact === "output"
-            ? " Allocation splits the requested output between input routes."
-            : ""}
-        </p>
-      </div>
+      <p className={styles.amountHint}>
+        Each 1inch leg uses an exact input amount and requires a separate wallet
+        confirmation.
+      </p>
     </div>
   );
 }

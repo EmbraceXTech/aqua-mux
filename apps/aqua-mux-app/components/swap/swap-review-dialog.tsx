@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import type { SwapWorkspace } from "@/hooks/useSwapWorkspace";
-import { SWAP_CHAIN, V3_ROUTER, type LiveQuote } from "@/lib/live-swap";
+import { classicRouter } from "@/lib/config";
+import { SWAP_CHAIN, type LiveQuote } from "@/lib/live-swap";
 import { SwapReviewSummary } from "./swap-review-summary";
 import styles from "./swap.module.css";
 
@@ -19,6 +20,7 @@ type Props = {
     | "clock"
     | "walletChain"
     | "insufficient"
+    | "nextLeg"
   >;
   onSubmit: SwapWorkspace["submit"];
   onClose: () => void;
@@ -33,6 +35,8 @@ function ReviewAction({
   onRefresh,
 }: Omit<Props, "account" | "onClose">) {
   const approval = trade.approvalsFor(quote)[0];
+  const totalLegs = quote.legs.length;
+  const finished = trade.nextLeg >= totalLegs;
   if (trade.awaitingWallet) {
     const deadline = trade.awaitingWallet.deadline;
     const expired = deadline !== undefined && trade.clock >= deadline;
@@ -80,8 +84,8 @@ function ReviewAction({
           {approval.reset
             ? `Reset the existing ${approval.symbol} allowance to zero first.`
             : `Approve only the reviewed maximum ${approval.symbol} spend.`}{" "}
-          Spender: {V3_ROUTER}. Approval is separate from the swap. Refresh and
-          review after confirmation.
+          Spender: {classicRouter(SWAP_CHAIN)}. Approval is separate from the
+          swap. Refresh and review after confirmation.
         </p>
         <button
           className={styles.primaryButton}
@@ -94,6 +98,12 @@ function ReviewAction({
         </button>
       </>
     );
+  if (finished)
+    return (
+      <p role="status" className={styles.settingsNote}>
+        All {totalLegs} 1inch swap legs are confirmed.
+      </p>
+    );
   return (
     <button
       className={styles.primaryButton}
@@ -104,7 +114,9 @@ function ReviewAction({
       }
       onClick={() => void onSubmit()}
     >
-      {trade.busy ? "Check wallet…" : "Confirm swap in wallet"}
+      {trade.busy
+        ? "Check wallet…"
+        : `Confirm leg ${trade.nextLeg + 1} of ${totalLegs} in wallet`}
       <ArrowRight size={17} />
     </button>
   );

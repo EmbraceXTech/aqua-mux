@@ -56,7 +56,6 @@ export function SwapTokenSection({
             index={index}
             side={side}
             exact={exact}
-            expanded={expanded}
             removable={expanded && rows.length > 1}
             locked={locked}
             connected={connected}

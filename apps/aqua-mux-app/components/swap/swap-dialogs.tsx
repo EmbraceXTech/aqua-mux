@@ -14,10 +14,10 @@ export function SwapDialogs({ workspace: w }: { workspace: SwapWorkspace }) {
         : "Review your swap";
   const description =
     dialog?.type === "tokens"
-      ? "Verified Arbitrum token addresses. Pool availability depends on the fee tier."
+      ? "Verified Arbitrum token addresses. 1inch availability depends on the selected pair."
       : dialog?.type === "slippage"
-        ? "A minimum receive or maximum spend limit for every swap leg."
-        : "Real transaction on Arbitrum One, chain ID 42161. Confirm each action in your wallet.";
+        ? "1inch uses this limit when it prepares the transaction."
+        : "Real 1inch transaction on Arbitrum One, chain ID 42161. Confirm each action in your wallet.";
   // Keep the dialog root mounted so Base UI can restore focus to its opener.
   // Only the content mounts per session, resetting transient picker search.
   return (
@@ -43,7 +43,6 @@ export function SwapDialogs({ workspace: w }: { workspace: SwapWorkspace }) {
       {dialog?.type === "slippage" && (
         <SwapSlippageDialog
           value={w.slippage}
-          multi={w.multi}
           locked={w.locked}
           onChange={(value) => w.edit({ type: "slippage", value })}
           onClose={w.closeDialog}

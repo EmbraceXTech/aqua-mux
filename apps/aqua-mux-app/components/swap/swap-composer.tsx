@@ -1,6 +1,5 @@
 import { ArrowDownUp, ArrowRight, RefreshCw, Settings2 } from "lucide-react";
 import type { SwapWorkspace } from "@/hooks/useSwapWorkspace";
-import { liveTokens } from "@/lib/live-swap";
 import { SwapActions } from "./swap-actions";
 import { SwapModeControls } from "./swap-mode-controls";
 import { SwapStatus } from "./swap-status";
@@ -10,18 +9,18 @@ import styles from "./swap.module.css";
 export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
   const { trade, draft, locked } = w;
   const quoteLabel = trade.quoteBusy
-    ? "Fetching pool quote…"
+    ? "Fetching 1inch quote…"
     : trade.quote
       ? trade.fresh
-        ? "Live pool quote"
+        ? "Live 1inch quote"
         : "Quote expired"
       : "Awaiting quote";
   return (
-    <section className={styles.composer} aria-label="Multi-swap builder">
+    <section className={styles.composer} aria-label="Swap builder">
       <div className={styles.composerHeader}>
         <span>
           <ArrowDownUp size={17} />{" "}
-          {w.singleSwap ? "Single swap" : "Multi-swap"}
+          {w.singleSwap ? "1inch swap" : "Multi-leg 1inch swap"}
         </span>
         <div className={styles.headerActions}>
           <button
@@ -44,20 +43,18 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
       </div>
       <SwapModeControls
         mode={w.mode}
-        exact={draft.exact}
         locked={locked}
         onModeChange={(mode) => w.edit({ type: "mode", mode })}
-        onExactChange={w.setExact}
       />
       <div className={styles.tokenColumns}>
         <SwapTokenSection
           side="input"
           rows={draft.input}
-          exact={draft.exact === "input"}
+          exact={true}
           expanded={w.multi === "input"}
           locked={locked}
           connected={!!trade.account}
-          canAdd={draft.input.length + draft.output.length < liveTokens.length}
+          canAdd={true}
           amounts={trade.quote?.amounts.input}
           balances={trade.holdings}
           quoteLabel={quoteLabel}
@@ -70,11 +67,11 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
         <SwapTokenSection
           side="output"
           rows={draft.output}
-          exact={draft.exact === "output"}
+          exact={false}
           expanded={w.multi === "output"}
           locked={locked}
           connected={!!trade.account}
-          canAdd={draft.input.length + draft.output.length < liveTokens.length}
+          canAdd={true}
           amounts={trade.quote?.amounts.output}
           balances={trade.holdings}
           quoteLabel={quoteLabel}

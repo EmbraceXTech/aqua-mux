@@ -1,4 +1,4 @@
-import { ChevronDown, Settings2, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { getToken, type Row, type Side } from "@/lib/live-swap";
 import { SwapTokenMark } from "./swap-token-mark";
 import styles from "./swap.module.css";
@@ -9,7 +9,6 @@ type Props = {
   side: Side;
   index: number;
   exact: boolean;
-  expanded: boolean;
   removable: boolean;
   locked: boolean;
   connected: boolean;
@@ -30,7 +29,6 @@ export function SwapTokenRow({
   side,
   index,
   exact,
-  expanded,
   removable,
   locked,
   connected,
@@ -110,27 +108,6 @@ export function SwapTokenRow({
           </label>
         )}
       </div>
-      {expanded && (
-        <div className={styles.rowFee}>
-          <span>
-            <Settings2 size={12} /> {token.symbol} pool fee
-          </span>
-          <div className={styles.feePresets}>
-            {(["0.01", "0.05", "0.3", "1"] as const).map((fee) => (
-              <button
-                key={fee}
-                disabled={locked}
-                className={item.fee === fee ? styles.activeFee : ""}
-                aria-pressed={item.fee === fee}
-                aria-label={`${token.symbol} fee ${fee}%`}
-                onClick={() => onChange({ fee })}
-              >
-                {fee}%
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }

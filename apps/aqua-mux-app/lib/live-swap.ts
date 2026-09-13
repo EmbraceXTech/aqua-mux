@@ -1,21 +1,8 @@
-import {
-  encodeFunctionData,
-  parseAbi,
-  parseUnits,
-  formatUnits,
-  type Address,
-} from "viem";
+import { parseUnits, formatUnits, type Address, type Hex } from "viem";
 import { z } from "zod";
-import { NATIVE, tokens } from "./config";
+import { NATIVE, classicRouter, tokens } from "./config";
 
-// Arbitrum deployment references are documented in components/swap/README.md.
 export const SWAP_CHAIN = 42161;
-export const SWAP_DEADLINE_SECONDS = 600;
-export const V3_ROUTER =
-  "0xe592427a0aece92de3edee1f18e0157c05861564" as Address;
-export const V3_QUOTER =
-  "0xb27308f9f90d607463bb33ea1bebb41c27ce5ab6" as Address;
-export const WETH = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1" as Address;
 export const liveTokens = tokens(SWAP_CHAIN).map((token) => ({
   ...token,
   id: token.address,
@@ -43,8 +30,6 @@ export const getToken = (symbol: Symbol) => {
   return token;
 };
 export const isNative = (symbol: Symbol) => getToken(symbol).address === NATIVE;
-export const poolAddress = (symbol: Symbol) =>
-  isNative(symbol) ? WETH : getToken(symbol).address;
 const tokenId = (ticker: string) => {
   const token = liveTokens.find((candidate) => candidate.symbol === ticker);
   if (!token) throw new Error(`${ticker} is not in the Arbitrum token list.`);
@@ -71,10 +56,12 @@ export function initialDrafts(): Record<Mode, Draft> {
   };
 }
 const rowSchema = z.object({
-  symbol: z.string().refine(
-    (address) => liveTokens.some((token) => token.id === address),
-    "Token is not in the Arbitrum token list.",
-  ),
+  symbol: z
+    .string()
+    .refine(
+      (address) => liveTokens.some((token) => token.id === address),
+      "Token is not in the Arbitrum token list.",
+    ),
   amount: z.string().max(80),
   weight: z.string().max(10),
   fee: z.enum(["0.01", "0.05", "0.3", "1"]),
@@ -102,6 +89,11 @@ export type QuotedLeg = RouteLeg & {
   maxIn: string;
   minOut: string;
 };
+export type SwapTransaction = {
+  to: Address;
+  data: Hex;
+  value: string;
+};
 export type LiveQuote = {
   request: SwapRequest;
   legs: QuotedLeg[];
@@ -109,6 +101,7 @@ export type LiveQuote = {
   limits: Record<Side, string[]>;
   block: string;
   expiresAt: number;
+  transactions?: SwapTransaction[];
 };
 export function tokenUnits(amount: string, symbol: Symbol) {
   const decimals = getToken(symbol).decimals;
@@ -132,14 +125,16 @@ function allocate(total: bigint, rows: Row[]) {
     return Number(parseUnits(r.weight, 2));
   });
   if (
-    weights.some((w) => w <= 0) ||
-    weights.reduce((a, b) => a + b, 0) !== 10000
+    weights.some((weight) => weight <= 0) ||
+    weights.reduce((sum, weight) => sum + weight, 0) !== 10000
   )
     throw new Error("Allocations must be positive and total 100%.");
   let used = 0n;
-  return weights.map((w, i) => {
+  return weights.map((weight, index) => {
     const value =
-      i === weights.length - 1 ? total - used : (total * BigInt(w)) / 10000n;
+      index === weights.length - 1
+        ? total - used
+        : (total * BigInt(weight)) / 10000n;
     used += value;
     if (!value) throw new Error("Amount is too small for this allocation.");
     return value;
@@ -155,6 +150,8 @@ export function routeLegs(input: unknown): {
   const single = multi === "input" ? "output" : "input";
   if (d[single].length !== 1)
     throw new Error(`Choose one ${single} token for this mode.`);
+  if (d.exact !== "input")
+    throw new Error("1inch Classic Swap supports exact-input swaps only.");
   const symbols = [...d.input, ...d.output].map((r) => r.symbol);
   if (new Set(symbols).size !== symbols.length)
     throw new Error("Choose a different token for each row.");
@@ -238,81 +235,23 @@ export function finishQuote(
     expiresAt: now + 30000,
   };
 }
-export const quoterAbi = parseAbi([
-  "function quoteExactInputSingle(address tokenIn,address tokenOut,uint24 fee,uint256 amountIn,uint160 sqrtPriceLimitX96) returns (uint256 amountOut)",
-  "function quoteExactOutputSingle(address tokenIn,address tokenOut,uint24 fee,uint256 amountOut,uint160 sqrtPriceLimitX96) returns (uint256 amountIn)",
-]);
-export const routerAbi = parseAbi([
-  "function exactInputSingle((address tokenIn,address tokenOut,uint24 fee,address recipient,uint256 deadline,uint256 amountIn,uint256 amountOutMinimum,uint160 sqrtPriceLimitX96) params) payable returns (uint256 amountOut)",
-  "function exactOutputSingle((address tokenIn,address tokenOut,uint24 fee,address recipient,uint256 deadline,uint256 amountOut,uint256 amountInMaximum,uint160 sqrtPriceLimitX96) params) payable returns (uint256 amountIn)",
-  "function multicall(bytes[] data) payable returns (bytes[] results)",
-  "function unwrapWETH9(uint256 amountMinimum,address recipient) payable",
-  "function refundETH() payable",
-]);
-export function buildSwap(
-  quote: LiveQuote,
-  account: Address,
-  now = Date.now(),
-) {
+export function buildSwap(quote: LiveQuote, index: number, now = Date.now()) {
   if (quote.expiresAt <= now)
     throw new Error("Quote expired. Refresh and review it again.");
-  const deadline = BigInt(Math.floor(now / 1000) + SWAP_DEADLINE_SECONDS);
-  const calls = quote.legs.map((l) => {
-    const common = {
-      tokenIn: poolAddress(l.input),
-      tokenOut: poolAddress(l.output),
-      fee: l.fee,
-      recipient: isNative(l.output) ? V3_ROUTER : account,
-      deadline,
-      sqrtPriceLimitX96: 0n,
-    };
-    return quote.request.draft.exact === "input"
-      ? encodeFunctionData({
-          abi: routerAbi,
-          functionName: "exactInputSingle",
-          args: [
-            {
-              ...common,
-              amountIn: BigInt(l.amountIn),
-              amountOutMinimum: BigInt(l.minOut),
-            },
-          ],
-        })
-      : encodeFunctionData({
-          abi: routerAbi,
-          functionName: "exactOutputSingle",
-          args: [
-            {
-              ...common,
-              amountOut: BigInt(l.amountOut),
-              amountInMaximum: BigInt(l.maxIn),
-            },
-          ],
-        });
-  });
-  const ethOut = quote.legs.filter((l) => isNative(l.output));
-  if (ethOut.length)
-    calls.push(
-      encodeFunctionData({
-        abi: routerAbi,
-        functionName: "unwrapWETH9",
-        args: [ethOut.reduce((s, l) => s + BigInt(l.minOut), 0n), account],
-      }),
+  const transaction = quote.transactions?.[index];
+  const leg = quote.legs[index];
+  if (!transaction || !leg)
+    throw new Error(
+      "Quote has no 1inch transaction for this leg. Refresh and review again.",
     );
-  const value = quote.legs
-    .filter((l) => isNative(l.input))
-    .reduce((s, l) => s + BigInt(l.maxIn), 0n);
-  if (value > 0n)
-    calls.push(
-      encodeFunctionData({ abi: routerAbi, functionName: "refundETH" }),
+  if (transaction.to.toLowerCase() !== classicRouter(SWAP_CHAIN).toLowerCase())
+    throw new Error("1inch returned an unexpected router.");
+  if (!/^(0|[1-9]\d*)$/.test(transaction.value))
+    throw new Error("1inch returned an invalid transaction value.");
+  const expectedValue = isNative(leg.input) ? BigInt(leg.amountIn) : 0n;
+  if (BigInt(transaction.value) !== expectedValue)
+    throw new Error(
+      "1inch transaction value does not match the reviewed input.",
     );
-  return {
-    to: V3_ROUTER,
-    data: encodeFunctionData({
-      abi: routerAbi,
-      functionName: "multicall",
-      args: [calls],
-    }),
-    value,
-  };
+  return { ...transaction, value: BigInt(transaction.value) };
 }

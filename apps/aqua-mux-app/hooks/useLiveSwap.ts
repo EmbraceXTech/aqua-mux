@@ -17,6 +17,7 @@ import {
   type Hex,
 } from "viem";
 import type { Provider } from "@/lib/wallet";
+import { classicRouter } from "@/lib/config";
 import { swapTransactionStatus } from "@/lib/swap-transaction-status";
 import {
   buildSwap,
@@ -24,9 +25,7 @@ import {
   isNative,
   routeLegs,
   SWAP_CHAIN,
-  SWAP_DEADLINE_SECONDS,
   tokenUnits,
-  V3_ROUTER,
   type LiveQuote,
   type SwapRequest,
   type Symbol,
@@ -69,8 +68,10 @@ export function useLiveSwap(request: SwapRequest) {
     hash: Hex;
     label: string;
     submittedAt: number;
+    legIndex?: number;
   }>();
   const [unlocated, setUnlocated] = useState(false);
+  const [nextLeg, setNextLeg] = useState(0);
   const [awaitingWallet, setAwaitingWallet] = useState<{ deadline?: number }>();
   const [result, setResult] = useState<{
     hash: Hex;
@@ -160,6 +161,12 @@ export function useLiveSwap(request: SwapRequest) {
   useEffect(() => {
     const controller = new AbortController();
     let alive = true;
+    if (!account) {
+      setQuote(undefined);
+      setQuoteError("");
+      setQuoteBusy(false);
+      return () => controller.abort();
+    }
     const timer = setTimeout(async () => {
       setQuote(undefined);
       setQuoteError("");
@@ -179,10 +186,13 @@ export function useLiveSwap(request: SwapRequest) {
         const value = await api<LiveQuote>("/api/live-swap", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: key,
+          body: JSON.stringify({ request: JSON.parse(key), account }),
           signal: controller.signal,
         });
-        if (alive) setQuote(value);
+        if (alive) {
+          setQuote(value);
+          setNextLeg(0);
+        }
       } catch (e) {
         if (alive) setQuoteError(message(e));
       } finally {
@@ -194,7 +204,7 @@ export function useLiveSwap(request: SwapRequest) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [key, revision]);
+  }, [account, key, revision]);
   useEffect(() => {
     if (!pending || walletChain !== SWAP_CHAIN) return;
     let alive = true;
@@ -225,7 +235,12 @@ export function useLiveSwap(request: SwapRequest) {
             setResult({ ...pending, success: state === "confirmed" });
             setPending(undefined);
             setError("");
-            setRevision((v) => v + 1);
+            if (state === "confirmed" && pending.legIndex !== undefined) {
+              setNextLeg(pending.legIndex + 1);
+              void refreshHoldings();
+            } else {
+              setRevision((v) => v + 1);
+            }
           }
         }
       } catch {
@@ -243,7 +258,7 @@ export function useLiveSwap(request: SwapRequest) {
       alive = false;
       clearInterval(timer);
     };
-  }, [pending, walletChain]);
+  }, [pending, walletChain, refreshHoldings]);
   const activeQuote =
     quote && JSON.stringify(quote.request) === key ? quote : undefined;
   const fresh = !!activeQuote && clock > 0 && activeQuote.expiresAt > clock;
@@ -253,7 +268,10 @@ export function useLiveSwap(request: SwapRequest) {
           const balance = holdings[r.symbol]?.balance;
           if (balance === undefined)
             return [`${r.symbol} balance unavailable.`];
-          const required = tokenUnits(activeQuote.limits.input[i], r.symbol);
+          const required = activeQuote.legs
+            .slice(nextLeg)
+            .filter((leg) => leg.input === r.symbol)
+            .reduce((sum, leg) => sum + BigInt(leg.amountIn), 0n);
           // Balance may be zero; unlike trade amounts it is allowed here.
           const actual = parseUnits(balance, getToken(r.symbol).decimals);
           return required > actual
@@ -339,19 +357,21 @@ export function useLiveSwap(request: SwapRequest) {
       await check();
       const balances = await refreshHoldings();
       if (!balances) throw new Error("Balances unavailable.");
+      const activeLeg = reviewed.legs[nextLeg];
       for (const [i, r] of reviewed.request.draft.input.entries()) {
         const held = balances[r.symbol];
         if (!held) throw new Error(`${r.symbol} balance unavailable.`);
-        if (
-          parseUnits(held.balance, getToken(r.symbol).decimals) <
-          tokenUnits(reviewed.limits.input[i], r.symbol)
-        )
+        const required = approval
+          ? tokenUnits(reviewed.limits.input[i], r.symbol)
+          : activeLeg?.input === r.symbol
+            ? BigInt(activeLeg.amountIn)
+            : 0n;
+        if (parseUnits(held.balance, getToken(r.symbol).decimals) < required)
           throw new Error(`Not enough ${r.symbol}.`);
         if (
           !approval &&
           !isNative(r.symbol) &&
-          BigInt(held.allowance) <
-            tokenUnits(reviewed.limits.input[i], r.symbol)
+          BigInt(held.allowance) < required
         )
           throw new Error(`Approve ${r.symbol} first.`);
       }
@@ -373,11 +393,14 @@ export function useLiveSwap(request: SwapRequest) {
             data: encodeFunctionData({
               abi: erc20Abi,
               functionName: "approve",
-              args: [V3_ROUTER, approval.reset ? 0n : approval.cap],
+              args: [
+                classicRouter(SWAP_CHAIN),
+                approval.reset ? 0n : approval.cap,
+              ],
             }),
             value: 0n,
           }
-        : buildSwap(reviewed, owner!, transactionTime);
+        : buildSwap(reviewed, nextLeg, transactionTime);
       const rpcTx = {
         from: owner,
         to: tx.to,
@@ -389,9 +412,7 @@ export function useLiveSwap(request: SwapRequest) {
       await p.request({ method: "eth_estimateGas", params: [rpcTx] });
       await check();
       setAwaitingWallet({
-        deadline: approval
-          ? undefined
-          : transactionTime + SWAP_DEADLINE_SECONDS * 1000,
+        deadline: approval ? undefined : reviewed.expiresAt,
       });
       requested = true;
       const hash = await p.request({
@@ -408,7 +429,8 @@ export function useLiveSwap(request: SwapRequest) {
         submittedAt: Date.now(),
         label: approval
           ? `${approval.reset ? "Reset" : "Approve"} ${approval.symbol}`
-          : "Swap",
+          : `Swap leg ${nextLeg + 1} of ${reviewed.legs.length}`,
+        legIndex: approval ? undefined : nextLeg,
       });
       return true;
     } catch (e) {
@@ -439,6 +461,7 @@ export function useLiveSwap(request: SwapRequest) {
     awaitingWallet,
     result,
     unknown,
+    nextLeg,
     insufficient: insufficient ?? [],
     approvalsFor,
     connect,
