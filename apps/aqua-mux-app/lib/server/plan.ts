@@ -131,13 +131,13 @@ export async function buildPlan(
         t.address,
         total,
         n,
-        b.feeBps,
+        leg.feeBps ?? b.feeBps,
         range,
         BigInt("0x" + randomBytes(8).toString("hex")),
       );
       calls.push({ ...s.call, label: `Create ${base.symbol} / ${t.symbol}` });
       summary.push(
-        `${base.symbol} / ${t.symbol}: shared ${b.amount} ${base.symbol}, paired with ${leg.amount} ${t.symbol}.`,
+        `${base.symbol} / ${t.symbol}: shared ${b.amount} ${base.symbol}, paired with ${leg.amount} ${t.symbol}. Fee ${(leg.feeBps ?? b.feeBps) / 100}%.`,
         range === "full"
           ? "Full-range constant product."
           : `Concentrated bounds ${range.minPct}% to +${range.maxPct}% around the reserve ratio.`,
@@ -152,7 +152,7 @@ export async function buildPlan(
       `${b.amount} ${base.symbol} backs all ${b.legs.length} pairs. It is shared, not multiplied.`,
       `Paired assets must already be in your wallet. Fills against one pair change the backing of the others.`,
       `The reserve amounts and selected curve determine the opening price. Review them against the market before signing.`,
-      `Swap fee ${b.feeBps / 100}%.`,
+      `Each pair uses its selected swap fee.`,
       `Strategies include the 1inch resolver access check. Portfolio indexing and resolver discovery are external to AquaMux.`,
     );
   }

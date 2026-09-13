@@ -4,7 +4,12 @@ import type {
   WalletMode,
 } from "@/lib/managed-client/wallet-execution";
 
-export type Leg = { address: Address; bps: number; amount: string };
+export type Leg = {
+  address: Address;
+  bps: number;
+  amount: string;
+  feeBps?: number;
+};
 
 export type TransactionRecord = {
   id: string;

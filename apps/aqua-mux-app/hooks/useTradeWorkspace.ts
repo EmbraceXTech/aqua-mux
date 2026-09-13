@@ -506,6 +506,7 @@ export function useTradeWorkspace(initialMode: "swap" | "liquidity") {
     pairedToken,
     pairKey,
     pairState,
+    pairCharts,
     picker,
     plan,
     quote,

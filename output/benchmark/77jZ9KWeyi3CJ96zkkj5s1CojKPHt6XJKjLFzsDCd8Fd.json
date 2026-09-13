@@ -1,0 +1,4105 @@
+{
+  "data": {
+    "_meta": {
+      "block": {
+        "number": 25964445,
+        "timestamp": 1789253567
+      },
+      "hasIndexingErrors": false
+    },
+    "__schema": {
+      "types": [
+        {
+          "name": "Account",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Account_filter",
+          "fields": null
+        },
+        {
+          "name": "Account_orderBy",
+          "fields": null
+        },
+        {
+          "name": "ActiveAccount",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "ActiveAccount_filter",
+          "fields": null
+        },
+        {
+          "name": "ActiveAccount_orderBy",
+          "fields": null
+        },
+        {
+          "name": "Aggregation_current",
+          "fields": null
+        },
+        {
+          "name": "Aggregation_interval",
+          "fields": null
+        },
+        {
+          "name": "BigDecimal",
+          "fields": null
+        },
+        {
+          "name": "BigInt",
+          "fields": null
+        },
+        {
+          "name": "BlockChangedFilter",
+          "fields": null
+        },
+        {
+          "name": "Block_height",
+          "fields": null
+        },
+        {
+          "name": "Boolean",
+          "fields": null
+        },
+        {
+          "name": "Bytes",
+          "fields": null
+        },
+        {
+          "name": "Deposit",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hash",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "logIndex",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "to",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "from",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "inputTokens",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputToken",
+              "type": {
+                "name": "Token",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "inputTokenAmounts",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputTokenAmount",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "reserveAmounts",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "amountUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "pool",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "LiquidityPool",
+                  "kind": "OBJECT"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deposit_filter",
+          "fields": null
+        },
+        {
+          "name": "Deposit_orderBy",
+          "fields": null
+        },
+        {
+          "name": "DexAmmProtocol",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "slug",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "schemaVersion",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "subgraphVersion",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "methodologyVersion",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "network",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Network",
+                  "kind": "ENUM"
+                }
+              }
+            },
+            {
+              "name": "type",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ProtocolType",
+                  "kind": "ENUM"
+                }
+              }
+            },
+            {
+              "name": "totalValueLockedUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocolControlledValueUSD",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "cumulativeVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeSupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeUniqueUsers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "totalPoolCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyUsageMetrics",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "hourlyUsageMetrics",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "financialMetrics",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "pools",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "DexAmmProtocol_filter",
+          "fields": null
+        },
+        {
+          "name": "DexAmmProtocol_orderBy",
+          "fields": null
+        },
+        {
+          "name": "Event",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hash",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "logIndex",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "to",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "from",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Event_filter",
+          "fields": null
+        },
+        {
+          "name": "Event_orderBy",
+          "fields": null
+        },
+        {
+          "name": "FinancialsDailySnapshot",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "totalValueLockedUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocolControlledValueUSD",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "dailyVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailySupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeSupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "FinancialsDailySnapshot_filter",
+          "fields": null
+        },
+        {
+          "name": "FinancialsDailySnapshot_orderBy",
+          "fields": null
+        },
+        {
+          "name": "Float",
+          "fields": null
+        },
+        {
+          "name": "ID",
+          "fields": null
+        },
+        {
+          "name": "Int",
+          "fields": null
+        },
+        {
+          "name": "Int8",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPool",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "name": "String",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "symbol",
+              "type": {
+                "name": "String",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "inputTokens",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputToken",
+              "type": {
+                "name": "Token",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "rewardTokens",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "fees",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "isSingleSided",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Boolean",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "createdTimestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "createdBlockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "totalValueLockedUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeSupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "inputTokenBalances",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "inputTokenWeights",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputTokenSupply",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "outputTokenPriceUSD",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "stakedOutputTokenAmount",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "rewardTokenEmissionsAmount",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "rewardTokenEmissionsUSD",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "dailySnapshots",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "hourlySnapshots",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "deposits",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "withdraws",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "swaps",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "LiquidityPoolDailySnapshot",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "pool",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "LiquidityPool",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "totalValueLockedUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeSupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailySupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyVolumeByTokenAmount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "dailyVolumeByTokenUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "cumulativeVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "inputTokenBalances",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "inputTokenWeights",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputTokenSupply",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "outputTokenPriceUSD",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "stakedOutputTokenAmount",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "rewardTokenEmissionsAmount",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "rewardTokenEmissionsUSD",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "LiquidityPoolDailySnapshot_filter",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPoolDailySnapshot_orderBy",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPoolFee",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "feePercentage",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "feeType",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "LiquidityPoolFeeType",
+                  "kind": "ENUM"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "LiquidityPoolFeeType",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPoolFee_filter",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPoolFee_orderBy",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPoolHourlySnapshot",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "pool",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "LiquidityPool",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "totalValueLockedUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeSupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlySupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlyProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlyTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlyVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlyVolumeByTokenAmount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "hourlyVolumeByTokenUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "cumulativeVolumeUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "inputTokenBalances",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "inputTokenWeights",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputTokenSupply",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "outputTokenPriceUSD",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "stakedOutputTokenAmount",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "rewardTokenEmissionsAmount",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "rewardTokenEmissionsUSD",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "LiquidityPoolHourlySnapshot_filter",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPoolHourlySnapshot_orderBy",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPool_filter",
+          "fields": null
+        },
+        {
+          "name": "LiquidityPool_orderBy",
+          "fields": null
+        },
+        {
+          "name": "LogLevel",
+          "fields": null
+        },
+        {
+          "name": "Network",
+          "fields": null
+        },
+        {
+          "name": "OrderDirection",
+          "fields": null
+        },
+        {
+          "name": "Protocol",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "slug",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "schemaVersion",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "subgraphVersion",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "methodologyVersion",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "network",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Network",
+                  "kind": "ENUM"
+                }
+              }
+            },
+            {
+              "name": "type",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ProtocolType",
+                  "kind": "ENUM"
+                }
+              }
+            },
+            {
+              "name": "totalValueLockedUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocolControlledValueUSD",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "cumulativeSupplySideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeProtocolSideRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeTotalRevenueUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeUniqueUsers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "totalPoolCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyUsageMetrics",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "hourlyUsageMetrics",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "financialMetrics",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "ProtocolType",
+          "fields": null
+        },
+        {
+          "name": "Protocol_filter",
+          "fields": null
+        },
+        {
+          "name": "Protocol_orderBy",
+          "fields": null
+        },
+        {
+          "name": "Query",
+          "fields": [
+            {
+              "name": "token",
+              "type": {
+                "name": "Token",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "tokens",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "rewardToken",
+              "type": {
+                "name": "RewardToken",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "rewardTokens",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "liquidityPoolFee",
+              "type": {
+                "name": "LiquidityPoolFee",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "liquidityPoolFees",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "dexAmmProtocol",
+              "type": {
+                "name": "DexAmmProtocol",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "dexAmmProtocols",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "usageMetricsDailySnapshot",
+              "type": {
+                "name": "UsageMetricsDailySnapshot",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "usageMetricsDailySnapshots",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "usageMetricsHourlySnapshot",
+              "type": {
+                "name": "UsageMetricsHourlySnapshot",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "usageMetricsHourlySnapshots",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "financialsDailySnapshot",
+              "type": {
+                "name": "FinancialsDailySnapshot",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "financialsDailySnapshots",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "liquidityPool",
+              "type": {
+                "name": "LiquidityPool",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "liquidityPools",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "liquidityPoolDailySnapshot",
+              "type": {
+                "name": "LiquidityPoolDailySnapshot",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "liquidityPoolDailySnapshots",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "liquidityPoolHourlySnapshot",
+              "type": {
+                "name": "LiquidityPoolHourlySnapshot",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "liquidityPoolHourlySnapshots",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "deposit",
+              "type": {
+                "name": "Deposit",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "deposits",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "withdraw",
+              "type": {
+                "name": "Withdraw",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "withdraws",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "swap",
+              "type": {
+                "name": "Swap",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "swaps",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "account",
+              "type": {
+                "name": "Account",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "accounts",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "activeAccount",
+              "type": {
+                "name": "ActiveAccount",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "activeAccounts",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "masterChef",
+              "type": {
+                "name": "_MasterChef",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "masterChefs",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "masterChefStakingPool",
+              "type": {
+                "name": "_MasterChefStakingPool",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "masterChefStakingPools",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "masterChefRewarder",
+              "type": {
+                "name": "_MasterChefRewarder",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "masterChefRewarders",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "rewarderProbe",
+              "type": {
+                "name": "_RewarderProbe",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "rewarderProbes",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "masterChefAddressToPid",
+              "type": {
+                "name": "_MasterChefAddressToPid",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "masterChefAddressToPids",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "transfer",
+              "type": {
+                "name": "_Transfer",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "transfers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "helperStore",
+              "type": {
+                "name": "_HelperStore",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "helperStores",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "tokenWhitelist",
+              "type": {
+                "name": "_TokenWhitelist",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "tokenWhitelists",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "liquidityPoolAmount",
+              "type": {
+                "name": "_LiquidityPoolAmount",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "liquidityPoolAmounts",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "circularBuffer",
+              "type": {
+                "name": "_CircularBuffer",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "circularBuffers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": "Protocol",
+                "kind": "INTERFACE",
+                "ofType": null
+              }
+            },
+            {
+              "name": "protocols",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "event",
+              "type": {
+                "name": "Event",
+                "kind": "INTERFACE",
+                "ofType": null
+              }
+            },
+            {
+              "name": "events",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "_meta",
+              "type": {
+                "name": "_Meta_",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "_logs",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "RewardToken",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "token",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Token",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "type",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "RewardTokenType",
+                  "kind": "ENUM"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "RewardTokenType",
+          "fields": null
+        },
+        {
+          "name": "RewardToken_filter",
+          "fields": null
+        },
+        {
+          "name": "RewardToken_orderBy",
+          "fields": null
+        },
+        {
+          "name": "String",
+          "fields": null
+        },
+        {
+          "name": "Swap",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hash",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "logIndex",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "to",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "from",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "tokenIn",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Token",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "amountIn",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "amountInUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "tokenOut",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Token",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "amountOut",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "amountOutUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "reserveAmounts",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "pool",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "LiquidityPool",
+                  "kind": "OBJECT"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Swap_filter",
+          "fields": null
+        },
+        {
+          "name": "Swap_orderBy",
+          "fields": null
+        },
+        {
+          "name": "Timestamp",
+          "fields": null
+        },
+        {
+          "name": "Token",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "name",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "symbol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "decimals",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "lastPriceUSD",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "lastPriceBlockNumber",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "_totalSupply",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "_totalValueLockedUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "_largePriceChangeBuffer",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "_largeTVLImpactBuffer",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Token_filter",
+          "fields": null
+        },
+        {
+          "name": "Token_orderBy",
+          "fields": null
+        },
+        {
+          "name": "UsageMetricsDailySnapshot",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "dailyActiveUsers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeUniqueUsers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyTransactionCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyDepositCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailyWithdrawCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "dailySwapCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "totalPoolCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "UsageMetricsDailySnapshot_filter",
+          "fields": null
+        },
+        {
+          "name": "UsageMetricsDailySnapshot_orderBy",
+          "fields": null
+        },
+        {
+          "name": "UsageMetricsHourlySnapshot",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "hourlyActiveUsers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "cumulativeUniqueUsers",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlyTransactionCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlyDepositCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlyWithdrawCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hourlySwapCount",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "UsageMetricsHourlySnapshot_filter",
+          "fields": null
+        },
+        {
+          "name": "UsageMetricsHourlySnapshot_orderBy",
+          "fields": null
+        },
+        {
+          "name": "Withdraw",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hash",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "logIndex",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "protocol",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "DexAmmProtocol",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "to",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "from",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "inputTokens",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputToken",
+              "type": {
+                "name": "Token",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            },
+            {
+              "name": "inputTokenAmounts",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "outputTokenAmount",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "reserveAmounts",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            },
+            {
+              "name": "amountUSD",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "pool",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "LiquidityPool",
+                  "kind": "OBJECT"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Withdraw_filter",
+          "fields": null
+        },
+        {
+          "name": "Withdraw_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_Block_",
+          "fields": [
+            {
+              "name": "hash",
+              "type": {
+                "name": "Bytes",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "number",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": "Int",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "parentHash",
+              "type": {
+                "name": "Bytes",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "name": "_CircularBuffer",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blocks",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "windowStartIndex",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "nextIndex",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "bufferSize",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blocksPerDay",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigDecimal",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_CircularBuffer_filter",
+          "fields": null
+        },
+        {
+          "name": "_CircularBuffer_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_HelperStore",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "valueDecimal",
+              "type": {
+                "name": "BigDecimal",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "valueInt",
+              "type": {
+                "name": "Int",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "valueBigInt",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "valueString",
+              "type": {
+                "name": "String",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "name": "_HelperStore_filter",
+          "fields": null
+        },
+        {
+          "name": "_HelperStore_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_LiquidityPoolAmount",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "inputTokens",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "inputTokenBalances",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_LiquidityPoolAmount_filter",
+          "fields": null
+        },
+        {
+          "name": "_LiquidityPoolAmount_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_LogArgument_",
+          "fields": [
+            {
+              "name": "key",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_LogMeta_",
+          "fields": [
+            {
+              "name": "module",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "line",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "column",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Int",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_Log_",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "subgraphId",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "level",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "LogLevel",
+                  "kind": "ENUM"
+                }
+              }
+            },
+            {
+              "name": "text",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "arguments",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            },
+            {
+              "name": "meta",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "_LogMeta_",
+                  "kind": "OBJECT"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_MasterChef",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "address",
+              "type": {
+                "name": "String",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "totalAllocPoint",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "rewardTokenRate",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "rewardTokenInterval",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "adjustedRewardTokenRate",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "lastUpdatedRewardRate",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_MasterChefAddressToPid",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "pid",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_MasterChefAddressToPid_filter",
+          "fields": null
+        },
+        {
+          "name": "_MasterChefAddressToPid_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_MasterChefRewarder",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "pool",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "_MasterChefStakingPool",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "rewardToken",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "tokenPerSec",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "rateCalculatedAt",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hasFunds",
+              "type": {
+                "name": "Boolean",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "hasFundsAt",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "canRetrieveRate",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Boolean",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "_rewardRateCalculationInProgress",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Boolean",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "_probes",
+              "type": {
+                "name": null,
+                "kind": "LIST",
+                "ofType": {
+                  "name": null,
+                  "kind": "NON_NULL"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_MasterChefRewarder_filter",
+          "fields": null
+        },
+        {
+          "name": "_MasterChefRewarder_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_MasterChefStakingPool",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "poolAddress",
+              "type": {
+                "name": "String",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "poolAllocPoint",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "multiplier",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "lastRewardBlock",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "rewarder",
+              "type": {
+                "name": "_MasterChefRewarder",
+                "kind": "OBJECT",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "name": "_MasterChefStakingPool_filter",
+          "fields": null
+        },
+        {
+          "name": "_MasterChefStakingPool_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_MasterChef_filter",
+          "fields": null
+        },
+        {
+          "name": "_MasterChef_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_Meta_",
+          "fields": [
+            {
+              "name": "block",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "_Block_",
+                  "kind": "OBJECT"
+                }
+              }
+            },
+            {
+              "name": "deployment",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "hasIndexingErrors",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "Boolean",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_RewarderProbe",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "user",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "String",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "pending",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNum",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "lpStaked",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_RewarderProbe_filter",
+          "fields": null
+        },
+        {
+          "name": "_RewarderProbe_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_SubgraphErrorPolicy_",
+          "fields": null
+        },
+        {
+          "name": "_TokenWhitelist",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "whitelistPools",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": null,
+                  "kind": "LIST"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "_TokenWhitelist_filter",
+          "fields": null
+        },
+        {
+          "name": "_TokenWhitelist_orderBy",
+          "fields": null
+        },
+        {
+          "name": "_Transfer",
+          "fields": [
+            {
+              "name": "id",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "ID",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "blockNumber",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "timestamp",
+              "type": {
+                "name": null,
+                "kind": "NON_NULL",
+                "ofType": {
+                  "name": "BigInt",
+                  "kind": "SCALAR"
+                }
+              }
+            },
+            {
+              "name": "sender",
+              "type": {
+                "name": "ID",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "type",
+              "type": {
+                "name": "ID",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            },
+            {
+              "name": "liquidity",
+              "type": {
+                "name": "BigInt",
+                "kind": "SCALAR",
+                "ofType": null
+              }
+            }
+          ]
+        },
+        {
+          "name": "_Transfer_filter",
+          "fields": null
+        },
+        {
+          "name": "_Transfer_orderBy",
+          "fields": null
+        }
+      ]
+    }
+  }
+}

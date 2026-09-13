@@ -382,7 +382,11 @@
     order: 3;
     width: 100%;
     height: 42px;
-    gap: 28px;
+    gap: 20px;
+    overflow-x: auto;
+  }
+  .topbar .main-nav a {
+    flex-shrink: 0;
   }
   .topbar .main-nav button {
     flex: 1;

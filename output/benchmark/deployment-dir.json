@@ -1,0 +1,66 @@
+[
+  {
+    "name": "context",
+    "path": "deployment/context",
+    "sha": "44dedab7adf695a28facebd7fc8190ec196718ce",
+    "size": 0,
+    "url": "https://api.github.com/repos/messari/subgraphs/contents/deployment/context?ref=master",
+    "html_url": "https://github.com/messari/subgraphs/tree/master/deployment/context",
+    "git_url": "https://api.github.com/repos/messari/subgraphs/git/trees/44dedab7adf695a28facebd7fc8190ec196718ce",
+    "download_url": null,
+    "type": "dir",
+    "_links": {
+      "self": "https://api.github.com/repos/messari/subgraphs/contents/deployment/context?ref=master",
+      "git": "https://api.github.com/repos/messari/subgraphs/git/trees/44dedab7adf695a28facebd7fc8190ec196718ce",
+      "html": "https://github.com/messari/subgraphs/tree/master/deployment/context"
+    }
+  },
+  {
+    "name": "decentralized_network_deployments.csv",
+    "path": "deployment/decentralized_network_deployments.csv",
+    "sha": "4a56802d59f9ae5258812d96bc58ff3fd66a1d54",
+    "size": 39150,
+    "url": "https://api.github.com/repos/messari/subgraphs/contents/deployment/decentralized_network_deployments.csv?ref=master",
+    "html_url": "https://github.com/messari/subgraphs/blob/master/deployment/decentralized_network_deployments.csv",
+    "git_url": "https://api.github.com/repos/messari/subgraphs/git/blobs/4a56802d59f9ae5258812d96bc58ff3fd66a1d54",
+    "download_url": "https://raw.githubusercontent.com/messari/subgraphs/master/deployment/decentralized_network_deployments.csv",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/messari/subgraphs/contents/deployment/decentralized_network_deployments.csv?ref=master",
+      "git": "https://api.github.com/repos/messari/subgraphs/git/blobs/4a56802d59f9ae5258812d96bc58ff3fd66a1d54",
+      "html": "https://github.com/messari/subgraphs/blob/master/deployment/decentralized_network_deployments.csv"
+    }
+  },
+  {
+    "name": "deployment.json",
+    "path": "deployment/deployment.json",
+    "sha": "7665f4b048d92b5ea6f7fc833a9bfe3c1678cad2",
+    "size": 375977,
+    "url": "https://api.github.com/repos/messari/subgraphs/contents/deployment/deployment.json?ref=master",
+    "html_url": "https://github.com/messari/subgraphs/blob/master/deployment/deployment.json",
+    "git_url": "https://api.github.com/repos/messari/subgraphs/git/blobs/7665f4b048d92b5ea6f7fc833a9bfe3c1678cad2",
+    "download_url": "https://raw.githubusercontent.com/messari/subgraphs/master/deployment/deployment.json",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/messari/subgraphs/contents/deployment/deployment.json?ref=master",
+      "git": "https://api.github.com/repos/messari/subgraphs/git/blobs/7665f4b048d92b5ea6f7fc833a9bfe3c1678cad2",
+      "html": "https://github.com/messari/subgraphs/blob/master/deployment/deployment.json"
+    }
+  },
+  {
+    "name": "produce_decentralized_network_csv.py",
+    "path": "deployment/produce_decentralized_network_csv.py",
+    "sha": "bb6fb25a90276383c49b7a9dd48d5cd23dfe8e87",
+    "size": 3992,
+    "url": "https://api.github.com/repos/messari/subgraphs/contents/deployment/produce_decentralized_network_csv.py?ref=master",
+    "html_url": "https://github.com/messari/subgraphs/blob/master/deployment/produce_decentralized_network_csv.py",
+    "git_url": "https://api.github.com/repos/messari/subgraphs/git/blobs/bb6fb25a90276383c49b7a9dd48d5cd23dfe8e87",
+    "download_url": "https://raw.githubusercontent.com/messari/subgraphs/master/deployment/produce_decentralized_network_csv.py",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/messari/subgraphs/contents/deployment/produce_decentralized_network_csv.py?ref=master",
+      "git": "https://api.github.com/repos/messari/subgraphs/git/blobs/bb6fb25a90276383c49b7a9dd48d5cd23dfe8e87",
+      "html": "https://github.com/messari/subgraphs/blob/master/deployment/produce_decentralized_network_csv.py"
+    }
+  }
+]

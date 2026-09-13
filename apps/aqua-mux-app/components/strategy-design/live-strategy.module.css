@@ -1,0 +1,71 @@
+.root {
+  --blue: #3468f5;
+  --border: #e5eaf3;
+}
+.root :global(.managed-toolbar) {
+  padding: 18px 22px;
+  border: 1px solid #e5eaf3;
+  border-radius: 12px;
+  background: #fff;
+}
+.root :global(.managed-panel),
+.root :global(.managed-pair) {
+  border-color: #e5eaf3;
+  border-radius: 14px;
+  box-shadow: 0 3px 14px #202d4503;
+}
+.root :global(.managed-heading h1) {
+  font-size: 25px;
+  font-weight: 530;
+}
+.root :global(.managed-heading p),
+.root :global(.managed-footnote) {
+  font-size: 11px;
+  color: #738198;
+}
+.root :global(.managed-field) {
+  min-width: 0;
+  font-size: 11px;
+  color: #52617a;
+}
+.root :global(.managed-field input),
+.root :global(.managed-field select),
+.root :global(.managed-token-button) {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid #e5eaf3;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 12px;
+  color: #202d45;
+  font: inherit;
+}
+.root :global(.managed-token-results) {
+  position: relative;
+  z-index: 2;
+}
+.root :global(.managed-token-list) {
+  max-height: 300px;
+  overflow: auto;
+}
+.root :global(.managed-tabs) {
+  border-color: #e5eaf3;
+  font-size: 12px;
+}
+.root :global(.managed-address) {
+  overflow-wrap: anywhere;
+}
+.root :global(.managed-notice) {
+  margin-bottom: 16px;
+  font-size: 12px;
+}
+@media (max-width: 700px) {
+  .root :global(.managed-heading),
+  .root :global(.managed-toolbar) {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .root :global(.managed-layout) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

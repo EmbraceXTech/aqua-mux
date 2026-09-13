@@ -32,6 +32,17 @@ type ChallengeRow = {
   expires_at: number;
   used: number;
 };
+const isHttpOrigin = (origin: string | null): origin is string => {
+  if (!origin) return false;
+  try {
+    const parsed = new URL(origin);
+    return (
+      ["http:", "https:"].includes(parsed.protocol) && parsed.origin === origin
+    );
+  } catch {
+    return false;
+  }
+};
 
 export class WalletAuth {
   readonly origin: string;
@@ -39,6 +50,7 @@ export class WalletAuth {
     private readonly store: ManagedStore,
     origin: string,
     private readonly now: () => number = Date.now,
+    readonly allowsAnyOrigin = false,
   ) {
     const parsed = new URL(origin);
     if (
@@ -56,6 +68,7 @@ export class WalletAuth {
     this.origin = origin;
   }
   assertOrigin(origin: string | null) {
+    if (this.allowsAnyOrigin && isHttpOrigin(origin)) return;
     if (origin !== this.origin)
       throw new AuthError(403, "Request origin is not allowed.");
   }

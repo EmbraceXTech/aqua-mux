@@ -1,0 +1,1103 @@
+.page {
+  --ink: #253047;
+  --subtle: #748096;
+  --line: #e7ebf3;
+  color: var(--ink);
+  background:
+    radial-gradient(ellipse at 50% 18%, #edf2ff85, transparent 55%), #f8f9fc;
+}
+.container {
+  max-width: 1056px;
+  margin: 0 auto;
+  padding: 0 28px;
+}
+.network,
+.walletButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.network > span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #7286d9;
+}
+.walletButton {
+  padding: 11px 15px;
+  border: 1px solid #dfe5f0;
+  background: white;
+  border-radius: 9px;
+}
+.prototypeBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 19px 0;
+  color: #788399;
+  font-size: 10px;
+}
+.prototypeBar > span,
+.prototypeBar a {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.prototypeBar a {
+  color: #526989;
+  white-space: nowrap;
+}
+.barSeparator {
+  margin: 0 3px;
+  color: #c1cad9;
+}
+.intro {
+  padding: 25px 0 33px;
+}
+.eyebrow {
+  color: #7080a0;
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  font-weight: 600;
+  margin-bottom: 11px;
+}
+.intro h1 {
+  font-size: 35px;
+  line-height: 1.2;
+  font-weight: 570;
+  letter-spacing: -1.3px;
+}
+.intro h1 span {
+  color: #3468f5;
+}
+.intro p {
+  margin-top: 12px;
+  font-size: 12px;
+  color: #7d879c;
+  line-height: 1.6;
+}
+.workspace {
+  width: 100%;
+}
+.composer {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 17px;
+  box-shadow: 0 4px 16px #25365803;
+}
+.composer {
+  padding: 23px;
+}
+.composerHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 23px;
+  gap: 8px;
+}
+.composerHeader > span {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 620;
+}
+.composerHeader > span svg {
+  color: #3468f5;
+}
+.slippageButton {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  background: #f8f9fc;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 8px 9px;
+  font-size: 10px;
+  color: #65738c;
+}
+.slippageButton:hover {
+  background: #edf2ff;
+}
+.globalTag {
+  background: #eaf0ff;
+  color: #5b78b5;
+  border-radius: 4px;
+  font-size: 8px;
+  padding: 2px 4px;
+  font-weight: 500;
+}
+.builderControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 64px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.amountSettings {
+  min-width: 0;
+}
+.modeSwitch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  background: #f4f6fa;
+  border: 1px solid #edf0f6;
+  border-radius: 11px;
+  padding: 5px;
+}
+.modeSwitch > button {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 12px;
+  text-align: left;
+  background: transparent;
+  color: #8590a4;
+  border-radius: 8px;
+  position: relative;
+  border: 1px solid transparent;
+}
+.modeSwitch > button span:not(.modeCheck) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.modeSwitch strong {
+  font-size: 12px;
+  font-weight: 560;
+}
+.modeSwitch small {
+  font-size: 9px;
+  font-weight: 400;
+  color: #8b96a9;
+}
+.modeSwitch > .activeMode {
+  background: white;
+  color: #3468f5;
+  box-shadow: 0 2px 5px #2d46760b;
+  border-color: #dfe6f5;
+}
+.modeCheck {
+  position: absolute;
+  right: 9px;
+  top: 11px;
+  display: grid;
+  place-items: center;
+  color: white;
+  background: #3468f5;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+}
+.exactControl {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0;
+  font-size: 10px;
+  color: #778299;
+}
+.exactControl > div {
+  display: flex;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  gap: 2px;
+}
+.exactControl button {
+  padding: 5px 11px;
+  font-size: 10px;
+  background: transparent;
+  border-radius: 4px;
+}
+.exactControl .selectedExact,
+.slippageOptions .selectedExact {
+  color: #3468f5;
+  background: #edf2ff;
+}
+.amountHint {
+  font-size: 10px;
+  color: #8b94a6;
+  margin: 10px 0 0;
+}
+.sectionHeading,
+.sectionHeading > div {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.sectionHeading {
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sectionHeading h2 {
+  font-size: 12px;
+  font-weight: 580;
+}
+.count {
+  color: #929bad;
+  font-size: 9px;
+}
+.exactBadge,
+.estimateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+}
+.exactBadge {
+  color: #648174;
+}
+.estimateBadge {
+  color: #8894a7;
+}
+.tokenRows {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.tokenRow {
+  border: 1px solid #e8edf5;
+  border-radius: 11px;
+  background: #f8faff;
+  padding: 15px 14px 0;
+  overflow: hidden;
+}
+.invalidRow {
+  border-color: #d87d7d;
+}
+.rowMain {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.tokenSelector {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-align: left;
+  background: transparent;
+  padding: 0;
+  flex-shrink: 0;
+}
+.tokenSelector > span:not(.tokenMark) {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.tokenSelector strong {
+  font-size: 14px;
+  font-weight: 610;
+}
+.tokenSelector small {
+  font-size: 9px;
+  color: #8590a2;
+}
+.tokenSelector > svg {
+  margin-left: 3px;
+  color: #939eb1;
+}
+.tokenMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 33px;
+  height: 33px;
+  border-radius: 50%;
+  color: white;
+  font-size: 23px;
+  font-family: Arial, sans-serif;
+  box-shadow: inset 0 0 0 1px #00000005;
+}
+.smallMark {
+  width: 22px;
+  height: 22px;
+  font-size: 15px;
+}
+.amountBox {
+  flex: 1;
+  min-width: 0;
+  text-align: right;
+}
+.amountBox input {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  text-align: right;
+  font-size: 24px;
+  font-weight: 510;
+  letter-spacing: -0.6px;
+  font-variant-numeric: tabular-nums;
+}
+.amountBox input[readonly] {
+  color: #485a77;
+  cursor: default;
+}
+.amountBox small {
+  display: block;
+  color: #929daf;
+  font-size: 10px;
+  margin-top: 4px;
+}
+.remove {
+  display: grid;
+  place-items: center;
+  padding: 3px;
+  align-self: start;
+  margin: 3px -5px 0 0;
+  background: transparent;
+  color: #9da9bd;
+}
+.remove:disabled {
+  opacity: 0.25;
+}
+.rowMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 37px;
+  padding: 9px 0 10px;
+  color: #8a96aa;
+  font-size: 9px;
+}
+.rowMeta > span > button {
+  padding: 1px 0 1px 7px;
+  color: #3468f5;
+  background: transparent;
+  font-size: 9px;
+}
+.allocation {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  white-space: nowrap;
+}
+.allocation input {
+  width: 33px;
+  border: 1px solid #e1e7f0;
+  background: white;
+  border-radius: 4px;
+  padding: 3px;
+  text-align: right;
+  font-size: 10px;
+  color: #65738c;
+}
+.rowFee {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-top: 1px solid #e6ecf6;
+  padding: 8px 0;
+  font-size: 9px;
+}
+.rowFee > label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #7b88a0;
+  flex: 1;
+}
+.feePresets {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.feePresets button {
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: transparent;
+  color: #8a97ae;
+  font-size: 9px;
+}
+.feePresets .activeFee {
+  color: #3468f5;
+  background: #e9efff;
+}
+.customFee {
+  display: flex;
+  align-items: center;
+  border: 1px solid #e1e7f0;
+  border-radius: 5px;
+  background: white;
+  padding-right: 5px;
+  color: #7988a1;
+  font-size: 9px;
+}
+.customFee input {
+  width: 36px;
+  background: transparent;
+  border: 0;
+  text-align: right;
+  padding: 4px;
+  font-size: 9px;
+}
+.addToken {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  border: 1px dashed #dce5f5;
+  border-radius: 7px;
+  padding: 11px;
+  font-size: 10px;
+  color: #4a76d8;
+  margin-top: 9px;
+  position: relative;
+}
+.addToken:hover {
+  background: #f5f8ff;
+}
+.addToken > span {
+  position: absolute;
+  right: 12px;
+  font-size: 9px;
+  color: #9aa7bd;
+}
+.sectionTotal {
+  display: flex;
+  justify-content: space-between;
+  margin: 11px 1px 0;
+  font-size: 10px;
+  color: #8793a8;
+}
+.sectionTotal strong {
+  color: #64738e;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.tokenColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.tokenSection {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.singleSide .tokenRow {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 300px;
+  padding: 36px 28px;
+  border-color: #dce5f8;
+  border-radius: 14px;
+  background: #f3f7ff;
+}
+.singleSide .rowFee {
+  margin-top: 20px;
+  padding-top: 12px;
+}
+.singleSide .invalidRow {
+  border-color: #d87d7d;
+}
+.singleSide .rowMain {
+  flex-direction: column;
+  gap: 28px;
+}
+.singleSide .tokenSelector {
+  gap: 12px;
+  padding: 8px 12px;
+  border: 1px solid #e1e8f6;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 3px 10px #25365805;
+}
+.singleSide .tokenSelector:hover {
+  border-color: #bbcced;
+  background: #fafcff;
+}
+.singleSide .tokenMark {
+  width: 48px;
+  height: 48px;
+  font-size: 32px;
+}
+.singleSide .tokenSelector strong {
+  font-size: 19px;
+}
+.singleSide .tokenSelector small {
+  font-size: 11px;
+}
+.singleSide .tokenSelector > svg {
+  width: 16px;
+  height: 16px;
+  margin-left: 12px;
+  color: #657b9f;
+}
+.singleSide .amountBox {
+  flex: none;
+  width: 100%;
+  text-align: center;
+}
+.singleSide .amountBox input {
+  text-align: center;
+  font-size: 48px;
+  font-weight: 550;
+  line-height: 1.2;
+  letter-spacing: -1.8px;
+}
+.singleSide .amountBox small {
+  font-size: 13px;
+  margin-top: 10px;
+}
+.singleSide .rowMeta {
+  justify-content: center;
+  margin-top: 22px;
+  padding: 0;
+  font-size: 11px;
+}
+.singleSide .rowMeta > span > button {
+  margin-left: 8px;
+  padding: 5px 9px;
+  border: 1px solid #d9e4fb;
+  border-radius: 5px;
+  background: white;
+  color: #2858d8;
+  font-size: 10px;
+}
+.direction {
+  display: grid;
+  place-items: center;
+  height: 34px;
+  width: 34px;
+  align-self: start;
+  margin: 165px auto 0;
+  color: #7389b2;
+  border: 1px solid #e6ecf7;
+  background: #f8faff;
+  border-radius: 9px;
+}
+.composer > .primaryButton {
+  max-width: 420px;
+  margin-inline: auto;
+}
+.atomic {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  color: #8a96aa;
+  margin: 20px 0 13px;
+}
+.atomic svg {
+  color: #6e87bd;
+}
+.liveBadge {
+  border-left: 1px solid #dce3ef;
+  padding-left: 7px;
+  color: #a2abbb;
+}
+.primaryButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  background: #3468f5;
+  border-radius: 9px;
+  padding: 15px;
+  color: white;
+  font-size: 12px;
+  font-weight: 550;
+  box-shadow: 0 3px 6px #3468f512;
+}
+.primaryButton:hover:not(:disabled) {
+  background: #2658dc;
+}
+.noWallet {
+  text-align: center;
+  font-size: 9px;
+  color: #9aa4b6;
+  margin-top: 11px;
+}
+.errors {
+  border: 1px solid #f0d4d4;
+  padding: 10px;
+  border-radius: 7px;
+  background: #fff8f8;
+  margin-bottom: 10px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #b65353;
+}
+.errorText {
+  color: #b65353 !important;
+}
+.dialogContent {
+  --line: #e7ebf3;
+  color: #253047;
+}
+.search {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid #dfe6f2;
+  border-radius: 9px;
+  color: #8190a7;
+}
+.search input {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+}
+.pickerList {
+  margin: 14px 0;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.pickerList > button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 8px;
+  background: white;
+  width: 100%;
+  border-radius: 8px;
+  text-align: left;
+}
+.pickerList > button:hover:not(:disabled) {
+  background: #f5f8ff;
+}
+.pickerList > button > span:not(.tokenMark) {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pickerList strong {
+  font-size: 12px;
+  font-weight: 550;
+}
+.pickerList small {
+  font-size: 10px;
+  color: #8a96aa;
+}
+.pickerList > button > span:last-child {
+  margin-left: auto;
+  text-align: right;
+}
+.empty {
+  text-align: center;
+  color: #8a96aa;
+  font-size: 12px;
+  padding: 30px 0;
+}
+.slippageOptions {
+  display: flex;
+  gap: 8px;
+  margin: 20px 0;
+}
+.slippageOptions > button,
+.slippageOptions > label {
+  flex: 1;
+  border: 1px solid #e0e7f3;
+  background: #f8faff;
+  padding: 11px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+.slippageOptions > label {
+  display: flex;
+  min-width: 0;
+}
+.slippageOptions input {
+  width: 100%;
+  background: transparent;
+  border: 0;
+}
+.settingsNote,
+.warning {
+  font-size: 11px;
+  line-height: 1.8;
+  color: #8694aa;
+  margin: 13px 0;
+}
+.warning {
+  color: #b08036;
+}
+.settingsInfo {
+  display: flex;
+  gap: 9px;
+  background: #f6f9ff;
+  padding: 13px;
+  border-radius: 8px;
+  color: #7890b4;
+  margin: 22px 0;
+}
+.settingsInfo svg {
+  flex-shrink: 0;
+}
+.settingsInfo p {
+  font-size: 11px;
+  line-height: 1.7;
+}
+.reviewGroup {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--line);
+}
+.reviewGroup h3 {
+  font-size: 12px;
+  font-weight: 550;
+  margin-bottom: 12px;
+}
+.reviewGroup h3 span {
+  font-size: 10px;
+  font-weight: 400;
+  color: #8b99ae;
+  margin-left: 5px;
+}
+.reviewGroup > div {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 0;
+  font-size: 12px;
+}
+.reviewGroup strong {
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+.reviewGroup > div > span:last-child {
+  margin-left: auto;
+  color: #8392ab;
+}
+.reviewFees {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+  font-size: 11px;
+}
+.reviewFees > strong {
+  font-size: 12px;
+  font-weight: 550;
+}
+.reviewFees > span {
+  display: flex;
+  justify-content: space-between;
+  color: #8090a9;
+}
+.reviewFees b {
+  font-weight: 500;
+  color: #526c99;
+}
+.backButton {
+  display: block;
+  margin: 14px auto 0;
+  padding: 5px 15px;
+  background: transparent;
+  color: #8190a9;
+  font-size: 11px;
+}
+.complete {
+  text-align: center;
+  padding-top: 12px;
+}
+.complete > span {
+  display: inline-grid;
+  place-items: center;
+  height: 64px;
+  width: 64px;
+  border-radius: 50%;
+  background: #eef6f2;
+  color: #5d9b7a;
+  margin-bottom: 22px;
+}
+.complete h3 {
+  font-size: 17px;
+  font-weight: 550;
+}
+.complete p {
+  color: #8493a9;
+  font-size: 12px;
+  line-height: 1.8;
+  margin: 10px 0 25px;
+}
+/* Keep secondary information readable on the pale token cards. */
+.prototypeBar,
+.intro p,
+.modeSwitch > button,
+.modeSwitch small,
+.exactControl,
+.amountHint,
+.count,
+.estimateBadge,
+.tokenSelector small,
+.amountBox small,
+.rowMeta,
+.rowFee > label,
+.feePresets button,
+.customFee,
+.addToken > span,
+.sectionTotal,
+.atomic,
+.liveBadge,
+.noWallet,
+.pickerList small,
+.empty,
+.settingsNote,
+.settingsInfo,
+.reviewGroup h3 span,
+.reviewGroup > div > span:last-child,
+.reviewFees > span,
+.backButton,
+.complete p {
+  color: #62718a;
+}
+.exactBadge {
+  color: #507562;
+}
+.globalTag,
+.settingsInfo {
+  color: #526d9b;
+}
+.page :global(.main-nav a.active) {
+  color: #2858d8;
+}
+.page :global(.app-footer .bottom-note),
+.page :global(.app-footer strong) {
+  color: #62718a;
+}
+.modeSwitch > .activeMode,
+.exactControl .selectedExact,
+.slippageOptions .selectedExact,
+.feePresets .activeFee,
+.addToken {
+  color: #2858d8;
+}
+.page :global(.topbar),
+.page :global(.app-footer) {
+  background: #f8f9fc;
+}
+.page :global(.app-footer),
+.page :global(.app-footer .muted),
+.page :global(.main-nav a:not(.active)) {
+  color: #62718a;
+}
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1100px;
+  }
+  .intro {
+    padding-top: 37px;
+    padding-bottom: 39px;
+  }
+}
+@media (max-width: 850px) {
+  .container {
+    padding: 0 20px;
+  }
+  .tokenColumns {
+    grid-template-columns: minmax(0, 1fr) 28px minmax(0, 1fr);
+    gap: 8px;
+  }
+  .direction {
+    width: 28px;
+    height: 28px;
+  }
+  .intro h1 {
+    font-size: 31px;
+  }
+  .prototypeBar > span {
+    flex-wrap: wrap;
+  }
+  .prototypeBar a {
+    display: none;
+  }
+  .network {
+    display: none;
+  }
+}
+@media (min-width: 741px) and (max-width: 1000px) {
+  .singleSide .tokenRow {
+    padding-inline: 16px;
+  }
+  .singleSide .amountBox input {
+    font-size: 36px;
+  }
+}
+@media (max-width: 740px) {
+  .singleSide .tokenRow {
+    min-height: 260px;
+    padding: 28px 20px;
+  }
+  .singleSide .amountBox input {
+    font-size: 40px;
+  }
+  .builderControls {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+  .tokenColumns {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  .direction {
+    margin: 0 auto;
+    transform: rotate(90deg);
+  }
+}
+@media (max-width: 520px) {
+  .container {
+    padding: 0 14px;
+  }
+  .prototypeBar {
+    padding: 15px 0;
+    font-size: 9px;
+    gap: 4px;
+  }
+  .barSeparator {
+    display: none;
+  }
+  .prototypeBar > span {
+    column-gap: 6px;
+    row-gap: 5px;
+  }
+  .intro {
+    padding: 16px 0 24px;
+  }
+  .intro h1 {
+    font-size: 27px;
+    letter-spacing: -1px;
+  }
+  .intro p {
+    font-size: 11px;
+    max-width: 290px;
+  }
+  .composer {
+    padding: 16px 13px;
+    border-radius: 13px;
+  }
+  .composerHeader {
+    margin-bottom: 17px;
+  }
+  .composerHeader > span {
+    font-size: 13px;
+    gap: 6px;
+  }
+  .slippageButton {
+    font-size: 9px;
+    gap: 5px;
+    padding: 7px;
+  }
+  .slippageButton .globalTag {
+    display: none;
+  }
+  .modeSwitch > button {
+    gap: 7px;
+    padding: 11px 7px;
+  }
+  .modeSwitch strong {
+    font-size: 11px;
+  }
+  .modeSwitch small {
+    font-size: 8px;
+  }
+  .modeSwitch > button > svg {
+    width: 15px;
+  }
+  .modeCheck {
+    right: 5px;
+    top: 6px;
+    width: 12px;
+    height: 12px;
+  }
+  .tokenRow {
+    padding: 12px 10px 0;
+  }
+  .tokenMark {
+    width: 29px;
+    height: 29px;
+    font-size: 20px;
+  }
+  .smallMark {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+  .tokenSelector {
+    gap: 6px;
+  }
+  .tokenSelector strong {
+    font-size: 12px;
+  }
+  .tokenSelector small {
+    font-size: 8px;
+  }
+  .tokenSelector > svg {
+    margin-left: 0;
+    width: 12px;
+  }
+  .amountBox input {
+    font-size: 21px;
+  }
+  .rowMain {
+    gap: 5px;
+  }
+  .rowMeta {
+    font-size: 8px;
+  }
+  .rowFee {
+    gap: 4px;
+  }
+  .rowFee > label {
+    font-size: 8px;
+    gap: 3px;
+  }
+  .feePresets {
+    gap: 1px;
+  }
+  .feePresets button {
+    padding: 4px;
+    font-size: 8px;
+  }
+  .customFee input {
+    width: 32px;
+  }
+  .walletButton {
+    font-size: 10px;
+    padding: 9px;
+  }
+  .slippageOptions {
+    gap: 5px;
+  }
+  .slippageOptions > button,
+  .slippageOptions > label {
+    padding: 10px 6px;
+  }
+}
+@media (max-width: 780px) {
+  .page :global(.main-nav) {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page button,
+  .page a,
+  .dialogContent button {
+    transition: none;
+  }
+}

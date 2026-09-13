@@ -51,6 +51,7 @@ export const basketSchema = z
           bps: z.number().int().min(1).max(10000),
           amount: amountSchema,
           range: priceRangeSchema.optional(),
+          feeBps: z.number().int().min(1).max(100).optional(),
         }),
       )
       .min(2)

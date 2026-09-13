@@ -2,6 +2,7 @@ import type { ManagedSession } from "@/lib/managed-client/api";
 import { useManagedGroup } from "@/lib/managed-client/use-managed-group";
 import { useManagedActions } from "@/lib/managed-client/use-managed-actions";
 import { BotWorkspace } from "./bot-workspace";
+import { LiveStrategyWorkspace } from "../strategy-design/LiveStrategyWorkspace";
 import { PlanReview } from "./plan-review";
 import { Button } from "../ui/button";
 
@@ -9,11 +10,14 @@ export function GroupController({
   session,
   groupId,
   onBack,
+  design = false,
 }: {
   session: ManagedSession;
   groupId: string;
   onBack: () => void;
+  design?: boolean;
 }) {
+  const Workspace = design ? LiveStrategyWorkspace : BotWorkspace;
   const group = useManagedGroup(session, groupId);
   const actions = useManagedActions(
     session,
@@ -57,7 +61,7 @@ export function GroupController({
         </div>
       )}
       {group.detail ? (
-        <BotWorkspace
+        <Workspace
           detail={group.detail}
           busy={group.busy || actions.busy}
           stopBusy={group.stopBusy}

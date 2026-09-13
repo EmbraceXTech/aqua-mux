@@ -1,43 +1,51 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { Info } from "lucide-react";
 import { MainLayout } from "@/components/layouts/MainLayout";
-import { TradeHeaderActions } from "@/components/managed/trade-header-actions";
-import { TradeOverlays } from "@/components/managed/trade-overlays";
 import { SwapComposer } from "@/components/swap/swap-composer";
-import { SwapDetails } from "@/components/swap/swap-details";
-import { SwapFlowPreview } from "@/components/swap/swap-flow-preview";
+import { SwapDialogs } from "@/components/swap/swap-dialogs";
+import { SwapWalletActions } from "@/components/swap/swap-wallet-actions";
 import { useSwapWorkspace } from "@/hooks/useSwapWorkspace";
+import styles from "@/components/swap/swap.module.css";
 
 export function SwapView() {
-  const trade = useSwapWorkspace();
-
+  const workspace = useSwapWorkspace();
   return (
-    <>
+    <div className={styles.page}>
       <MainLayout
         activePage="swap"
-        actions={<TradeHeaderActions trade={trade} />}
+        actions={
+          <SwapWalletActions
+            account={workspace.trade.account}
+            locked={workspace.locked}
+            onConnect={workspace.trade.connect}
+          />
+        }
       >
-        <div className="intro">
-          <h1>
-            One token.
-            <br className="mobile-break" /> <span>Many possibilities.</span>
-          </h1>
-          <p>Build your basket with one transaction. You choose the mix.</p>
-        </div>
-        <div className="workspace">
-          <SwapComposer trade={trade} />
-          <aside className="sidebar">
-            <SwapFlowPreview trade={trade} />
-            <SwapDetails trade={trade} />
-            <button className="how-link" onClick={() => trade.setHowOpen(true)}>
-              New to shared liquidity? See how it works{" "}
-              <ArrowUpRight size={13} />
-            </button>
-          </aside>
+        <div className={styles.container}>
+          <div className={styles.prototypeBar}>
+            <span>
+              <Info size={13} /> Arbitrum mainnet. Real funds. Direct Uniswap v3
+              pools.
+            </span>
+            <span>Approvals may require separate transactions.</span>
+          </div>
+          <div className={styles.intro}>
+            <div className={styles.eyebrow}>MULTI-TOKEN SWAPS</div>
+            <h1>
+              Your tokens. <span>Your direction.</span>
+            </h1>
+            <p>
+              Swap one token, consolidate balances, or split into a basket. You
+              choose the amounts.
+            </p>
+          </div>
+          <div className={styles.workspace}>
+            <SwapComposer workspace={workspace} />
+          </div>
         </div>
       </MainLayout>
-      <TradeOverlays trade={trade} />
-    </>
+      <SwapDialogs workspace={workspace} />
+    </div>
   );
 }

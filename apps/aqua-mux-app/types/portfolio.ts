@@ -1,6 +1,8 @@
-import type { ChainId } from "@/lib/config";
+import type { ChainId, Token } from "@/lib/config";
 import type { StrategyGroup, Token as ManagedToken } from "@/lib/managed";
 import type { ManagedSession } from "@/lib/managed-client/api";
+
+export type PortfolioAsset = Token & { chainId: ChainId; balance: string };
 
 export type Balances = Record<string, string | null>;
 

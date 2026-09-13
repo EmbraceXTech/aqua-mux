@@ -1,0 +1,42 @@
+.page {
+  padding-bottom: 48px;
+}
+.page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.page button:focus-visible,
+.page input:focus-visible {
+  outline: 2px solid #7185df;
+  outline-offset: 3px;
+}
+.balance {
+  display: block;
+  margin-left: auto;
+  color: #64718a;
+  font-size: 10px;
+  background: transparent;
+  border: 0;
+}
+.range :global(.sidebar-range-control) {
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.range :global(.range-pair-picker) {
+  display: none;
+}
+.range :global(.price-chart) {
+  max-width: 100%;
+}
+.page :global(.main-action) {
+  margin-top: 18px;
+  width: 100%;
+  border-radius: 10px;
+}
+@media (max-width: 600px) {
+  .page {
+    padding-bottom: 24px;
+  }
+}

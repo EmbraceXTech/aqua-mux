@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Layers3 } from "lucide-react";
 
 type MainLayoutProps = {
-  activePage: "swap" | "liquidity" | "strategies" | "portfolio";
+  activePage: "swap" | "liquidity" | "strategies" | "benchmark" | "portfolio";
   actions?: ReactNode;
   children: ReactNode;
 };
@@ -47,6 +47,13 @@ export function MainLayout({ activePage, actions, children }: MainLayoutProps) {
             href="/strategies"
           >
             Strategies
+          </Link>
+          <Link
+            className={activePage === "benchmark" ? "active" : ""}
+            aria-current={activePage === "benchmark" ? "page" : undefined}
+            href="/benchmark"
+          >
+            Benchmark
           </Link>
           <Link
             className={activePage === "portfolio" ? "active" : ""}

@@ -1,0 +1,178 @@
+[
+  {
+    "id": "pancakeswap-v3-bsc",
+    "dex": "PancakeSwap",
+    "version": "v3",
+    "chain": "bsc",
+    "subgraphId": "A1BC1hzDsK4NTeXBpKQnDBphngpYZAwDUF7dEBfa3jHK",
+    "schema": "messari"
+  },
+  {
+    "id": "pancakeswap-v3-ethereum",
+    "dex": "PancakeSwap",
+    "version": "v3",
+    "chain": "ethereum",
+    "subgraphId": "JAGXF8B14mpB8QGKnwhKTs5JxsQZBJQvbDGFcWwL7gbm",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-arbitrum",
+    "dex": "SushiSwap",
+    "version": "v2",
+    "chain": "arbitrum",
+    "subgraphId": "9tSS5FaePZnjmnXnSKCCqKVLAqA6eGg6jA2oRojsXUbP",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-avalanche",
+    "dex": "SushiSwap",
+    "version": "v2",
+    "chain": "avalanche",
+    "subgraphId": "4KgG6aek9cEp8MXQZKWCmeJWj5Y77mK9tPRAD1kDQa8Q",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-bsc",
+    "dex": "SushiSwap",
+    "version": "v2",
+    "chain": "bsc",
+    "subgraphId": "7QyoZFgo1bYvTD7bmdBxsjFLjmeDLgBT3nC3H8y6yuKZ",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-celo",
+    "dex": "SushiSwap",
+    "version": "v2",
+    "chain": "celo",
+    "subgraphId": "5H97eNhy9fVHcqRXZtCV2UxHG2DbzcFA7yth1TaVZ45x",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-ethereum",
+    "dex": "SushiSwap",
+    "version": "v2",
+    "chain": "ethereum",
+    "subgraphId": "77jZ9KWeyi3CJ96zkkj5s1CojKPHt6XJKjLFzsDCd8Fd",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-gnosis",
+    "dex": "SushiSwap",
+    "version": "v2",
+    "chain": "gnosis",
+    "subgraphId": "GvgkY82DTAkYqRShBbPQMjF1WJyUcknXre3QPWiXrPnS",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-polygon",
+    "dex": "SushiSwap",
+    "version": "v2",
+    "chain": "polygon",
+    "subgraphId": "B3Jt84tHJJjanE4W1YijyksTwtm7jqK8KcG5dcoc1ZNF",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-v3-arbitrum",
+    "dex": "SushiSwap",
+    "version": "v3",
+    "chain": "arbitrum",
+    "subgraphId": "3oHCddbQGTi42kPZBwyGzD2JzZR33zK2MwXtxAerNJy2",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-v3-avalanche",
+    "dex": "SushiSwap",
+    "version": "v3",
+    "chain": "avalanche",
+    "subgraphId": "9WGqYsU8h1KVZeKz32663gFrbjVUNhBgmhRavMFqiSZz",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-v3-ethereum",
+    "dex": "SushiSwap",
+    "version": "v3",
+    "chain": "ethereum",
+    "subgraphId": "2tGWMrDha4164KkFAfkU3rDCtuxGb4q1emXmFdLLzJ8x",
+    "schema": "messari"
+  },
+  {
+    "id": "sushiswap-v3-gnosis",
+    "dex": "SushiSwap",
+    "version": "v3",
+    "chain": "gnosis",
+    "subgraphId": "9LC6MvaFHXyY3dmxM7VCwGNA9dvM6g2AuZxEGCyfvck3",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v2-swap-ethereum",
+    "dex": "Uniswap",
+    "version": "v2",
+    "chain": "ethereum",
+    "subgraphId": "3onEbd9MLfXTTWAfP91yqsKr7C68VCT2ZiF7EoQiQAFj",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v3-arbitrum",
+    "dex": "Uniswap",
+    "version": "v3",
+    "chain": "arbitrum",
+    "subgraphId": "FQ6JYszEKApsBpAmiHesRsd9Ygc6mzmpNRANeVQFYoVX",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v3-base",
+    "dex": "Uniswap",
+    "version": "v3",
+    "chain": "base",
+    "subgraphId": "FUbEPQw1oMghy39fwWBFY5fE6MXPXZQtjncQy2cXdrNS",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v3-bsc",
+    "dex": "Uniswap",
+    "version": "v3",
+    "chain": "bsc",
+    "subgraphId": "8f1KyiuNYiNGrjagzEVpf6k6KkPG517prtjdrJihgHw",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v3-celo",
+    "dex": "Uniswap",
+    "version": "v3",
+    "chain": "celo",
+    "subgraphId": "8cLf29KxAedWLVaEqjV8qKomdwwXQxjptBZFrqWNH5u2",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v3-ethereum",
+    "dex": "Uniswap",
+    "version": "v3",
+    "chain": "ethereum",
+    "subgraphId": "4cKy6QQMc5tpfdx8yxfYeb9TLZmgLQe44ddW1G7NwkA6",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v3-optimism",
+    "dex": "Uniswap",
+    "version": "v3",
+    "chain": "optimism",
+    "subgraphId": "EgnS9YE1avupkvCNj9fHnJxppfEmNNywYJtghqiu2pd9",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v3-polygon",
+    "dex": "Uniswap",
+    "version": "v3",
+    "chain": "polygon",
+    "subgraphId": "BvYimJ6vCLkk63oWZy7WB5cVDTVVMugUAF35RAUZpQXE",
+    "schema": "messari"
+  },
+  {
+    "id": "uniswap-v4-ethereum",
+    "dex": "Uniswap",
+    "version": "v4",
+    "chain": "ethereum",
+    "subgraphId": "DiYPVdygkfjDWhbxGSqAQxwBKmfKnkWQojqeM2rkLb3G",
+    "schema": "uniswap-v4"
+  }
+]

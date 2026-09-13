@@ -8,6 +8,8 @@ export function walletAuth() {
   return new WalletAuth(
     openManagedStore(),
     process.env.AQUAMUX_AUTH_ORIGIN ?? "http://127.0.0.1:3100",
+    Date.now,
+    process.env.NODE_ENV === "development",
   );
 }
 export function requireOwner(request: Request) {
@@ -17,6 +19,7 @@ export function requireOwner(request: Request) {
   else if (origin) auth.assertOrigin(origin);
   // The URL is also checked when Origin is absent on same-origin GET requests.
   if (
+    !auth.allowsAnyOrigin &&
     new URL(request.url).origin !== auth.origin &&
     !isLocalOriginAlias(request, auth.origin)
   )
@@ -24,6 +27,9 @@ export function requireOwner(request: Request) {
   const authorization = request.headers.get("authorization");
   if (!authorization?.startsWith("Bearer "))
     throw new AuthError(401, "Authentication required.");
-  return auth.authenticate(authorization.slice(7), auth.origin);
+  return auth.authenticate(
+    authorization.slice(7),
+    origin ?? new URL(request.url).origin,
+  );
 }
 export const requireOwnerSession = requireOwner;

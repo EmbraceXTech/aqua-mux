@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start --hostname 127.0.0.1 --port 3100",
     "typecheck": "tsc --noEmit",
+    "benchmark:index": "node --env-file-if-exists=.env --import tsx scripts/index-benchmark.ts",
     "test": "tsx --test test/*.test.ts lib/server/dev-wallet/*.test.ts",
     "test:review": "tsx --test test/managed-runner-http.test.ts test/managed-review-environment.test.ts test/automation-review.test.ts",
     "test:review:live": "tsx scripts/live-inline-review.ts",

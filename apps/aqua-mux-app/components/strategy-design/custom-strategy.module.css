@@ -1,0 +1,242 @@
+.entry {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 22px;
+  padding: 25px;
+  border: 1px solid #dce6f7;
+  border-radius: 14px;
+  background: linear-gradient(110deg, #f0f5ff, #fff);
+}
+.entry > div {
+  flex: 1;
+}
+.entry h3 {
+  font-size: 17px;
+  font-weight: 560;
+  letter-spacing: -0.4px;
+  margin-top: 6px;
+}
+.entry p {
+  font-size: 11px;
+  color: #7487a4;
+  line-height: 1.8;
+  margin-top: 5px;
+}
+.section {
+  margin-top: 27px;
+  padding-top: 23px;
+  border-top: 1px solid #e7edf6;
+}
+.title {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 17px;
+}
+.title > span {
+  display: grid;
+  place-items: center;
+  width: 27px;
+  height: 27px;
+  border-radius: 8px;
+  border: 1px solid #dce6fb;
+  background: #eef3ff;
+  color: #5178c5;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+.title h3 {
+  font-size: 13px;
+  font-weight: 580;
+  margin: 3px 0 5px;
+}
+.title p {
+  color: #7f90a9;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.tokenChoices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.tokenChoices button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid #e0e7f3;
+  border-radius: 8px;
+  background: #fff;
+  padding: 10px 12px;
+  color: #7b8ba4;
+  font-size: 11px;
+}
+.tokenChoices .chosen {
+  border-color: #b2c7f7;
+  background: #f0f5ff;
+  color: #4770c2;
+}
+.allocationHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 18px 0 10px;
+}
+.allocationHeading strong {
+  font-size: 11px;
+  font-weight: 550;
+  color: #6e7f98;
+}
+.markets {
+  display: grid;
+  gap: 8px;
+}
+.markets > div {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  padding: 12px;
+  background: #fafbfe;
+  border: 1px solid #e5ebf5;
+  border-radius: 10px;
+}
+.markets strong {
+  font-size: 11px;
+  font-weight: 550;
+}
+.markets label {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  border: 1px solid #dce5f5;
+  border-radius: 7px;
+  padding: 7px;
+  background: #fff;
+  color: #8797b0;
+  font-size: 11px;
+}
+.markets input {
+  width: 42px;
+  text-align: right;
+  border: none;
+  background: none;
+  font-size: 12px;
+  appearance: textfield;
+}
+.markets input::-webkit-inner-spin-button {
+  appearance: none;
+}
+.remove {
+  padding: 6px;
+  background: none;
+  color: #8e9cb0;
+  border-radius: 5px;
+}
+.remove:hover {
+  background: #fbeeee;
+  color: #aa6565;
+}
+.total {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 13px;
+  font-size: 10px;
+  color: #7689a4;
+}
+.total strong {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 550;
+}
+.triggers {
+  border: 1px solid #e1e9f5;
+  border-radius: 10px;
+  margin-bottom: 17px;
+}
+.triggers label {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 15px;
+  cursor: pointer;
+}
+.triggers label + label {
+  border-top: 1px solid #e8edf6;
+}
+.triggers input {
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  accent-color: #3468f5;
+  flex-shrink: 0;
+}
+.triggers strong {
+  font-size: 11px;
+  font-weight: 560;
+  color: #566d8e;
+}
+.triggers small {
+  display: block;
+  font-size: 10px;
+  line-height: 1.8;
+  color: #8495ac;
+  margin-top: 4px;
+}
+.section select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.summary {
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid #dfe7f5;
+}
+.summary dl {
+  margin-bottom: 0;
+}
+.summary dd {
+  max-width: 60%;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 760px) {
+  .entry {
+    flex-wrap: wrap;
+    padding: 22px;
+    gap: 12px;
+  }
+  .entry > div {
+    min-width: 180px;
+  }
+  .entry > button {
+    width: 100%;
+    margin-top: 5px;
+  }
+  .markets > div {
+    padding: 10px 8px;
+    gap: 6px;
+  }
+  .markets strong {
+    font-size: 10px;
+  }
+  .markets label {
+    padding: 7px 5px;
+  }
+  .markets input {
+    width: 34px;
+  }
+}

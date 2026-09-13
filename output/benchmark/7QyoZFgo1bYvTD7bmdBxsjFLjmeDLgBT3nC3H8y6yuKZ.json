@@ -1,0 +1,7 @@
+{
+  "errors": [
+    {
+      "message": "bad indexers: {0xbdfb5ee5a2abf4fc7bb1bd1221067aef7f9de491: BadResponse(no attestation: indexing_error)}"
+    }
+  ]
+}

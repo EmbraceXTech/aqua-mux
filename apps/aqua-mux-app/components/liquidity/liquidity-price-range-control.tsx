@@ -31,7 +31,7 @@ export function LiquidityPriceRangeControl({
       <div>
         <span>Price range</span>
         <button className="text-button" onClick={() => setSettings(true)}>
-          Fee {feeBps / 100}% <SlidersHorizontal size={12} />
+          Default fee {feeBps / 100}% <SlidersHorizontal size={12} />
         </button>
       </div>
       <label className="range-pair-picker">
