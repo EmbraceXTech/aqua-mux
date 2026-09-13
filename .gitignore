@@ -4,3 +4,7 @@ node_modules/
 references
 private.pem
 public.pem
+.DS_Store
+.pi/
+output/imagegen/
+apps/aqua-mux-app/public/aquamux-logo.png
