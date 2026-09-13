@@ -215,7 +215,7 @@ export function useLiveSwap(request: SwapRequest) {
         });
         if (alive) {
           setQuote(value);
-          setNextLeg(0);
+          if (approvalPlan?.key !== key) setNextLeg(0);
         }
       } catch (e) {
         if (!alive) return;
@@ -247,7 +247,7 @@ export function useLiveSwap(request: SwapRequest) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [account, key, revision]);
+  }, [account, approvalPlan, key, revision]);
   useEffect(() => {
     if (!pending || walletChain !== SWAP_CHAIN) return;
     let alive = true;
@@ -288,6 +288,7 @@ export function useLiveSwap(request: SwapRequest) {
                   : plan,
               );
               void refreshHoldings();
+              setRevision((v) => v + 1);
             } else if (
               state === "confirmed" &&
               pending.legIndex !== undefined
@@ -297,8 +298,8 @@ export function useLiveSwap(request: SwapRequest) {
               void refreshHoldings();
               if (quote && next >= quote.legs.length) {
                 setApprovalPlan(undefined);
-                setRevision((v) => v + 1);
               }
+              setRevision((v) => v + 1);
             } else {
               setRevision((v) => v + 1);
             }
