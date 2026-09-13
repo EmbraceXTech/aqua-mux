@@ -6,6 +6,7 @@ import {
   sources,
   type BenchmarkData,
   type Coverage,
+  type MarketPool,
   type VerifiedPosition,
 } from "../../benchmark/model";
 
@@ -22,6 +23,7 @@ export class BenchmarkStore {
     this.db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
       CREATE TABLE IF NOT EXISTS benchmark_sources(id TEXT PRIMARY KEY, body TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS benchmark_positions(id TEXT PRIMARY KEY, source_id TEXT NOT NULL, body TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS benchmark_pools(id TEXT PRIMARY KEY, source_id TEXT NOT NULL, body TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS benchmark_attempts(id TEXT PRIMARY KEY, updated_at INTEGER NOT NULL, reason TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS benchmark_scans(id TEXT PRIMARY KEY, body TEXT NOT NULL);
       CREATE TABLE IF NOT EXISTS benchmark_lock(id INTEGER PRIMARY KEY CHECK(id=1), expires_at INTEGER NOT NULL, holder TEXT);
@@ -74,6 +76,14 @@ export class BenchmarkStore {
       .prepare("INSERT OR REPLACE INTO benchmark_positions VALUES(?,?,?)")
       .run(row.id, row.sourceId, JSON.stringify(row));
   }
+  replacePools(sourceId: string, pools: MarketPool[]) {
+    this.db
+      .prepare("DELETE FROM benchmark_pools WHERE source_id=?")
+      .run(sourceId);
+    const insert = this.db.prepare("INSERT INTO benchmark_pools VALUES(?,?,?)");
+    for (const pool of pools)
+      insert.run(pool.id, sourceId, JSON.stringify(pool));
+  }
   scan(
     id: string,
   ): { block: number; since: number; skip: number; days: number } | undefined {
@@ -119,6 +129,11 @@ export class BenchmarkStore {
         body: string;
       }[]
     ).map((row) => JSON.parse(row.body) as VerifiedPosition);
+    const pools = (
+      this.db.prepare("SELECT body FROM benchmark_pools").all() as {
+        body: string;
+      }[]
+    ).map((row) => JSON.parse(row.body) as MarketPool);
     return {
       coverage: sources.map(
         (source) =>
@@ -132,6 +147,7 @@ export class BenchmarkStore {
             rejected: 0,
           },
       ),
+      pools,
       positions,
       updatedAt:
         Math.max(0, ...[...coverage.values()].map((row) => row.checkedAt)) ||

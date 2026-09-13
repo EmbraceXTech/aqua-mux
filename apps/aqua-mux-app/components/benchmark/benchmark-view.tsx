@@ -15,36 +15,43 @@ import {
   RefreshCw,
   Search,
   ShieldCheck,
-  Wallet,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
 import { MainLayout } from "@/components/layouts/MainLayout";
 import {
-  defaultFilters,
-  rankWallets,
+  defaultMarketFilters,
+  rankMarketPools,
   sources,
   type BenchmarkData,
-  type Filters,
+  type MarketFilters,
 } from "@/lib/benchmark/model";
 import s from "./benchmark.module.css";
 
-const money = (value: number | null) =>
-  value === null
-    ? "Unpriced"
-    : new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-        maximumFractionDigits: 2,
-      }).format(value);
-const compact = (value: number) =>
+const empty: BenchmarkData = {
+  coverage: [],
+  pools: [],
+  positions: [],
+  updatedAt: null,
+};
+const pageSize = 12;
+const money = (value: number) =>
   new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-    notation: "compact",
-    maximumFractionDigits: 2,
+    notation: value >= 1_000_000 ? "compact" : "standard",
+    maximumFractionDigits: value >= 1_000_000 ? 2 : 0,
   }).format(value);
+const percent = (value: number | null, digits = 1) =>
+  value === null || !Number.isFinite(value)
+    ? "Not available"
+    : new Intl.NumberFormat("en-US", {
+        style: "percent",
+        maximumFractionDigits: digits,
+      }).format(value);
 const short = (address: string) =>
   `${address.slice(0, 6)}…${address.slice(-4)}`;
-const chainNames: Record<string, string> = {
+const chains: Record<string, string> = {
   ethereum: "Ethereum",
   arbitrum: "Arbitrum",
   base: "Base",
@@ -56,30 +63,38 @@ const chainNames: Record<string, string> = {
   celo: "Celo",
 };
 const explorers: Record<string, string> = {
-  ethereum: "https://etherscan.io",
-  arbitrum: "https://arbiscan.io",
-  base: "https://basescan.org",
-  bsc: "https://bscscan.com",
-  optimism: "https://optimistic.etherscan.io",
-  polygon: "https://polygonscan.com",
-  avalanche: "https://snowtrace.io",
-  gnosis: "https://gnosisscan.io",
-  celo: "https://celoscan.io",
+  ethereum: "https://etherscan.io/address/",
+  arbitrum: "https://arbiscan.io/address/",
+  base: "https://basescan.org/address/",
+  bsc: "https://bscscan.com/address/",
+  optimism: "https://optimistic.etherscan.io/address/",
+  polygon: "https://polygonscan.com/address/",
+  avalanche: "https://snowtrace.io/address/",
+  gnosis: "https://gnosisscan.io/address/",
+  celo: "https://celoscan.io/address/",
 };
-const empty: BenchmarkData = { coverage: [], positions: [], updatedAt: null };
-const pageSize = 10;
+
+function Trend({ value }: { value: number | null }) {
+  if (value === null) return <span className={s.muted}>Not available</span>;
+  const up = value >= 0;
+  return (
+    <span className={up ? s.positive : s.negative}>
+      {up ? <TrendingUp size={13} /> : <TrendingDown size={13} />}
+      {percent(Math.abs(value))}
+    </span>
+  );
+}
 
 export function BenchmarkView() {
-  const [filters, setFilters] = useState<Filters>(defaultFilters);
+  const [filters, setFilters] = useState<MarketFilters>(defaultMarketFilters);
   const [page, setPage] = useState(0);
   const [expanded, setExpanded] = useState<string | null>(null);
-  const [tab, setTab] = useState<"wallets" | "coverage">("wallets");
+  const [tab, setTab] = useState<"markets" | "coverage">("markets");
   const query = useQuery({
     queryKey: ["benchmark"],
     queryFn: async ({ signal }) => {
       const response = await fetch("/api/benchmark", { signal });
-      if (!response.ok)
-        throw new Error("Could not load benchmark history. Try again.");
+      if (!response.ok) throw new Error("Could not load market data.");
       return (await response.json()) as BenchmarkData;
     },
     refetchInterval: 60_000,
@@ -87,9 +102,7 @@ export function BenchmarkView() {
     retry: 1,
   });
   const data = query.data ?? empty;
-  const now = query.dataUpdatedAt;
-  const rows = rankWallets(data, filters, now / 1000);
-  const totalFees = rows.reduce((total, row) => total + row.feesUSD, 0);
+  const rows = rankMarketPools(data, filters);
   const currentPage = Math.min(
     page,
     Math.max(0, Math.ceil(rows.length / pageSize) - 1),
@@ -98,34 +111,36 @@ export function BenchmarkView() {
     currentPage * pageSize,
     (currentPage + 1) * pageSize,
   );
-  const filteredCoverage = data.coverage.filter(
+  const activeCoverage = data.coverage.filter(
     (source) =>
       (filters.chain === "all" || source.chain === filters.chain) &&
       (filters.dex === "all" || source.dex === filters.dex) &&
       (filters.version === "all" || source.version === filters.version),
   );
-  const fresh = data.coverage.filter(
-    (source) =>
-      source.status === "ready" &&
-      source.indexedAt &&
-      now / 1000 - source.indexedAt < 86400,
+  const ready = data.coverage.filter((source) => source.status === "ready");
+  const totalTvl = rows.reduce((sum, row) => sum + row.tvlUSD, 0);
+  const totalRevenue = rows.reduce(
+    (sum, row) => sum + row.supplySideRevenueUSD,
+    0,
   );
-  const databaseOld = !data.updatedAt || now - data.updatedAt > 86400000;
-  function update<K extends keyof Filters>(key: K, value: Filters[K]) {
+  const updatedAt = data.updatedAt;
+  const stale = !updatedAt || query.dataUpdatedAt - updatedAt > 86_400_000;
+  const update = <K extends keyof MarketFilters>(
+    key: K,
+    value: MarketFilters[K],
+  ) => {
     setFilters((current) => ({ ...current, [key]: value }));
     setPage(0);
     setExpanded(null);
-  }
-  function sort(key: Filters["sort"]) {
+  };
+  const sort = (key: MarketFilters["sort"]) =>
     setFilters((current) => ({
       ...current,
       sort: key,
       direction:
         current.sort === key && current.direction === "desc" ? "asc" : "desc",
     }));
-    setPage(0);
-  }
-  const sortIcon = (key: Filters["sort"]) =>
+  const sortIcon = (key: MarketFilters["sort"]) =>
     filters.sort === key ? (
       filters.direction === "desc" ? (
         <ArrowDown size={13} />
@@ -135,21 +150,17 @@ export function BenchmarkView() {
     ) : (
       <ChevronDown size={13} />
     );
-  const reset = () => {
-    setFilters(defaultFilters);
-    setPage(0);
-    setExpanded(null);
-  };
 
   return (
     <MainLayout activePage="benchmark">
       <div className={s.root}>
         <div className={s.heading}>
           <div>
-            <div className={s.eyebrow}>LIQUIDITY INTELLIGENCE</div>
-            <h1>What can one wallet earn?</h1>
+            <div className={s.eyebrow}>CROSS-CHAIN MARKET INTELLIGENCE</div>
+            <h1>Find liquid markets for your strategy.</h1>
             <p>
-              Explore historical LP fee collections across DEXes and chains.
+              Compare live AMM market conditions across standardized Graph data
+              sources.
             </p>
           </div>
           <button
@@ -160,123 +171,111 @@ export function BenchmarkView() {
             <RefreshCw
               size={15}
               className={query.isFetching ? s.spinning : ""}
-            />{" "}
+            />
             {query.isFetching ? "Refreshing" : "Refresh data"}
           </button>
         </div>
+
         <div className={s.notice}>
           <ShieldCheck size={19} />
           <div>
-            <strong>Verified collections, not projected returns.</strong>
+            <strong>Pool-level market data, not wallet earnings.</strong>
             <p>
-              This is a sample of v3 position histories, not a global wallet
-              leaderboard. Principal is excluded. USD values use historical
-              subgraph price snapshots. Fees are not profit and top wallets are
-              not typical outcomes.
+              TVL, volume, and supply-side revenue describe an entire pool. They
+              help compare market conditions, but do not predict Aqua strategy
+              returns, fees, or profit.
             </p>
           </div>
           <a href="#methodology">
-            How we calculate <ArrowUpRight size={13} />
+            Methodology <ArrowUpRight size={13} />
           </a>
         </div>
+
         {query.isError && (
           <div className={s.error} role="alert">
-            {query.error.message}{" "}
-            {query.data && "Showing the last loaded snapshot."}
+            {query.error.message}
           </div>
         )}
-        {!query.isPending && databaseOld && (
+        {!query.isPending && stale && (
           <div className={s.error} role="status">
-            {data.updatedAt
-              ? "The stored backfill is over 24 hours old. Refresh reloads saved results, not blockchain history."
-              : "The historical indexer has not published a snapshot yet. No example wallets are substituted."}
+            {updatedAt
+              ? "The stored market scan is over 24 hours old. Refresh reloads the latest stored scan."
+              : "No market scan has been published yet. Source availability is shown below."}
           </div>
         )}
-        <section className={s.stats} aria-label="Benchmark summary">
+
+        <section className={s.stats} aria-label="Market summary">
           <div className={s.featuredStat}>
             <span>
-              <Layers3 size={15} /> Collected fees in this sample
+              <Layers3 size={15} /> Indexed market TVL
             </span>
-            <strong>{query.isPending ? "…" : compact(totalFees)}</strong>
-            <small>
-              Priced fees only ·{" "}
-              {rows.reduce((sum, row) => sum + row.unpricedPositions, 0)}{" "}
-              unpriced histories
-            </small>
+            <strong>{query.isPending ? "…" : money(totalTvl)}</strong>
+            <small>Across the filtered market set</small>
           </div>
           <div>
             <span>
-              <Wallet size={15} /> Verified wallets
+              <TrendingUp size={15} /> Pool LP revenue
+            </span>
+            <strong>{query.isPending ? "…" : money(totalRevenue)}</strong>
+            <small>All-time aggregate supply-side revenue</small>
+          </div>
+          <div>
+            <span>
+              <Database size={15} /> Market pools
             </span>
             <strong>
               {query.isPending ? "…" : rows.length.toLocaleString()}
             </strong>
-            <small>
-              {rows.reduce((sum, row) => sum + row.positions.length, 0)} audited
-              position histories
-            </small>
+            <small>Indexed pools matching these filters</small>
           </div>
           <div>
             <span>
-              <ShieldCheck size={15} /> Highest priced wallet total
+              <ShieldCheck size={15} /> Source coverage
             </span>
             <strong>
-              {query.isPending
-                ? "…"
-                : rows.length
-                  ? Math.max(...rows.map((row) => row.feesUSD)) > 0
-                    ? compact(Math.max(...rows.map((row) => row.feesUSD)))
-                    : "Unpriced"
-                  : "Not available"}
+              {query.isPending ? "…" : `${ready.length} / ${sources.length}`}
             </strong>
-            <small>Collected fees, before costs and losses</small>
-          </div>
-          <div>
-            <span>
-              <Database size={15} /> Source coverage
-            </span>
-            <strong>
-              {query.isPending ? "…" : `${fresh.length} / ${sources.length}`}
-            </strong>
-            <small>Fresh deployments · 3 DEXes · 9 chains</small>
+            <small>Healthy standardized deployments</small>
           </div>
         </section>
-        <section className={s.panel} aria-label="LP fee benchmark">
+
+        <section className={s.panel} aria-label="Market scanner">
           <div className={s.panelHeading}>
             <div className={s.tabs}>
               <button
-                aria-pressed={tab === "wallets"}
-                className={tab === "wallets" ? s.activeTab : ""}
-                onClick={() => setTab("wallets")}
+                aria-pressed={tab === "markets"}
+                className={tab === "markets" ? s.activeTab : ""}
+                onClick={() => setTab("markets")}
               >
-                Wallet rankings <span>{rows.length}</span>
+                Market scanner <span>{rows.length}</span>
               </button>
               <button
                 aria-pressed={tab === "coverage"}
                 className={tab === "coverage" ? s.activeTab : ""}
                 onClick={() => setTab("coverage")}
               >
-                Data coverage <span>{sources.length}</span>
+                Source coverage <span>{sources.length}</span>
               </button>
             </div>
             <span className={s.snapshot}>
-              <i className={databaseOld ? s.staleDot : s.dot} />
-              {data.updatedAt
-                ? `Snapshot ${new Date(data.updatedAt).toLocaleString()}`
-                : "Awaiting backfill"}
+              <i className={stale ? s.staleDot : s.dot} />
+              {updatedAt
+                ? `Scan ${new Date(updatedAt).toLocaleString()}`
+                : "Awaiting scan"}
             </span>
           </div>
+
           <div className={s.filters}>
             <label>
               Chain
               <select
                 value={filters.chain}
-                onChange={(e) => update("chain", e.target.value)}
+                onChange={(event) => update("chain", event.target.value)}
               >
                 <option value="all">All chains</option>
-                {Object.keys(chainNames).map((chain) => (
-                  <option key={chain} value={chain}>
-                    {chainNames[chain]}
+                {Object.entries(chains).map(([id, name]) => (
+                  <option key={id} value={id}>
+                    {name}
                   </option>
                 ))}
               </select>
@@ -285,7 +284,7 @@ export function BenchmarkView() {
               DEX
               <select
                 value={filters.dex}
-                onChange={(e) => update("dex", e.target.value)}
+                onChange={(event) => update("dex", event.target.value)}
               >
                 <option value="all">All DEXes</option>
                 {["Uniswap", "SushiSwap", "PancakeSwap"].map((dex) => (
@@ -297,7 +296,7 @@ export function BenchmarkView() {
               AMM version
               <select
                 value={filters.version}
-                onChange={(e) => update("version", e.target.value)}
+                onChange={(event) => update("version", event.target.value)}
               >
                 <option value="all">All versions</option>
                 {["v2", "v3", "v4"].map((version) => (
@@ -305,198 +304,145 @@ export function BenchmarkView() {
                 ))}
               </select>
             </label>
-            {tab === "wallets" && (
-              <>
-                <label>
-                  Last collection
-                  <select
-                    value={filters.closedDays}
-                    onChange={(e) =>
-                      update("closedDays", Number(e.target.value))
-                    }
-                  >
-                    <option value={0}>All indexed history</option>
-                    <option value={7}>In the last 7 days</option>
-                    <option value={30}>In the last 30 days</option>
-                    <option value={90}>In the last 90 days</option>
-                  </select>
-                </label>
-                <label>
-                  Min. collected fees
-                  <input
-                    type="number"
-                    min="0"
-                    step="any"
-                    placeholder="USD 0"
-                    value={filters.minFees || ""}
-                    onChange={(e) =>
-                      update(
-                        "minFees",
-                        Math.max(0, Number(e.target.value) || 0),
-                      )
-                    }
-                  />
-                </label>
-              </>
-            )}
-            <button className={s.reset} onClick={reset}>
+            <label>
+              Minimum TVL
+              <input
+                type="number"
+                min="0"
+                step="any"
+                placeholder="USD 0"
+                value={filters.minTvl || ""}
+                onChange={(event) =>
+                  update("minTvl", Math.max(0, Number(event.target.value) || 0))
+                }
+              />
+            </label>
+            <button
+              className={s.reset}
+              onClick={() => {
+                setFilters(defaultMarketFilters);
+                setPage(0);
+                setExpanded(null);
+              }}
+            >
               Reset filters
             </button>
           </div>
-          {tab === "wallets" ? (
+
+          {tab === "markets" ? (
             <>
               <div className={s.tableToolbar}>
                 <label className={s.search}>
                   <Search size={16} />
                   <input
-                    aria-label="Search wallet address"
-                    placeholder="Search wallet address"
+                    aria-label="Search markets"
+                    placeholder="Search pair, DEX, or pool address"
                     value={filters.search}
-                    onChange={(e) => update("search", e.target.value)}
+                    onChange={(event) => update("search", event.target.value)}
                   />
                 </label>
                 <span>
-                  {rows.length} wallets <span className={s.separator}>/</span>{" "}
-                  Collections through each audited cutoff
+                  {rows.length} indexed pools{" "}
+                  <span className={s.separator}>/</span> Ordered by pool metrics
                 </span>
               </div>
               <div className={s.tableScroll}>
                 <table className={s.table}>
                   <caption className={s.srOnly}>
-                    Wallet rankings by verified collected LP fees
+                    Cross-chain AMM market scanner
                   </caption>
                   <thead>
                     <tr>
-                      <th scope="col">Rank</th>
-                      <th scope="col">Wallet</th>
-                      <th scope="col">DEXes / chains</th>
-                      <th
-                        scope="col"
-                        aria-sort={
-                          filters.sort === "positions"
-                            ? filters.direction === "desc"
-                              ? "descending"
-                              : "ascending"
-                            : "none"
-                        }
-                      >
-                        <button onClick={() => sort("positions")}>
-                          Positions {sortIcon("positions")}
+                      <th>Market</th>
+                      <th>DEX / chain</th>
+                      <th>
+                        <button onClick={() => sort("tvl")}>
+                          TVL {sortIcon("tvl")}
                         </button>
                       </th>
-                      <th
-                        scope="col"
-                        aria-sort={
-                          filters.sort === "deposits"
-                            ? filters.direction === "desc"
-                              ? "descending"
-                              : "ascending"
-                            : "none"
-                        }
-                      >
-                        <button onClick={() => sort("deposits")}>
-                          Cumulative deposits {sortIcon("deposits")}
+                      <th>
+                        <button onClick={() => sort("volume")}>
+                          All-time volume {sortIcon("volume")}
                         </button>
                       </th>
-                      <th
-                        scope="col"
-                        aria-sort={
-                          filters.sort === "fees"
-                            ? filters.direction === "desc"
-                              ? "descending"
-                              : "ascending"
-                            : "none"
-                        }
-                      >
-                        <button onClick={() => sort("fees")}>
-                          Collected fees {sortIcon("fees")}
+                      <th>
+                        <button onClick={() => sort("revenue")}>
+                          Pool LP revenue {sortIcon("revenue")}
                         </button>
                       </th>
-                      <th scope="col">
-                        <span className={s.srOnly}>Position details</span>
+                      <th>
+                        <button onClick={() => sort("efficiency")}>
+                          Volume / TVL {sortIcon("efficiency")}
+                        </button>
+                      </th>
+                      <th>
+                        <span className={s.srOnly}>Details</span>
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {query.isPending
-                      ? Array.from({ length: 5 }, (_, i) => (
-                          <tr key={i}>
+                      ? Array.from({ length: 6 }, (_, index) => (
+                          <tr key={index}>
                             <td colSpan={7}>
                               <div className={s.skeleton} />
                             </td>
                           </tr>
                         ))
-                      : shown.map((row, index) => (
-                          <Fragment key={row.wallet}>
+                      : shown.map((pool) => (
+                          <Fragment key={pool.id}>
                             <tr
                               className={
-                                expanded === row.wallet ? s.selectedRow : ""
+                                expanded === pool.id ? s.selectedRow : ""
                               }
                             >
                               <td>
-                                <span className={s.rank}>
-                                  {filters.sort === "fees" &&
-                                  row.unpricedPositions === row.positions.length
-                                    ? "n/a"
-                                    : currentPage * pageSize + index + 1}
-                                </span>
-                              </td>
-                              <td>
-                                <div className={s.wallet}>
-                                  <span
-                                    className={s.avatar}
-                                    style={{
-                                      background: `hsl(${parseInt(row.wallet.slice(2, 6), 16) % 360} 55% 94%)`,
-                                      color: `hsl(${parseInt(row.wallet.slice(2, 6), 16) % 360} 45% 38%)`,
-                                    }}
-                                  >
-                                    <Wallet size={17} />
-                                  </span>
-                                  <div>
-                                    <code title={row.wallet}>
-                                      {short(row.wallet)}
-                                    </code>
-                                    <small>Verified position owner</small>
-                                  </div>
-                                </div>
-                              </td>
-                              <td>
-                                <div className={s.dexes}>
-                                  {row.dexes.join(", ")}
-                                </div>
-                                <div className={s.chains}>
-                                  {row.chains.map((chain) => (
-                                    <span key={chain}>{chainNames[chain]}</span>
-                                  ))}
-                                </div>
-                              </td>
-                              <td>{row.positions.length}</td>
-                              <td className={s.numeric}>
-                                {money(row.depositUSD)}
-                                <small>Not average capital</small>
-                              </td>
-                              <td className={s.fee}>
-                                {money(
-                                  row.unpricedPositions === row.positions.length
-                                    ? null
-                                    : row.feesUSD,
-                                )}
+                                <strong>{pool.pair}</strong>
                                 <small>
-                                  {row.unpricedPositions
-                                    ? `${row.unpricedPositions} unpriced histories excluded from USD`
-                                    : "Principal excluded"}
+                                  <code title={pool.pool}>
+                                    {short(pool.pool)}
+                                  </code>
+                                  {pool.feePercentage !== null
+                                    ? ` · ${percent(pool.feePercentage / 100)} fee tier`
+                                    : ""}
                                 </small>
+                              </td>
+                              <td>
+                                <strong>
+                                  {pool.source.dex} {pool.source.version}
+                                </strong>
+                                <small>{chains[pool.source.chain]}</small>
+                              </td>
+                              <td className={s.numeric}>
+                                {money(pool.tvlUSD)}
+                                <small>
+                                  <Trend value={pool.tvlChange} /> over indexed
+                                  window
+                                </small>
+                              </td>
+                              <td className={s.numeric}>
+                                {money(pool.volumeUSD)}
+                                <small>
+                                  <Trend value={pool.volumeChange} /> daily
+                                  activity trend
+                                </small>
+                              </td>
+                              <td className={s.numeric}>
+                                {money(pool.supplySideRevenueUSD)}
+                                <small>All-time pool aggregate</small>
+                              </td>
+                              <td className={s.numeric}>
+                                {percent(pool.volumeToTvl)}
+                                <small>Not a yield measure</small>
                               </td>
                               <td>
                                 <button
                                   className={s.expand}
-                                  aria-label={`View positions for ${short(row.wallet)}`}
-                                  aria-expanded={expanded === row.wallet}
+                                  aria-label={`View market details for ${pool.pair}`}
+                                  aria-expanded={expanded === pool.id}
                                   onClick={() =>
                                     setExpanded(
-                                      expanded === row.wallet
-                                        ? null
-                                        : row.wallet,
+                                      expanded === pool.id ? null : pool.id,
                                     )
                                   }
                                 >
@@ -504,72 +450,64 @@ export function BenchmarkView() {
                                 </button>
                               </td>
                             </tr>
-                            {expanded === row.wallet && (
+                            {expanded === pool.id && (
                               <tr>
                                 <td colSpan={7} className={s.detailCell}>
                                   <div className={s.details}>
-                                    <h3>Audited position histories</h3>
-                                    <p className={s.fullAddress}>
-                                      {row.wallet}
-                                    </p>
-                                    {row.positions.map((position) => {
-                                      const source = sources.find(
-                                        (source) =>
-                                          source.id === position.sourceId,
-                                      )!;
-                                      return (
-                                        <div
-                                          key={position.id}
-                                          className={s.position}
-                                        >
-                                          <div>
-                                            <strong>{position.pair}</strong>
-                                            <p>
-                                              {source.dex} {source.version} ·{" "}
-                                              {chainNames[source.chain]} · NFT #
-                                              {position.tokenId} ·{" "}
-                                              {position.closed === false
-                                                ? "Open at cutoff"
-                                                : "Closed at cutoff"}
-                                            </p>
-                                            <small>
-                                              Opened{" "}
-                                              {new Date(
-                                                position.openedAt * 1000,
-                                              ).toLocaleDateString()}{" "}
-                                              · Last collection{" "}
-                                              {new Date(
-                                                position.closedAt * 1000,
-                                              ).toLocaleDateString()}
-                                            </small>
-                                          </div>
-                                          <div>
-                                            <strong>
-                                              {money(position.feesUSD)}
-                                            </strong>
-                                            <p>
-                                              {position.feesToken0} /{" "}
-                                              {position.feesToken1} fee tokens
-                                            </p>
-                                            <small>
-                                              USD price snapshot at block{" "}
-                                              {position.valuationBlock.toLocaleString()}
-                                              . Audited through block{" "}
-                                              {position.auditedThroughBlock.toLocaleString()}
-                                              .
-                                            </small>
-                                          </div>
-                                          <a
-                                            href={`${explorers[source.chain]}/tx/${position.transaction}`}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                          >
-                                            Collection transaction{" "}
-                                            <ArrowUpRight size={14} />
-                                          </a>
-                                        </div>
-                                      );
-                                    })}
+                                    <div>
+                                      <h3>{pool.pair}</h3>
+                                      <p>
+                                        External market context for Aqua
+                                        strategy review. This pool is not an
+                                        Aqua position and its revenue is not
+                                        allocated to a wallet.
+                                      </p>
+                                      <a
+                                        href={`${explorers[pool.source.chain]}${pool.pool}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        Open pool contract{" "}
+                                        <ArrowUpRight size={13} />
+                                      </a>
+                                    </div>
+                                    <div className={s.snapshotGrid}>
+                                      <span>
+                                        <small>Latest indexed update</small>
+                                        <strong>
+                                          {pool.updatedAt
+                                            ? new Date(
+                                                pool.updatedAt * 1000,
+                                              ).toLocaleString()
+                                            : "Not available"}
+                                        </strong>
+                                      </span>
+                                      <span>
+                                        <small>Latest daily LP revenue</small>
+                                        <strong>
+                                          {pool.snapshots[0]
+                                            ? money(
+                                                pool.snapshots[0]
+                                                  .supplySideRevenueUSD,
+                                              )
+                                            : "Not available"}
+                                        </strong>
+                                      </span>
+                                      <span>
+                                        <small>Latest daily volume</small>
+                                        <strong>
+                                          {pool.snapshots[0]
+                                            ? money(pool.snapshots[0].volumeUSD)
+                                            : "Not available"}
+                                        </strong>
+                                      </span>
+                                      <span>
+                                        <small>Revenue / TVL</small>
+                                        <strong>
+                                          {percent(pool.dailyRevenueToTvl)}
+                                        </strong>
+                                      </span>
+                                    </div>
                                   </div>
                                 </td>
                               </tr>
@@ -583,33 +521,22 @@ export function BenchmarkView() {
                 <div className={s.empty}>
                   <Search size={26} />
                   <h3>
-                    {data.positions.length
-                      ? "No wallets match these filters"
-                      : "No verified wallet histories yet"}
+                    {data.pools.length
+                      ? "No markets match these filters"
+                      : "No indexed markets yet"}
                   </h3>
                   <p>
-                    {filters.version === "v2" || filters.version === "v4"
-                      ? "Wallet fee accounting for this AMM version is not implemented. Pool-level coverage is listed separately."
-                      : data.positions.length
-                        ? "Try another chain, DEX, or minimum fee."
-                        : "Only complete, principal-adjusted histories are eligible. Check source coverage for indexing status."}
+                    {data.pools.length
+                      ? "Try a broader chain, DEX, or TVL filter."
+                      : "Run the market indexer with a live Graph API key to publish pool data."}
                   </p>
-                  <button
-                    onClick={
-                      data.positions.length ? reset : () => setTab("coverage")
-                    }
-                  >
-                    {data.positions.length
-                      ? "Clear filters"
-                      : "View data coverage"}
-                  </button>
                 </div>
               )}
               <div className={s.pagination}>
                 <span>
                   {rows.length
-                    ? `${currentPage * pageSize + 1}–${Math.min((currentPage + 1) * pageSize, rows.length)} of ${rows.length} wallets`
-                    : "0 wallets"}
+                    ? `${currentPage * pageSize + 1}–${Math.min((currentPage + 1) * pageSize, rows.length)} of ${rows.length} markets`
+                    : "0 markets"}
                 </span>
                 <div>
                   <button
@@ -636,140 +563,110 @@ export function BenchmarkView() {
           ) : (
             <div className={s.coverage}>
               <p className={s.coverageNote}>
-                The same standardized AMM query reads LP supply-side revenue
-                across DEXes and chains. Pool totals are never substituted for
-                wallet earnings. V4 currently uses a separate ownership-only
-                schema.
+                Each deployment uses the shared DEX AMM schema. Availability and
+                freshness are shown per source so incomplete markets are never
+                presented as zero liquidity or zero revenue.
               </p>
               <div className={s.tableScroll}>
                 <table className={s.table}>
-                  <caption className={s.srOnly}>
-                    Subgraph coverage and wallet accounting availability
-                  </caption>
                   <thead>
                     <tr>
                       <th>Deployment</th>
                       <th>Index status</th>
-                      <th>Pool LP revenue, all time</th>
-                      <th>Wallet accounting</th>
-                      <th>Source</th>
+                      <th>Protocol TVL</th>
+                      <th>Pool LP revenue</th>
+                      <th>Market scanner</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {filteredCoverage.map((source) => {
-                      const status =
-                        source.status === "ready" &&
-                        source.indexedAt &&
-                        now / 1000 - source.indexedAt > 86400
-                          ? "stale"
-                          : source.status;
-                      return (
-                        <tr key={source.id}>
-                          <td>
-                            <strong>
-                              {source.dex} {source.version}
-                            </strong>
-                            <small>
-                              {chainNames[source.chain]} ·{" "}
-                              {source.schemaVersion
-                                ? `Schema ${source.schemaVersion}`
-                                : source.schema === "messari"
-                                  ? "Schema not verified"
-                                  : "Protocol-specific schema"}
-                            </small>
-                          </td>
-                          <td>
-                            <span
-                              className={`${s.status} ${status === "ready" ? s.ready : status === "stale" ? s.stale : s.unavailable}`}
-                            >
-                              {status === "ready"
-                                ? "Indexed"
-                                : status === "stale"
-                                  ? "Stale"
-                                  : "Unavailable"}
-                            </span>
-                            <small>
-                              {source.indexedAt
-                                ? new Date(
-                                    source.indexedAt * 1000,
-                                  ).toLocaleString()
-                                : "Not available"}
-                            </small>
-                          </td>
-                          <td className={s.numeric}>
-                            {source.poolFeesUSD === undefined
-                              ? "Not available"
-                              : compact(source.poolFeesUSD)}
-                          </td>
-                          <td>
-                            <span>{source.walletStatus}</span>
-                            <small>
-                              {source.verified} verified · {source.candidates}{" "}
-                              replay attempts
-                              {source.error ? ` · ${source.error}` : ""}
-                            </small>
-                          </td>
-                          <td>
-                            <a
-                              className={s.sourceLink}
-                              href={`https://thegraph.com/explorer/subgraphs/${source.subgraphId}?view=Query&chain=arbitrum-one`}
-                              target="_blank"
-                              rel="noreferrer"
-                              aria-label={`Open ${source.id} subgraph`}
-                            >
-                              <ArrowUpRight size={17} />
-                            </a>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {activeCoverage.map((source) => (
+                      <tr key={source.id}>
+                        <td>
+                          <strong>
+                            {source.dex} {source.version}
+                          </strong>
+                          <small>
+                            {chains[source.chain]} ·{" "}
+                            {source.schemaVersion
+                              ? `Schema ${source.schemaVersion}`
+                              : "Schema pending verification"}
+                          </small>
+                        </td>
+                        <td>
+                          <span
+                            className={`${s.status} ${source.status === "ready" ? s.ready : source.status === "stale" ? s.stale : s.unavailable}`}
+                          >
+                            {source.status === "ready"
+                              ? "Indexed"
+                              : source.status === "stale"
+                                ? "Stale"
+                                : "Unavailable"}
+                          </span>
+                          <small>
+                            {source.indexedAt
+                              ? new Date(
+                                  source.indexedAt * 1000,
+                                ).toLocaleString()
+                              : "Not available"}
+                          </small>
+                        </td>
+                        <td className={s.numeric}>
+                          {source.tvlUSD === undefined
+                            ? "Not available"
+                            : money(source.tvlUSD)}
+                        </td>
+                        <td className={s.numeric}>
+                          {source.poolFeesUSD === undefined
+                            ? "Not available"
+                            : money(source.poolFeesUSD)}
+                        </td>
+                        <td>
+                          <span>
+                            {source.status === "ready"
+                              ? "Pool scan available"
+                              : "Awaiting a healthy source"}
+                          </span>
+                          <small>
+                            {source.error ?? "Standardized fields only"}
+                          </small>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>
-              {!filteredCoverage.length && (
-                <div className={s.empty}>
-                  No deployments match these filters.
-                </div>
-              )}
             </div>
           )}
         </section>
+
         <section className={s.methodology} id="methodology">
           <div>
             <Info size={19} />
-            <h2>Read the numbers correctly</h2>
+            <h2>Read this market data correctly</h2>
           </div>
           <div className={s.methodGrid}>
             <article>
-              <h3>Historical accounting</h3>
+              <h3>Comparable market context</h3>
               <p>
-                We discover v3 positions through Messari&apos;s standardized AMM
-                schema and replay NFT mint, transfer, liquidity, and collection
-                logs from mint through the last indexed liquidity change.
-                Collected token amounts minus withdrawn principal are fees.
-                Transferred NFTs and histories with unpaid principal are
-                excluded.
+                The same standardized DEX AMM query reads pool liquidity,
+                volume, and supply-side revenue across supported deployments. It
+                is a market scanner, not a wallet leaderboard.
               </p>
             </article>
             <article>
-              <h3>A sample, not expected income</h3>
+              <h3>No implied strategy return</h3>
               <p>
-                The backfill prioritizes high-withdrawal, recently opened
-                positions within its RPC budget. Short histories and large
-                wallets are overrepresented. It excludes uncollected fees,
-                collections after the audited cutoff, gas, impermanent loss,
-                incentives, and tax. Deposits may recycle the same capital.
+                Pool revenue belongs to all liquidity providers. Range activity,
+                inventory changes, prices, strategy fees, gas, and timing
+                determine an Aqua strategy&apos;s own outcome.
               </p>
             </article>
             <article>
-              <h3>Valuation and coverage</h3>
+              <h3>Freshness is part of the result</h3>
               <p>
-                All fee tokens for a position use the subgraph&apos;s token
-                prices as of its final indexed collection block, not prices at
-                every collection. Date filters select positions by final
-                collection date; they do not measure fees generated within that
-                period. Missing token prices remain unpriced, never zero
-                earnings. V2 and v4 wallet accounting is not implemented.
+                Every source reports its indexed block and status. Missing,
+                stale, or incompatible data remains unavailable. The page never
+                turns unavailable data into zero.
               </p>
             </article>
           </div>

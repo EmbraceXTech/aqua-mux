@@ -1,13 +1,13 @@
-# Benchmark
+# Market scanner
 
-`/benchmark` is public and read-only. Its navigation link is immediately before Portfolio.
+`/benchmark` is public and read-only. It is a cross-chain AMM market scanner, not a wallet earnings leaderboard. Its navigation link is immediately before Portfolio.
 
 ## Run the historical backfill
 
 From `apps/aqua-mux-app`:
 
 ```sh
-npm run benchmark:index -- --candidates=20
+npm run benchmark:index
 ```
 
 The command reads `.env` without printing credentials. It needs `THE_GRAPH_API_KEY`. Wallet replay also needs the chain's `*_RPC_URL`, currently configured for Ethereum, Arbitrum, Base, and BNB Chain. Other chain RPC names are in `replay.ts`.
@@ -16,10 +16,12 @@ Results persist in `.data/benchmark.sqlite`. Override with `AQUAMUX_BENCHMARK_DB
 
 The page polls `/api/benchmark` once per minute. Its refresh button reloads the persisted snapshot; it does not start a paid backfill. An empty database produces a truthful empty state, not fixture wallets.
 
+The default scan reads up to 100 liquid pools per healthy source and persists current pool TVL, cumulative volume, cumulative supply-side revenue, fee metadata, and the latest seven daily snapshots. It does not claim that this is every pool in a deployment.
+
 Options:
 
 - `--sources=uniswap-v3-ethereum,uniswap-v3-base` selects deployments from the registry.
-- `--candidates=20` replays up to 20 candidate positions per source per invocation. Use `0` for a source-health/pool-revenue refresh only.
+- `--candidates=20` enables the legacy position-replay audit for up to 20 candidates per source. The market scanner does not display this archival wallet data. Use `0`, the default, for a market scan only.
 - `--days=30` limits discovery to positions **opened** in the preceding 30 days. This is not a fee-earning interval.
 - `--skip=40` explicitly selects a page. Without this argument, persisted scan checkpoints continue the previous source's pinned candidate snapshot. A completed scan starts a fresh snapshot on the next invocation.
 - `BENCHMARK_RPC_LOG_BLOCKS=10` is the default historical log chunk size. The configured Alchemy free plan rejected larger ranges during live testing. Increase only if the provider permits it.
@@ -29,7 +31,9 @@ Requests are throttled, 429s retry with backoff, GraphQL errors reject partial r
 
 ## What the data actually supports
 
-The registry contains 22 AMM deployments covering Uniswap, SushiSwap, and PancakeSwap on nine chains. Registry membership is **not** a claim that every source is healthy or supports wallet accounting.
+The registry contains 22 AMM deployments covering Uniswap, SushiSwap, and PancakeSwap on nine chains. Registry membership is **not** a claim that every source is healthy or complete.
+
+The market scanner shows pool-level TVL, volume, fee metadata, and supply-side revenue. It also shows source freshness and availability. These metrics provide external market context for an Aqua strategy. They do not establish an Aqua strategy's return, wallet earnings, or profitability.
 
 Messari's standard AMM schema exposes `DexAmmProtocol.cumulativeSupplySideRevenueUSD`, `totalValueLockedUSD`, and schema/methodology versions. One shared query reads these fields across v2 and v3 DEXes/chains. The coverage view reports each source's indexing timestamp and unavailable/stale states. Pool revenue is never allocated to wallets using current liquidity shares.
 

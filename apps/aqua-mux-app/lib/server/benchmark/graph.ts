@@ -59,6 +59,31 @@ export type Candidate = {
     inputTokens: { id: string; symbol: string; decimals: number }[];
   };
 };
+export const poolsQuery = `query Pools($block: Int!, $first: Int!) {
+  liquidityPools(block: {number: $block}, first: $first, orderBy: totalValueLockedUSD, orderDirection: desc) {
+    id name totalValueLockedUSD cumulativeVolumeUSD cumulativeSupplySideRevenueUSD
+    inputTokens { id symbol }
+    fees { feePercentage feeType }
+    dailySnapshots(first: 7, orderBy: timestamp, orderDirection: desc) {
+      timestamp totalValueLockedUSD dailyVolumeUSD dailySupplySideRevenueUSD
+    }
+  }
+}`;
+export type GraphPool = {
+  id: string;
+  name: string | null;
+  totalValueLockedUSD: string;
+  cumulativeVolumeUSD: string;
+  cumulativeSupplySideRevenueUSD: string;
+  inputTokens: { id: string; symbol: string }[];
+  fees: { feePercentage: string | null; feeType: string }[];
+  dailySnapshots: {
+    timestamp: string;
+    totalValueLockedUSD: string;
+    dailyVolumeUSD: string;
+    dailySupplySideRevenueUSD: string;
+  }[];
+};
 export const candidatesQuery = `query Candidates($block: Int!, $since: BigInt!, $first: Int!, $skip: Int!) {
   positions(block: {number: $block}, first: $first, skip: $skip, orderBy: cumulativeWithdrawUSD, orderDirection: desc,
     where: {timestampOpened_gte: $since, cumulativeWithdrawUSD_gt: "0"}) {

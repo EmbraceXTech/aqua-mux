@@ -5,7 +5,9 @@ import {
   type PositionEvent,
 } from "../lib/server/benchmark/accounting";
 import {
+  rankMarketPools,
   rankWallets,
+  defaultMarketFilters,
   defaultFilters,
   type VerifiedPosition,
 } from "../lib/benchmark/model";
@@ -132,6 +134,7 @@ const position = (
 });
 const data = {
   coverage: [],
+  pools: [],
   updatedAt: 1,
   positions: [
     position("1", "uniswap-v3-ethereum", 20),
@@ -144,6 +147,66 @@ const data = {
     ),
   ],
 };
+test("ranks market pools using pool-level metrics without creating wallet claims", () => {
+  const markets = {
+    ...data,
+    pools: [
+      {
+        id: "uniswap-v3-ethereum:pool-a",
+        sourceId: "uniswap-v3-ethereum",
+        pool: wallet,
+        pair: "WETH / USDC",
+        tvlUSD: 1_000_000,
+        volumeUSD: 5_000_000,
+        supplySideRevenueUSD: 10_000,
+        feePercentage: 0.3,
+        updatedAt: 100,
+        snapshots: [
+          {
+            timestamp: 100,
+            tvlUSD: 1_000_000,
+            volumeUSD: 100_000,
+            supplySideRevenueUSD: 300,
+          },
+          {
+            timestamp: 90,
+            tvlUSD: 800_000,
+            volumeUSD: 50_000,
+            supplySideRevenueUSD: 150,
+          },
+        ],
+      },
+      {
+        id: "sushiswap-v3-arbitrum:pool-b",
+        sourceId: "sushiswap-v3-arbitrum",
+        pool: zero,
+        pair: "ARB / USDC",
+        tvlUSD: 2_000_000,
+        volumeUSD: 1_000_000,
+        supplySideRevenueUSD: 20_000,
+        feePercentage: null,
+        updatedAt: 100,
+        snapshots: [],
+      },
+    ],
+  };
+  const rows = rankMarketPools(markets, defaultMarketFilters);
+  assert.equal(rows[0].pair, "WETH / USDC");
+  assert.equal(rows[0].volumeToTvl, 5);
+  assert.equal(rows[0].tvlChange, 0.25);
+  assert.equal(rows[0].dailyRevenueToTvl, 0.0003);
+  assert.equal(
+    rankMarketPools(markets, { ...defaultMarketFilters, chain: "arbitrum" })[0]
+      .pair,
+    "ARB / USDC",
+  );
+  assert.equal(
+    rankMarketPools(markets, { ...defaultMarketFilters, minTvl: 1_500_000 })
+      .length,
+    1,
+  );
+});
+
 test("filters contributions before wallet aggregation across DEXes and chains", () => {
   assert.equal(rankWallets(data, defaultFilters)[0].feesUSD, 50);
   const eth = rankWallets(data, { ...defaultFilters, chain: "ethereum" });
@@ -229,6 +292,7 @@ test("SQLite persistence is idempotent and single-writer locked", () => {
     store.position(data.positions[0]);
     store.position(data.positions[0]);
     assert.equal(store.read().positions.length, 1);
+    assert.equal(store.read().pools.length, 0);
     assert.equal(store.read().coverage.length, 22);
   } finally {
     store.close();

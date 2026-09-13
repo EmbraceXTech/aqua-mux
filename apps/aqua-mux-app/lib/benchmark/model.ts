@@ -43,10 +43,54 @@ export type VerifiedPosition = {
   depositUSD: number;
   transaction: string;
 };
+export type PoolSnapshot = {
+  timestamp: number;
+  tvlUSD: number;
+  volumeUSD: number;
+  supplySideRevenueUSD: number;
+};
+export type MarketPool = {
+  id: string;
+  sourceId: string;
+  pool: string;
+  pair: string;
+  tvlUSD: number;
+  volumeUSD: number;
+  supplySideRevenueUSD: number;
+  feePercentage: number | null;
+  updatedAt: number | null;
+  snapshots: PoolSnapshot[];
+};
 export type BenchmarkData = {
   coverage: Coverage[];
+  pools: MarketPool[];
   positions: VerifiedPosition[];
   updatedAt: number | null;
+};
+export type MarketFilters = {
+  chain: string;
+  dex: string;
+  version: string;
+  search: string;
+  minTvl: number;
+  sort: "volume" | "tvl" | "revenue" | "efficiency";
+  direction: "asc" | "desc";
+};
+export const defaultMarketFilters: MarketFilters = {
+  chain: "all",
+  dex: "all",
+  version: "all",
+  search: "",
+  minTvl: 0,
+  sort: "volume",
+  direction: "desc",
+};
+export type MarketPoolRow = MarketPool & {
+  source: Source;
+  volumeToTvl: number | null;
+  dailyRevenueToTvl: number | null;
+  tvlChange: number | null;
+  volumeChange: number | null;
 };
 export type WalletRow = {
   wallet: string;
@@ -78,7 +122,62 @@ export const defaultFilters: Filters = {
   direction: "desc",
 };
 
-// Filter contributions BEFORE aggregating a wallet across deployments.
+export function rankMarketPools(
+  data: BenchmarkData,
+  filters: MarketFilters,
+): MarketPoolRow[] {
+  const bySource = new Map(sources.map((source) => [source.id, source]));
+  const rows = data.pools.flatMap((pool) => {
+    const source = bySource.get(pool.sourceId);
+    if (!source) return [];
+    if (filters.chain !== "all" && source.chain !== filters.chain) return [];
+    if (filters.dex !== "all" && source.dex !== filters.dex) return [];
+    if (filters.version !== "all" && source.version !== filters.version)
+      return [];
+    if (pool.tvlUSD < filters.minTvl) return [];
+    const search = filters.search.trim().toLowerCase();
+    if (
+      search &&
+      !`${pool.pair} ${pool.pool} ${source.dex} ${source.chain}`
+        .toLowerCase()
+        .includes(search)
+    )
+      return [];
+    const latest = pool.snapshots[0];
+    const prior = pool.snapshots.at(-1);
+    const change = (value: number, previous: number | undefined) =>
+      previous && previous > 0 ? (value - previous) / previous : null;
+    return [
+      {
+        ...pool,
+        source,
+        volumeToTvl: pool.tvlUSD > 0 ? pool.volumeUSD / pool.tvlUSD : null,
+        dailyRevenueToTvl:
+          latest && latest.tvlUSD > 0
+            ? latest.supplySideRevenueUSD / latest.tvlUSD
+            : null,
+        tvlChange: latest && prior ? change(latest.tvlUSD, prior.tvlUSD) : null,
+        volumeChange:
+          latest && prior ? change(latest.volumeUSD, prior.volumeUSD) : null,
+      },
+    ];
+  });
+  const value = (row: MarketPoolRow) =>
+    filters.sort === "tvl"
+      ? row.tvlUSD
+      : filters.sort === "revenue"
+        ? row.supplySideRevenueUSD
+        : filters.sort === "efficiency"
+          ? (row.volumeToTvl ?? -1)
+          : row.volumeUSD;
+  return rows.sort(
+    (a, b) =>
+      (value(a) - value(b)) * (filters.direction === "asc" ? 1 : -1) ||
+      a.id.localeCompare(b.id),
+  );
+}
+
+// Retained for historical record tests. The market scanner does not display wallet rankings.
 export function rankWallets(
   data: BenchmarkData,
   filters: Filters,

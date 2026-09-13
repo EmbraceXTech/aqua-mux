@@ -3,9 +3,11 @@ import {
   graph,
   protocolQuery,
   candidatesQuery,
+  poolsQuery,
   nonnegative,
   type ProtocolResult,
   type Candidate,
+  type GraphPool,
 } from "./graph";
 import { hasRpc, replayPosition } from "./replay";
 import { BenchmarkStore } from "./store";
@@ -24,7 +26,8 @@ export async function indexBenchmarks(
     store.close();
     throw new Error("A benchmark indexer is already running");
   }
-  const limit = options.candidates ?? 5;
+  // Market scanning is the product path. Legacy wallet replay is opt-in only.
+  const limit = options.candidates ?? 0;
   const days = options.days ?? 30;
   if (
     !Number.isInteger(limit) ||
@@ -95,6 +98,49 @@ export async function indexBenchmarks(
               : row.status === "stale"
                 ? "Index is stale. Wallet replay paused."
                 : "Principal-adjusted collection sample";
+        const { liquidityPools } = await graph<{ liquidityPools: GraphPool[] }>(
+          source,
+          poolsQuery,
+          { block: row.indexedBlock, first: 100 },
+        );
+        store.replacePools(
+          source.id,
+          liquidityPools.map((pool) => {
+            const primaryFee = pool.fees.find(
+              (fee) =>
+                fee.feeType.includes("LP_FEE") ||
+                fee.feeType.includes("TRADING_FEE"),
+            );
+            return {
+              id: `${source.id}:${pool.id.toLowerCase()}`,
+              sourceId: source.id,
+              pool: pool.id,
+              pair:
+                pool.name ??
+                (pool.inputTokens.map((token) => token.symbol).join(" / ") ||
+                  "Unnamed pool"),
+              tvlUSD: nonnegative(pool.totalValueLockedUSD),
+              volumeUSD: nonnegative(pool.cumulativeVolumeUSD),
+              supplySideRevenueUSD: nonnegative(
+                pool.cumulativeSupplySideRevenueUSD,
+              ),
+              feePercentage:
+                primaryFee?.feePercentage === null ||
+                primaryFee?.feePercentage === undefined
+                  ? null
+                  : nonnegative(primaryFee.feePercentage),
+              updatedAt: row.indexedAt ?? null,
+              snapshots: pool.dailySnapshots.map((snapshot) => ({
+                timestamp: Number(snapshot.timestamp),
+                tvlUSD: nonnegative(snapshot.totalValueLockedUSD),
+                volumeUSD: nonnegative(snapshot.dailyVolumeUSD),
+                supplySideRevenueUSD: nonnegative(
+                  snapshot.dailySupplySideRevenueUSD,
+                ),
+              })),
+            };
+          }),
+        );
         store.coverage(row);
         if (
           source.version === "v3" &&

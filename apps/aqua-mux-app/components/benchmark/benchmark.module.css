@@ -415,6 +415,56 @@
   font-size: 12px;
   font-weight: 550;
 }
+.details > div > p {
+  color: #77849a;
+  font-size: 11px;
+  line-height: 1.6;
+  margin: 7px 0 10px;
+  max-width: 760px;
+}
+.details a {
+  color: #4f72c9;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+.snapshotGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 18px;
+}
+.snapshotGrid span {
+  background: #fff;
+  border: 1px solid #e7edf8;
+  border-radius: 7px;
+  padding: 10px;
+}
+.snapshotGrid small {
+  margin: 0 0 5px;
+}
+.snapshotGrid strong {
+  color: #506078;
+  display: block;
+  font-size: 11px;
+  font-weight: 550;
+}
+.positive,
+.negative {
+  align-items: center;
+  display: inline-flex;
+  gap: 3px;
+}
+.positive {
+  color: #398b72;
+}
+.negative {
+  color: #bd6f72;
+}
+.muted {
+  color: #a0a8b7;
+}
 .fullAddress {
   font-family: monospace;
   color: #94a0b5;
@@ -746,6 +796,9 @@
   .position > div {
     max-width: 100%;
     width: 100%;
+  }
+  .snapshotGrid {
+    grid-template-columns: 1fr 1fr;
   }
   .methodGrid {
     grid-template-columns: 1fr;
