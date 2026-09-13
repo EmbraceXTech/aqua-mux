@@ -23,8 +23,8 @@ export async function POST(request: Request) {
       throw new Error("RPC network does not match Arbitrum.");
     const block = await c.getBlockNumber();
     const started = Date.now();
-    const results = await Promise.all(
-      legs.map(async (l) => {
+    const quoted = await Promise.all(
+      legs.map(async (l, index) => {
         try {
           const { result } = await c.simulateContract({
             address: V3_QUOTER,
@@ -42,15 +42,33 @@ export async function POST(request: Request) {
             ],
             blockNumber: block,
           });
-          return result;
+          return { index, result };
         } catch {
-          throw new Error(
-            `Cannot quote ${l.input}/${l.output} at ${l.fee / 10000}%. Try another pool fee or amount. Direct Uniswap v3 pools only.`,
-          );
+          return { index, result: null };
         }
       }),
     );
-    const quote = finishQuote(swap, legs, results, block, started);
+    const unavailable = quoted
+      .filter((quote) => quote.result === null)
+      .map(({ index }) => ({
+        index,
+        message: "No quote for this fee tier. Choose another fee or amount.",
+      }));
+    if (unavailable.length)
+      return Response.json(
+        {
+          error: "Some selected routes are unavailable.",
+          routeErrors: unavailable,
+        },
+        { status: 422 },
+      );
+    const quote = finishQuote(
+      swap,
+      legs,
+      quoted.map((quote) => quote.result!),
+      block,
+      started,
+    );
     if (quote.expiresAt <= Date.now())
       throw new Error("Quote took too long. Please retry.");
     return Response.json(quote, { headers: { "Cache-Control": "no-store" } });

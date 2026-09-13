@@ -3,7 +3,6 @@ import type { SwapWorkspace } from "@/hooks/useSwapWorkspace";
 import { liveTokens } from "@/lib/live-swap";
 import { SwapActions } from "./swap-actions";
 import { SwapModeControls } from "./swap-mode-controls";
-import { SwapStatus } from "./swap-status";
 import { SwapTokenSection } from "./swap-token-section";
 import styles from "./swap.module.css";
 
@@ -13,7 +12,7 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
     ? "Fetching pool quote…"
     : trade.quote
       ? trade.fresh
-        ? "Live pool quote"
+        ? ""
         : "Quote expired"
       : "Awaiting quote";
   return (
@@ -61,6 +60,7 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
           amounts={trade.quote?.amounts.input}
           balances={trade.holdings}
           quoteLabel={quoteLabel}
+          routeErrors={trade.routeErrors}
           onEdit={w.edit}
           onPick={w.openPicker}
         />
@@ -78,20 +78,14 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
           amounts={trade.quote?.amounts.output}
           balances={trade.holdings}
           quoteLabel={quoteLabel}
+          routeErrors={trade.routeErrors}
           onEdit={w.edit}
           onPick={w.openPicker}
         />
       </div>
-      <SwapStatus
-        error={trade.error}
-        pending={trade.pending}
-        unlocated={trade.unlocated}
-        result={trade.result}
-        unknown={trade.unknown}
-      />
       <SwapActions
         locked={locked}
-        openReview={w.openReview}
+        swap={w.swap}
         account={trade.account}
         walletChain={trade.walletChain}
         busy={trade.busy}
@@ -101,6 +95,7 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
         clock={trade.clock}
         connect={trade.connect}
         switchChain={trade.switchChain}
+        approvalsFor={trade.approvalsFor}
       />
     </section>
   );
