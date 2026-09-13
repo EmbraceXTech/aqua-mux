@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ChevronDown, Wallet } from "lucide-react";
 import { NetworkIcon } from "@/components/managed/token-icon";
 import { Modal } from "@/components/ui/modal";
@@ -8,16 +8,21 @@ import { WalletModePicker } from "@/components/wallet-mode-picker";
 import { network, networks } from "@/lib/config";
 import { useManagedSession } from "@/lib/managed-client/use-managed-session";
 import {
+  defaultChainId,
   saveSelectedChainId,
   selectedChainId,
 } from "@/lib/selected-chain";
 
 export function WalletControls() {
-  const [chainId, setChainId] = useState(selectedChainId);
+  const [chainId, setChainId] = useState(defaultChainId);
   const [chainPickerOpen, setChainPickerOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
   const wallet = useManagedSession(chainId);
   const account = wallet.session?.owner;
+
+  useEffect(() => {
+    setChainId(selectedChainId());
+  }, []);
 
   function selectChain(nextChainId: typeof chainId) {
     saveSelectedChainId(nextChainId);

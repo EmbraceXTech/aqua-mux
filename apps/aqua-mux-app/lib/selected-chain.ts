@@ -1,7 +1,7 @@
 import { networks, type ChainId } from "./config";
 
 const storageKey = "aquamux-selected-chain";
-const defaultChainId: ChainId = 42161;
+export const defaultChainId: ChainId = 42161;
 
 export function selectedChainId(): ChainId {
   if (typeof window === "undefined") return defaultChainId;

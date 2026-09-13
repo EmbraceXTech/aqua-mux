@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { logoForTokenSymbol } from "@/lib/token-logo";
 
 export const TOKEN_IMAGE_FALLBACK = "/aquamux-logo.svg";
 
@@ -20,10 +21,14 @@ export function TokenImage({
   className,
   alt = `${symbol} token icon`,
 }: TokenImageProps) {
-  const [failedLogo, setFailedLogo] = useState<string>();
+  const [failedLogos, setFailedLogos] = useState<string[]>([]);
   const registryLogo = logo?.trim();
-  const showingRegistryLogo = !!registryLogo && failedLogo !== registryLogo;
-  const src = showingRegistryLogo ? registryLogo : TOKEN_IMAGE_FALLBACK;
+  const symbolLogo = logoForTokenSymbol(symbol);
+  const candidates = [registryLogo, symbolLogo].filter(
+    (candidate): candidate is string =>
+      !!candidate && !failedLogos.includes(candidate),
+  );
+  const src = candidates[0] ?? TOKEN_IMAGE_FALLBACK;
 
   return (
     <Image
@@ -33,7 +38,12 @@ export function TokenImage({
       width={size}
       height={size}
       onError={
-        showingRegistryLogo ? () => setFailedLogo(registryLogo) : undefined
+        src === TOKEN_IMAGE_FALLBACK
+          ? undefined
+          : () =>
+              setFailedLogos((current) =>
+                current.includes(src) ? current : [...current, src],
+              )
       }
     />
   );
