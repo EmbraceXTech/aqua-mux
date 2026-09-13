@@ -39,6 +39,7 @@ export async function POST(request: Request) {
             from: account,
             receiver: account,
             slippage: String(swap.slippageBps / 100),
+            disableEstimate: "true",
             allowPartialFill: "false",
           }),
           "1inch returned an invalid swap response.",
