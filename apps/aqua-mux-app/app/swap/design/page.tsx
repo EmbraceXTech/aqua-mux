@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { SwapView } from "@/components/views/SwapView";
 
 export const metadata: Metadata = {
-  title: "Multi-swap design preview | AquaMux",
-  description:
-    "Interactive multi-in and multi-out swap prototype. Sample data only.",
+  title: "1inch swap preview | AquaMux",
+  description: "Interactive 1inch Classic Swap on Arbitrum.",
   robots: { index: false, follow: false },
 };
 

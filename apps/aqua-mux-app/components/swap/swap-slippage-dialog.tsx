@@ -1,18 +1,15 @@
 import { Check, Info } from "lucide-react";
 import { isValidSlippage } from "@/lib/swap-draft";
-import type { Side } from "@/lib/live-swap";
 import styles from "./swap.module.css";
 
 type Props = {
   value: string;
-  multi: Side;
   locked: boolean;
   onChange: (value: string) => void;
   onClose: () => void;
 };
 export function SwapSlippageDialog({
   value,
-  multi,
   locked,
   onChange,
   onClose,
@@ -58,10 +55,7 @@ export function SwapSlippageDialog({
       )}
       <div className={styles.settingsInfo}>
         <Info size={16} />
-        <p>
-          Each {multi} token selects a Uniswap v3 pool fee tier. Fees go to the
-          pool, not AquaMux.
-        </p>
+        <p>1inch finds the route across supported liquidity sources.</p>
       </div>
       <button
         className={styles.primaryButton}

@@ -41,6 +41,18 @@ export function useSwapWorkspace() {
     slippageBps: validSlippage ? Math.round(Number(state.slippage) * 100) : 0,
   } as const;
   const trade = useLiveSwap(request);
+  useEffect(() => {
+    const result = trade.result;
+    if (!result || result.label !== "Swap") return;
+    const timer = window.setTimeout(() => {
+      setToast([
+        result.success
+          ? "Swap confirmed."
+          : "Swap reverted. Your wallet balance was not changed by this transaction.",
+      ]);
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [trade.result]);
   const locked = trade.busy || !!trade.pending || trade.unknown;
   const canReview =
     trade.fresh &&
@@ -86,7 +98,7 @@ export function useSwapWorkspace() {
     setDialog(null);
     trade.refresh();
   }
-  function openReview() {
+  async function swap() {
     if (locked) return;
     const errors = !validSlippage
       ? ["Enter slippage from 0.01% to 5%."]
@@ -103,18 +115,14 @@ export function useSwapWorkspace() {
       setToast(errors);
       return;
     }
-    if (canReview && trade.quote && trade.account)
-      openDialog({
-        type: "review",
-        quote: trade.quote,
-        account: trade.account,
-      });
+    if (!canReview || !trade.quote) return;
+    await trade.run(trade.quote);
   }
   async function submit(
     approval?: ReturnType<typeof trade.approvalsFor>[number],
   ) {
     if (dialog?.type !== "review" || !reviewValid || locked) return;
-    if (await trade.send(dialog.quote, approval)) setDialog(null);
+    await trade.send(dialog.quote, approval);
   }
   return {
     mode: state.mode,
@@ -139,7 +147,7 @@ export function useSwapWorkspace() {
     setExact,
     closeDialog,
     refresh,
-    openReview,
+    swap,
     submit,
     openPicker: (target: TokenPickerTarget) => {
       openDialog({ type: "tokens", target });

@@ -1,23 +1,47 @@
 "use client";
 
-import { useState } from "react";
-import { Check, ChevronDown, Wallet } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Bell, Check, ChevronDown, Wallet } from "lucide-react";
 import { NetworkIcon } from "@/components/managed/token-icon";
 import { Modal } from "@/components/ui/modal";
 import { WalletModePicker } from "@/components/wallet-mode-picker";
 import { network, networks } from "@/lib/config";
 import { useManagedSession } from "@/lib/managed-client/use-managed-session";
 import {
+  defaultChainId,
   saveSelectedChainId,
   selectedChainId,
 } from "@/lib/selected-chain";
+import {
+  loadSwapActivities,
+  swapActivityEvent,
+  type SwapActivity,
+} from "@/lib/swap-activity";
 
 export function WalletControls() {
-  const [chainId, setChainId] = useState(selectedChainId);
+  const [chainId, setChainId] = useState(defaultChainId);
   const [chainPickerOpen, setChainPickerOpen] = useState(false);
   const [walletOpen, setWalletOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+  const [activities, setActivities] = useState<SwapActivity[]>([]);
   const wallet = useManagedSession(chainId);
   const account = wallet.session?.owner;
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setChainId(selectedChainId());
+      setActivities(loadSwapActivities());
+    }, 0);
+    const update = (event: Event) => {
+      const activities = (event as CustomEvent<SwapActivity[]>).detail;
+      setActivities(Array.isArray(activities) ? activities : loadSwapActivities());
+    };
+    window.addEventListener(swapActivityEvent, update);
+    return () => {
+      window.clearTimeout(timer);
+      window.removeEventListener(swapActivityEvent, update);
+    };
+  }, []);
 
   function selectChain(nextChainId: typeof chainId) {
     saveSelectedChainId(nextChainId);
@@ -35,6 +59,47 @@ export function WalletControls() {
 
   return (
     <div className="header-actions">
+      <div className="activity-popover">
+        <button
+          className="activity-button"
+          aria-label={`Swap activity${activities.length ? `, ${activities.length} transactions` : ""}`}
+          aria-expanded={activityOpen}
+          aria-haspopup="dialog"
+          onClick={() => setActivityOpen((open) => !open)}
+        >
+          <Bell size={17} />
+          {activities.length > 0 && <span className="activity-count">{activities.length}</span>}
+        </button>
+        {activityOpen && (
+          <div className="activity-menu" role="dialog" aria-label="Swap activity">
+            <strong>Transactions</strong>
+            {activities.length ? (
+              <div className="activity-list">
+                {activities.map((activity) => (
+                  <a
+                    key={activity.hash}
+                    href={`https://arbiscan.io/tx/${activity.hash}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <span>
+                      <span>
+                        <strong>{activity.label}</strong>
+                        <small>{`${activity.hash.slice(0, 10)}…${activity.hash.slice(-8)}`}</small>
+                      </span>
+                    </span>
+                    <small className={`transaction-state state-${activity.state}`}>
+                      {activity.state}
+                    </small>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p>No swap transactions yet.</p>
+            )}
+          </div>
+        )}
+      </div>
       <button
         className="network-button"
         onClick={() => setChainPickerOpen(true)}

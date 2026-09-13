@@ -221,7 +221,7 @@ p {
   max-height: 330px;
   overflow: auto;
 }
-.activity-list > button {
+.activity-list > a {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -232,16 +232,16 @@ p {
   background: transparent;
   text-align: left;
 }
-.activity-list > button:hover {
+.activity-list > a:hover {
   background: #f4f7fd;
 }
-.activity-list > button > span {
+.activity-list > a > span {
   display: flex;
   align-items: center;
   gap: 9px;
   min-width: 0;
 }
-.activity-list > button > span > span {
+.activity-list > a > span > span {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -260,10 +260,11 @@ p {
   flex-shrink: 0;
   color: #c17c1b !important;
 }
-.transaction-state.state-200 {
+.transaction-state.state-confirmed {
   color: #258c73 !important;
 }
-.transaction-state.state-500 {
+.transaction-state.state-reverted,
+.transaction-state.state-unknown {
   color: #c04e5b !important;
 }
 .network-button {

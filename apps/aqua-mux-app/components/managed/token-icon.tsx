@@ -1,5 +1,5 @@
 import { TokenImage } from "@/components/token-image";
-import { NATIVE, network, tokens, type Token } from "@/lib/config";
+import { network, type Token } from "@/lib/config";
 
 export function TokenIcon({
   token,
@@ -26,11 +26,10 @@ export function NetworkIcon({
   size?: number;
 }) {
   const net = network(chainId);
-  const logo = tokens(chainId).find((item) => item.address === NATIVE)!.logo;
   return (
     <TokenImage
       className="network-icon"
-      logo={logo}
+      logo={net.logo}
       symbol={net.symbol}
       size={size}
       alt={`${net.name} network icon`}

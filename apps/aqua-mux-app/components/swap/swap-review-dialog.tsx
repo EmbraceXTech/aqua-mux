@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import type { SwapWorkspace } from "@/hooks/useSwapWorkspace";
-import { SWAP_CHAIN, V3_ROUTER, type LiveQuote } from "@/lib/live-swap";
+import { classicRouter } from "@/lib/config";
+import { SWAP_CHAIN, type LiveQuote } from "@/lib/live-swap";
 import { SwapReviewSummary } from "./swap-review-summary";
 import styles from "./swap.module.css";
 
@@ -78,10 +79,10 @@ function ReviewAction({
       <>
         <p className={styles.settingsNote}>
           {approval.reset
-            ? `Reset the existing ${approval.symbol} allowance to zero first.`
-            : `Approve only the reviewed maximum ${approval.symbol} spend.`}{" "}
-          Spender: {V3_ROUTER}. Approval is separate from the swap. Refresh and
-          review after confirmation.
+            ? `Reset the existing ${approval.label} allowance to zero first.`
+            : `Approve only the reviewed maximum ${approval.label} spend.`}{" "}
+          Spender: {classicRouter(SWAP_CHAIN)}. Approval is separate from the
+          swap. Refresh and review after confirmation.
         </p>
         <button
           className={styles.primaryButton}
@@ -90,7 +91,7 @@ function ReviewAction({
         >
           {trade.busy
             ? "Check wallet…"
-            : `${approval.reset ? "Reset" : "Approve"} ${approval.symbol} in wallet`}
+            : `${approval.reset ? "Reset" : "Approve"} ${approval.label} in wallet`}
         </button>
       </>
     );

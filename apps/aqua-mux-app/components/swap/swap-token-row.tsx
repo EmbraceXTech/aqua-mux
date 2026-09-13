@@ -16,6 +16,7 @@ type Props = {
   balance?: string;
   amount: string;
   quoteLabel: string;
+  routeError?: string;
   onPick: () => void;
   onRemove: () => void;
   onChange: (values: Partial<Pick<Row, "amount" | "weight" | "fee">>) => void;
@@ -37,6 +38,7 @@ export function SwapTokenRow({
   balance,
   amount,
   quoteLabel,
+  routeError,
   onPick,
   onRemove,
   onChange,
@@ -82,20 +84,19 @@ export function SwapTokenRow({
         )}
       </div>
       <div className={styles.rowMeta}>
-        <span>
-          Balance: {connected ? (balance ?? "Unavailable") : "Connect wallet"}
-          {side === "input" &&
-            exact &&
-            balance !== undefined &&
-            token.address !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
-              <button
-                disabled={locked}
-                onClick={() => onChange({ amount: balance })}
-              >
-                Max
-              </button>
-            )}
-        </span>
+        {exact && balance !== undefined ? (
+          <button
+            type="button"
+            className={styles.balanceButton}
+            disabled={locked}
+            aria-label={`Use full ${token.symbol} wallet balance`}
+            onClick={() => onChange({ amount: balance })}
+          >
+            Balance: {balance}
+          </button>
+        ) : connected ? (
+          <span>Balance: {balance ?? "Unavailable"}</span>
+        ) : null}
         {removable && !exact && (
           <label className={styles.allocation}>
             Allocation{" "}
@@ -110,10 +111,16 @@ export function SwapTokenRow({
           </label>
         )}
       </div>
+      {routeError && (
+        <p role="alert" className={styles.routeError}>
+          {routeError}
+        </p>
+      )}
       {expanded && (
         <div className={styles.rowFee}>
-          <span>
-            <Settings2 size={12} /> {token.symbol} pool fee
+          <span className={styles.feeLabel}>
+            <Settings2 size={12} />
+            Fee
           </span>
           <div className={styles.feePresets}>
             {(["0.01", "0.05", "0.3", "1"] as const).map((fee) => (

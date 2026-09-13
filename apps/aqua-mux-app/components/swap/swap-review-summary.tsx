@@ -1,9 +1,5 @@
-import {
-  V3_ROUTER,
-  SWAP_DEADLINE_SECONDS,
-  getToken,
-  type LiveQuote,
-} from "@/lib/live-swap";
+import { classicRouter } from "@/lib/config";
+import { getToken, SWAP_CHAIN, type LiveQuote } from "@/lib/live-swap";
 import { SwapTokenMark } from "./swap-token-mark";
 import styles from "./swap.module.css";
 
@@ -14,16 +10,12 @@ export function SwapReviewSummary({
   quote: LiveQuote;
   account: string;
 }) {
+  const router = classicRouter(SWAP_CHAIN);
   return (
     <>
       {(["input", "output"] as const).map((side) => (
         <div className={styles.reviewGroup} key={side}>
-          <h3>
-            {side === "input" ? "You pay" : "You receive"}
-            <span>
-              {quote.request.draft.exact === side ? "Exact" : "Estimated"}
-            </span>
-          </h3>
+          <h3>{side === "input" ? "You pay" : "You receive"}</h3>
           {quote.request.draft[side].map((item, index) => (
             <div key={item.symbol}>
               <SwapTokenMark symbol={item.symbol} small />
@@ -32,23 +24,16 @@ export function SwapReviewSummary({
               </strong>
             </div>
           ))}
-          {quote.request.draft.exact !== side &&
-            quote.request.draft[side].map((item, index) => (
-              <p className={styles.settingsNote} key={item.symbol}>
-                {side === "input" ? "Maximum spend" : "Minimum receive"}:{" "}
-                {quote.limits[side][index]} {getToken(item.symbol).symbol}
-              </p>
-            ))}
+          {side === "output" && (
+            <p className={styles.settingsNote}>
+              Minimum receive: {quote.limits.output[0]}{" "}
+              {getToken(quote.request.draft.output[0].symbol).symbol}
+            </p>
+          )}
         </div>
       ))}
       <div className={styles.reviewFees}>
-        <strong>Pool routes</strong>
-        {quote.legs.map((leg) => (
-          <span key={`${leg.input}-${leg.output}`}>
-            {getToken(leg.input).symbol} → {getToken(leg.output).symbol}
-            <b>{leg.fee / 10000}%</b>
-          </span>
-        ))}
+        <strong>1inch route</strong>
         <span>
           Slippage<b>{quote.request.slippageBps / 100}%</b>
         </span>
@@ -58,17 +43,16 @@ export function SwapReviewSummary({
         <br />
         Router:{" "}
         <a
-          href={`https://arbiscan.io/address/${V3_ROUTER}`}
+          href={`https://arbiscan.io/address/${router}`}
           target="_blank"
           rel="noreferrer"
         >
-          {V3_ROUTER}
+          {router}
         </a>
         <br />
-        Method: multicall. Network gas is additional and shown by MetaMask.
-        Exact-output swaps refund unused ETH. The router deadline is{" "}
-        {SWAP_DEADLINE_SECONDS / 60} minutes from preparation. Reject an expired
-        wallet request; do not confirm it.
+        Each route is a separate 1inch Classic Swap transaction. Legs are not
+        atomic, and every leg needs its own wallet confirmation. Network gas is
+        additional and shown by MetaMask. This quote expires in 30 seconds.
       </p>
     </>
   );

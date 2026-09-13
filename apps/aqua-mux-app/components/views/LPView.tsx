@@ -296,10 +296,6 @@ export function LPView() {
                 <Plus size={15} /> Add liquidity pair{" "}
                 <span>{legs.length} / 6</span>
               </button>
-              <div className={styles.atomic}>
-                <Layers3 size={13} /> One registration batch. Your assets remain
-                in your wallet.
-              </div>
               {trade.error && (
                 <div role="alert" className="error-box">
                   {trade.error}
@@ -314,9 +310,6 @@ export function LPView() {
                     Number(leg.amount) <= 0,
                 )}
               />
-              <p className={styles.noWallet}>
-                Review token approvals and positions before signing.
-              </p>
             </section>
             <aside className={styles.sidebar}>
               <section

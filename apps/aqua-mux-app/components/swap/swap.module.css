@@ -340,11 +340,19 @@
   color: #8a96aa;
   font-size: 9px;
 }
-.rowMeta > span > button {
-  padding: 1px 0 1px 7px;
+.balanceButton {
+  padding: 1px 0;
   color: #3468f5;
   background: transparent;
   font-size: 9px;
+}
+.balanceButton:disabled {
+  color: #8a96aa;
+  cursor: default;
+}
+.balanceButton:not(:disabled):hover,
+.balanceButton:not(:disabled):focus-visible {
+  text-decoration: underline;
 }
 .allocation {
   display: flex;
@@ -362,6 +370,12 @@
   font-size: 10px;
   color: #65738c;
 }
+.routeError {
+  margin: -2px 0 7px;
+  color: #c04e5b;
+  font-size: 9px;
+  line-height: 1.4;
+}
 .rowFee {
   display: flex;
   align-items: center;
@@ -370,12 +384,12 @@
   padding: 8px 0;
   font-size: 9px;
 }
-.rowFee > label {
-  display: flex;
+.feeLabel {
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
+  white-space: nowrap;
   color: #7b88a0;
-  flex: 1;
 }
 .feePresets {
   display: flex;
@@ -522,8 +536,7 @@
   padding: 0;
   font-size: 11px;
 }
-.singleSide .rowMeta > span > button {
-  margin-left: 8px;
+.singleSide .balanceButton {
   padding: 5px 9px;
   border: 1px solid #d9e4fb;
   border-radius: 5px;
