@@ -78,8 +78,8 @@ function ReviewAction({
       <>
         <p className={styles.settingsNote}>
           {approval.reset
-            ? `Reset the existing ${approval.symbol} allowance to zero first.`
-            : `Approve only the reviewed maximum ${approval.symbol} spend.`}{" "}
+            ? `Reset the existing ${approval.label} allowance to zero first.`
+            : `Approve only the reviewed maximum ${approval.label} spend.`}{" "}
           Spender: {V3_ROUTER}. Approval is separate from the swap. Refresh and
           review after confirmation.
         </p>
@@ -90,7 +90,7 @@ function ReviewAction({
         >
           {trade.busy
             ? "Check wallet…"
-            : `${approval.reset ? "Reset" : "Approve"} ${approval.symbol} in wallet`}
+            : `${approval.reset ? "Reset" : "Approve"} ${approval.label} in wallet`}
         </button>
       </>
     );

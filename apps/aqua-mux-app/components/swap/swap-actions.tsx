@@ -3,7 +3,7 @@ import type { SwapWorkspace } from "@/hooks/useSwapWorkspace";
 import { SWAP_CHAIN } from "@/lib/live-swap";
 import styles from "./swap.module.css";
 
-type Props = Pick<SwapWorkspace, "locked" | "openReview"> &
+type Props = Pick<SwapWorkspace, "locked" | "swap"> &
   Pick<
     SwapWorkspace["trade"],
     | "account"
@@ -15,10 +15,11 @@ type Props = Pick<SwapWorkspace, "locked" | "openReview"> &
     | "clock"
     | "connect"
     | "switchChain"
+    | "approvalsFor"
   >;
 export function SwapActions({
   locked,
-  openReview,
+  swap,
   account,
   walletChain,
   busy,
@@ -28,7 +29,9 @@ export function SwapActions({
   clock,
   connect,
   switchChain,
+  approvalsFor,
 }: Props) {
+  const approval = quote ? approvalsFor(quote)[0] : undefined;
   return (
     <>
       {!account ? (
@@ -51,13 +54,15 @@ export function SwapActions({
         <button
           className={styles.primaryButton}
           disabled={locked || quoteBusy}
-          onClick={openReview}
+          onClick={() => void swap()}
         >
           {quoteBusy
             ? "Fetching quote…"
             : busy
               ? "Check wallet…"
-              : "Review swap"}
+              : approval
+                ? `${approval.reset ? "Reset" : "Approve"} ${approval.label}`
+                : "Swap"}
           <ArrowRight size={17} />
         </button>
       )}
@@ -65,7 +70,7 @@ export function SwapActions({
         <p className={styles.noWallet}>
           {fresh
             ? `Quote expires in ${Math.max(0, Math.ceil((quote.expiresAt - clock) / 1000))}s`
-            : "Quote expired. Refresh before reviewing."}{" "}
+            : "Quote expired. Refresh before swapping."}{" "}
           · Block {quote.block}
         </p>
       )}
