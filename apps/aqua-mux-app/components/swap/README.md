@@ -18,7 +18,7 @@ Legacy `swap-output-*`, `swap-details`, and `swap-flow-preview` components are n
 - Exact input or exact output, using integer token units throughout.
 - Six curated Arbitrum assets: ETH, native USDC, WBTC, ARB, LINK, and DAI.
 - Direct Uniswap v3 pools with selectable 0.01%, 0.05%, 0.3%, or 1% fee tiers. There is no multihop discovery or best-price aggregation. Missing pools fail with a route-specific error; the app never substitutes a simulated quote.
-- Global slippage of 0.01% to 5%, enforced separately on every leg. Exact-input minimums round down; exact-output maximums round up.
+- Slippage of 0.01% to 5%, enforced separately on every leg. Exact-input minimums round down; exact-output maximums round up.
 
 For one-to-many exact-input trades, allocations split the input token. For many-to-one exact-output trades, allocations split the requested output amount between input routes. Other combinations specify each expanded-side amount directly. Percentages are not dollar-value estimates.
 

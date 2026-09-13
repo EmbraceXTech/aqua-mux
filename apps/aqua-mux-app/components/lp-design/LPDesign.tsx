@@ -15,7 +15,6 @@ import {
   Plus,
   Settings2,
   SlidersHorizontal,
-  Wallet,
   X,
 } from "lucide-react";
 import { MainLayout } from "@/components/layouts/MainLayout";
@@ -266,19 +265,7 @@ export function LPDesign() {
 
   return (
     <div className={styles.page}>
-      <MainLayout
-        activePage="liquidity"
-        actions={
-          <>
-            <span className={styles.network}>
-              <i /> Arbitrum
-            </span>
-            <span className={styles.demoWallet}>
-              <Wallet size={14} /> Demo wallet
-            </span>
-          </>
-        }
-      >
+      <MainLayout activePage="liquidity">
         <div className={styles.container}>
           <div className={styles.prototypeBar}>
             <span>

@@ -4,17 +4,18 @@ This directory contains the AquaMux Next.js app. For the project overview, suppo
 
 ## Quick start
 
-From this directory:
+From the repository root:
 
 ```sh
-npm install
-cp .env.example .env
+npm ci
+npm --prefix apps/aqua-mux-app ci
+[ -f .env ] || cp .env.example .env
 npm run dev
 ```
 
-Open [http://127.0.0.1:3100](http://127.0.0.1:3100). The development server binds to localhost on port 3100 and fails if that port is occupied.
+Open the loopback URL printed by `npm run dev`. Each development server picks a random available port. Set one explicitly with `PORT=3100 npm run dev`.
 
-Populate `.env` with RPC URLs for each desired network. `ONEINCH_API_KEY` is required for live Classic Swap quotes and execution. Environment variables are consumed only by server modules and are excluded from Git. Do not commit secrets. Development reviews use the locally installed Claude Code subscription session, not an Anthropic API key.
+Populate the root `.env` with RPC URLs for each desired network. `npm run dev` copies it to `apps/aqua-mux-app/.env` before Next.js starts. `ONEINCH_API_KEY` is required for live Classic Swap quotes and execution. Environment variables are consumed only by server modules and are excluded from Git. Do not commit secrets. Development reviews use the locally installed Claude Code subscription session, not an Anthropic API key.
 
 ```dotenv
 ETHEREUM_RPC_URL=
@@ -26,11 +27,11 @@ ONEINCH_API_KEY=
 
 ## Commands
 
-Run all commands from `apps/frontend`.
+Run all commands from `apps/aqua-mux-app`.
 
 | Command | Purpose |
 | --- | --- |
-| `npm run dev` | Start the development server on `127.0.0.1:3100`. |
+| `npm run dev` | Start the development server on a random loopback port. Set `PORT` to choose one. |
 | `npm run build` | Create a production build. |
 | `npm run start` | Serve the production build on `127.0.0.1:3100`. |
 | `npm run typecheck` | Type-check without emitting files. |

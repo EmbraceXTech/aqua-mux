@@ -1,4 +1,4 @@
-import { ArrowDownUp, ArrowRight, Layers3, Settings2 } from "lucide-react";
+import { ArrowDownUp, ArrowRight, RefreshCw, Settings2 } from "lucide-react";
 import type { SwapWorkspace } from "@/hooks/useSwapWorkspace";
 import { liveTokens } from "@/lib/live-swap";
 import { SwapActions } from "./swap-actions";
@@ -23,15 +23,24 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
           <ArrowDownUp size={17} />{" "}
           {w.singleSwap ? "Single swap" : "Multi-swap"}
         </span>
-        <button
-          disabled={locked}
-          className={styles.slippageButton}
-          onClick={w.openSettings}
-        >
-          <Settings2 size={14} />
-          {w.slippage || "0"}% slippage{" "}
-          <span className={styles.globalTag}>Global</span>
-        </button>
+        <div className={styles.headerActions}>
+          <button
+            disabled={locked}
+            className={styles.slippageButton}
+            onClick={w.openSettings}
+          >
+            <Settings2 size={14} />
+            {w.slippage || "0"}% slippage
+          </button>
+          <button
+            aria-label="Refresh quote and balances"
+            disabled={locked || trade.quoteBusy}
+            className={styles.refreshButton}
+            onClick={w.refresh}
+          >
+            <RefreshCw size={14} />
+          </button>
+        </div>
       </div>
       <SwapModeControls
         mode={w.mode}
@@ -73,23 +82,8 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
           onPick={w.openPicker}
         />
       </div>
-      <div className={styles.atomic}>
-        <Layers3 size={13} />
-        <span>
-          {w.singleSwap
-            ? "One swap. One transaction."
-            : "All swap legs execute together or revert."}
-        </span>
-        <span className={styles.liveBadge}>Live</span>
-      </div>
-      <p className={styles.noWallet}>
-        Only direct pools at your chosen fee tier are quoted. No best-price
-        aggregation. Keep ETH for gas.
-      </p>
       <SwapStatus
-        quoteError={trade.quoteError}
         error={trade.error}
-        insufficient={trade.insufficient}
         pending={trade.pending}
         unlocated={trade.unlocated}
         result={trade.result}
@@ -97,9 +91,7 @@ export function SwapComposer({ workspace: w }: { workspace: SwapWorkspace }) {
       />
       <SwapActions
         locked={locked}
-        canReview={w.canReview}
         openReview={w.openReview}
-        refresh={w.refresh}
         account={trade.account}
         walletChain={trade.walletChain}
         busy={trade.busy}

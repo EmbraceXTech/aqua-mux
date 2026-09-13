@@ -4,6 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "dev": "npm --prefix apps/aqua-mux-app run dev",
+    "build": "npm --prefix apps/aqua-mux-app run build",
+    "start": "npm --prefix apps/aqua-mux-app run start",
+    "sync:app-env": "node scripts/sync-app-env.mjs",
     "check-wallet-balance": "tsx scripts/check-wallet-balance.ts",
     "get-wallet-address": "tsx scripts/get-wallet-address.ts",
     "refresh-token-list": "tsx scripts/refresh-token-list.ts"

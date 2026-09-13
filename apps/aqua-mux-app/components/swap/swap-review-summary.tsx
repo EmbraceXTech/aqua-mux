@@ -49,7 +49,7 @@ export function SwapReviewSummary({
           </span>
         ))}
         <span>
-          Global slippage<b>{quote.request.slippageBps / 100}%</b>
+          Slippage<b>{quote.request.slippageBps / 100}%</b>
         </span>
       </div>
       <p className={styles.settingsNote}>

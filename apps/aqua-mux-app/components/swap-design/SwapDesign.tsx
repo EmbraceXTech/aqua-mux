@@ -318,26 +318,7 @@ export function SwapDesign() {
     trade.walletChain === SWAP_CHAIN;
   return (
     <div className={styles.page}>
-      <MainLayout
-        activePage="swap"
-        actions={
-          <>
-            <span className={styles.network}>
-              <span /> Arbitrum
-            </span>
-            <button
-              className={styles.demoWallet}
-              disabled={locked}
-              onClick={() => void trade.connect()}
-            >
-              <Wallet size={14} />
-              {trade.account
-                ? `${trade.account.slice(0, 6)}…${trade.account.slice(-4)}`
-                : "Connect wallet"}
-            </button>
-          </>
-        }
-      >
+      <MainLayout activePage="swap">
         <div className={styles.container}>
           <div className={styles.prototypeBar}>
             <span>

@@ -3,33 +3,20 @@ import styles from "./swap.module.css";
 
 type Props = Pick<
   SwapWorkspace["trade"],
-  | "quoteError"
-  | "error"
-  | "insufficient"
-  | "pending"
-  | "unlocated"
-  | "result"
-  | "unknown"
+  "error" | "pending" | "unlocated" | "result" | "unknown"
 >;
 export function SwapStatus({
-  quoteError,
   error,
-  insufficient,
   pending,
   unlocated,
   result,
   unknown,
 }: Props) {
-  const errors = [
-    ...new Set([quoteError, error, ...insufficient].filter(Boolean)),
-  ];
   return (
     <>
-      {errors.length > 0 && (
+      {error && (
         <div role="alert" className={styles.errors}>
-          {errors.map((text) => (
-            <p key={text}>{text}</p>
-          ))}
+          <p>{error}</p>
         </div>
       )}
       {pending && (

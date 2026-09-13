@@ -27,16 +27,7 @@ export function PortfolioFooter() {
           Explore liquidity <ArrowRight size={16} />
         </Link>
       </section>
-      <footer className={s.footer}>
-        <span>
-          © {new Date().getFullYear()} AquaMux{" "}
-          <span className={s.footerSeparator}>/</span> Built on 1inch Aqua
-        </span>
-        <span>
-          <span className={s.online} />
-          Supported wallet balances · AquaMux LP records
-        </span>
-      </footer>
+
     </>
   );
 }

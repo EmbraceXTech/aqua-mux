@@ -6,6 +6,9 @@ import {
   swapDraftReducer,
 } from "../lib/swap-draft";
 
+test("multi-out is the initial mode", () => {
+  assert.equal(createSwapDraftState().mode, "multi-out");
+});
 test("draft edits are immutable and mode drafts stay independent", () => {
   const initial = createSwapDraftState();
   const edited = swapDraftReducer(initial, {

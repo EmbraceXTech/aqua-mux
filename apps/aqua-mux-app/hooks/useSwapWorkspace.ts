@@ -1,6 +1,6 @@
 "use client";
 
-import { useReducer, useRef, useState } from "react";
+import { useEffect, useReducer, useRef, useState } from "react";
 import { useLiveSwap } from "./useLiveSwap";
 import { SWAP_CHAIN, type LiveQuote, type Side } from "@/lib/live-swap";
 import {
@@ -25,7 +25,13 @@ export function useSwapWorkspace() {
     createSwapDraftState,
   );
   const [dialog, setDialog] = useState<SwapDialog | null>(null);
+  const [toast, setToast] = useState<string[] | null>(null);
   const dialogOpener = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    const timer = window.setTimeout(() => setToast(null), 5000);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
   const draft = state.drafts[state.mode];
   const validSlippage = isValidSlippage(state.slippage);
   const request = {
@@ -59,6 +65,7 @@ export function useSwapWorkspace() {
   }
   function edit(action: SwapDraftAction) {
     if (locked) return;
+    setToast(null);
     dispatch(action);
     // Slippage is controlled in its open dialog; other edits dismiss overlays.
     if (action.type !== "slippage") setDialog(null);
@@ -75,10 +82,27 @@ export function useSwapWorkspace() {
   }
   function refresh() {
     if (locked) return;
+    setToast(null);
     setDialog(null);
     trade.refresh();
   }
   function openReview() {
+    if (locked) return;
+    const errors = !validSlippage
+      ? ["Enter slippage from 0.01% to 5%."]
+      : trade.quoteError
+        ? [trade.quoteError]
+        : trade.insufficient.length
+          ? trade.insufficient
+          : !trade.quote
+            ? ["Enter valid amounts, then wait for a quote."]
+            : !trade.fresh
+              ? ["Quote expired. Refresh to continue."]
+              : [];
+    if (errors.length) {
+      setToast(errors);
+      return;
+    }
     if (canReview && trade.quote && trade.account)
       openDialog({
         type: "review",
@@ -103,6 +127,8 @@ export function useSwapWorkspace() {
     locked,
     canReview,
     dialog,
+    toast,
+    dismissToast: () => setToast(null),
     restoreDialogFocus: () => {
       const opener = dialogOpener.current;
       // Token replacement remounts a keyed row; restore the same field slot.

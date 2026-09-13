@@ -1,12 +1,13 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { MainLayout } from "@/components/layouts/MainLayout";
 import { useManagedSession } from "@/lib/managed-client/use-managed-session";
+import { selectedChainId } from "@/lib/selected-chain";
 import { usePortfolio } from "@/hooks/usePortfolio";
 import { downloadPortfolio } from "@/lib/utils/portfolio-export";
 import type { PortfolioAsset } from "@/types/portfolio";
 import { AssetDetails } from "@/components/portfolio/asset-details";
-import { PortfolioHeader } from "@/components/portfolio/portfolio-header";
 import { PortfolioHeading } from "@/components/portfolio/portfolio-heading";
 import { PortfolioNotices } from "@/components/portfolio/portfolio-notices";
 import { PortfolioPerformance } from "@/components/portfolio/portfolio-performance";
@@ -20,7 +21,7 @@ import { PortfolioFooter } from "@/components/portfolio/portfolio-footer";
 import s from "@/components/portfolio/portfolio.module.css";
 
 export function PortfolioView() {
-  const wallet = useManagedSession(42161);
+  const wallet = useManagedSession(selectedChainId());
   const session = wallet.session;
   const portfolio = usePortfolio(session);
   const [tab, setTab] = useState<PortfolioTab>("Assets");
@@ -57,18 +58,9 @@ export function PortfolioView() {
     });
   }
   return (
-    <div className={s.root}>
-      <PortfolioHeader
-        session={session}
-        busy={wallet.busy}
-        localWalletAvailable={wallet.developmentWallet?.available === true}
-        onConnect={(mode) => void wallet.connect(mode)}
-        onDisconnect={() => {
-          setSelection(null);
-          void wallet.disconnect();
-        }}
-      />
-      <main className={s.main}>
+    <MainLayout activePage="portfolio">
+      <div className={s.root}>
+        <div className={s.main}>
         <PortfolioHeading
           connected={!!session}
           loading={portfolio.loading}
@@ -128,7 +120,8 @@ export function PortfolioView() {
           onRetryPositions={portfolio.retryPositions}
         />
         <PortfolioFooter />
-      </main>
+        </div>
+      </div>
       {selected && (
         <AssetDetails
           key={`${selected.chainId}:${selected.address}`}
@@ -136,6 +129,6 @@ export function PortfolioView() {
           onClose={() => setSelection(null)}
         />
       )}
-    </div>
+    </MainLayout>
   );
 }

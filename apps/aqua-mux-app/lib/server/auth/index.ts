@@ -4,10 +4,14 @@ import { AuthError, WalletAuth } from "./wallet-auth";
 export { AuthError, WalletAuth } from "./wallet-auth";
 export type { OwnerSession, VerifiedSession } from "./wallet-auth";
 
+function defaultAuthOrigin() {
+  return `http://127.0.0.1:${process.env.PORT ?? "3100"}`;
+}
+
 export function walletAuth() {
   return new WalletAuth(
     openManagedStore(),
-    process.env.AQUAMUX_AUTH_ORIGIN ?? "http://127.0.0.1:3100",
+    process.env.AQUAMUX_AUTH_ORIGIN ?? defaultAuthOrigin(),
     Date.now,
     process.env.NODE_ENV === "development",
   );

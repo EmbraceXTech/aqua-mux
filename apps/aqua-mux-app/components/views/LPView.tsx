@@ -11,7 +11,6 @@ import {
   X,
 } from "lucide-react";
 import { MainLayout } from "@/components/layouts/MainLayout";
-import { TradeHeaderActions } from "@/components/managed/trade-header-actions";
 import { TradeOverlays } from "@/components/managed/trade-overlays";
 import { TokenIcon } from "@/components/managed/token-icon";
 import { TradeReviewAction } from "@/components/trade/trade-review-action";
@@ -47,10 +46,7 @@ export function LPView() {
   }
   return (
     <div className={`${styles.page} ${live.page}`}>
-      <MainLayout
-        activePage="liquidity"
-        actions={<TradeHeaderActions trade={trade} />}
-      >
+      <MainLayout activePage="liquidity">
         <div className={styles.container}>
           <div className={styles.intro}>
             <div className={styles.eyebrow}>MULTI-PAIR LIQUIDITY</div>

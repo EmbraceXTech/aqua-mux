@@ -85,16 +85,15 @@ Required local tools are Node.js 22.13 or newer and npm. Development reviews als
 From the repository root, install and start the frontend:
 
 ```sh
-cd apps/frontend
-npm install
-cp .env.example .env
+npm ci
+npm --prefix apps/aqua-mux-app ci
+[ -f .env ] || cp .env.example .env
 npm run dev
 ```
 
-Open [http://127.0.0.1:3100](http://127.0.0.1:3100).
-The development server binds to loopback port 3100.
+Open the loopback URL printed by `npm run dev`. Each development server picks a random available port. Set one explicitly with `PORT=3100 npm run dev`. Before Next.js starts, `npm run dev` copies the root `.env` to `apps/aqua-mux-app/.env`.
 
-Put only these variable names in `apps/frontend/.env` as needed for the local environment:
+Put only these variable names in the root `.env` as needed for the local environment:
 
 ```dotenv
 ETHEREUM_RPC_URL=
@@ -112,7 +111,7 @@ Starting the frontend and running read-only verification do not submit transacti
 Explicit owner confirmation can submit through the connected external wallet, and the optional development-wallet adapter can sign real transactions when configured.
 
 The optional local development wallet is a real-funds server-side signer for explicit local testing.
-Enable it only on a loopback development server by adding these server-only settings to `apps/frontend/.env`:
+Enable it only on a loopback development server by adding these server-only settings to the root `.env`. It requires a fixed port, so start the app with `PORT=3100 npm run dev` when using the values below:
 
 ```dotenv
 AQUAMUX_DEV_WALLET_ORIGIN=http://127.0.0.1:3100
@@ -134,17 +133,16 @@ A development instance invokes the locally installed Claude Code CLI from the ma
 
 ```sh
 claude auth login
-cd apps/frontend
 npm run dev
 ```
 
 No Anthropic API key, runner URL, runner token, Docker engine, or second service is used. The app starts Claude Code in a fresh temporary directory with tools, MCP configuration, session persistence, and inherited application secrets disabled. It sends the validated review request through standard input and keeps prompts, wallet data, credentials, and raw model reasoning out of browser code and durable evidence.
 
-This path runs only when `NODE_ENV=development`. Every other environment returns HTTP 501 with `review_not_implemented` for proposal and review requests, and never starts a local agent process. See the [redacted inline review check](apps/frontend/verification/INLINE_DEVELOPMENT_REVIEW.md) for the exact prerequisites and recorded result.
+This path runs only when `NODE_ENV=development`. Every other environment returns HTTP 501 with `review_not_implemented` for proposal and review requests, and never starts a local agent process. See the [redacted inline review check](apps/aqua-mux-app/verification/INLINE_DEVELOPMENT_REVIEW.md) for the exact prerequisites and recorded result.
 
 ## Development
 
-Run frontend commands from `apps/frontend`:
+Run frontend commands from `apps/aqua-mux-app`:
 
 ```sh
 npm run typecheck
@@ -154,9 +152,9 @@ npm run test:e2e
 npm run build
 ```
 
-The default Playwright configuration starts or reuses a frontend at `http://127.0.0.1:3100` and discovers the ordinary E2E suite.
+The default Playwright configuration starts or reuses a frontend at `http://127.0.0.1:3100` and discovers the ordinary E2E suite. Start it with `PORT=3100 npm run dev` when running that suite against a manually started server.
 Run `npm run test:e2e -- --list` to inspect discovery without running the suite.
-The managed suite uses `apps/frontend/e2e/managed.config.ts`, targets `MANAGED_E2E_URL` or `http://127.0.0.1:33127`, and expects a separately started server.
+The managed suite uses `apps/aqua-mux-app/e2e/managed.config.ts`, targets `MANAGED_E2E_URL` or `http://127.0.0.1:33127`, and expects a separately started server.
 Use the managed suite only after that server has the fixture or explicitly configured development-wallet prerequisites required by its tests.
 Ordinary frontend startup does not enable the local development wallet.
 
@@ -164,7 +162,7 @@ The unit suite covers both review environments. It verifies that development inv
 
 ## Verification and live signing
 
-Run the following verification commands from `apps/frontend`.
+Run the following verification commands from `apps/aqua-mux-app`.
 The fork verifier is intended to run against an isolated local Arbitrum Anvil fork and requires `ARBITRUM_RPC_URL`:
 
 ```sh
@@ -210,7 +208,7 @@ The [runtime spike results](references/ethglobal-competitive-analysis/runtime-sp
 
 The [implementation task map](references/ethglobal-competitive-analysis/implementation-task-map.md) lists ownership, review gates, remaining integration work, and the commands that must be refreshed before release claims.
 
-The [frontend guide](apps/frontend/README.md) contains the frontend command reference and its application environment variables. Development-wallet settings belong to the setup section above and the relevant evidence reports.
+The [frontend guide](apps/aqua-mux-app/README.md) contains the frontend command reference and its application environment variables. Development-wallet settings belong to the setup section above and the relevant evidence reports.
 
 ## Boundaries
 

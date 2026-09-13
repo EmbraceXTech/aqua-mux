@@ -142,14 +142,7 @@ export function BenchmarkView() {
   };
 
   return (
-    <MainLayout
-      activePage="benchmark"
-      actions={
-        <span className={s.headerLabel}>
-          <Database size={14} /> Public on-chain data
-        </span>
-      }
-    >
+    <MainLayout activePage="benchmark">
       <div className={s.root}>
         <div className={s.heading}>
           <div>

@@ -2,10 +2,10 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Layers3 } from "lucide-react";
+import { WalletControls } from "./WalletControls";
 
 type MainLayoutProps = {
   activePage: "swap" | "liquidity" | "strategies" | "benchmark" | "portfolio";
-  actions?: ReactNode;
   children: ReactNode;
 };
 
@@ -22,7 +22,7 @@ function Logo() {
   );
 }
 
-export function MainLayout({ activePage, actions, children }: MainLayoutProps) {
+export function MainLayout({ activePage, children }: MainLayoutProps) {
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -62,7 +62,7 @@ export function MainLayout({ activePage, actions, children }: MainLayoutProps) {
             Portfolio
           </Link>
         </nav>
-        {actions && <div className="header-actions">{actions}</div>}
+        <WalletControls />
       </header>
       <main className="app-main">{children}</main>
       <footer className="app-footer">

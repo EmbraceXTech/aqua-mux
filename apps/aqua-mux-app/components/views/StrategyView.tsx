@@ -12,6 +12,7 @@ import { ReviewResultCard } from "@/components/managed/review-result";
 import { titleLabel } from "@/components/managed/format";
 import type { ProposalIntent } from "@/components/managed/proposal-form";
 import { useManagedSession } from "@/lib/managed-client/use-managed-session";
+import { selectedChainId } from "@/lib/selected-chain";
 import { managedRequest, requestKey } from "@/lib/managed-client/api";
 import type { ReviewRecord, StrategyGroup } from "@/lib/managed";
 import s from "@/components/strategy-design/strategy-design.module.css";
@@ -24,7 +25,7 @@ const recipeIds = {
 } as const;
 
 export function StrategyView() {
-  const wallet = useManagedSession(42161);
+  const wallet = useManagedSession(selectedChainId());
   return (
     <StrategyWorkspace
       key={wallet.session?.sessionId ?? "anonymous"}

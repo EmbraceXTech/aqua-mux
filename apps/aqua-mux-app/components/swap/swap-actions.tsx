@@ -3,10 +3,7 @@ import type { SwapWorkspace } from "@/hooks/useSwapWorkspace";
 import { SWAP_CHAIN } from "@/lib/live-swap";
 import styles from "./swap.module.css";
 
-type Props = Pick<
-  SwapWorkspace,
-  "locked" | "canReview" | "openReview" | "refresh"
-> &
+type Props = Pick<SwapWorkspace, "locked" | "openReview"> &
   Pick<
     SwapWorkspace["trade"],
     | "account"
@@ -21,9 +18,7 @@ type Props = Pick<
   >;
 export function SwapActions({
   locked,
-  canReview,
   openReview,
-  refresh,
   account,
   walletChain,
   busy,
@@ -55,7 +50,7 @@ export function SwapActions({
       ) : (
         <button
           className={styles.primaryButton}
-          disabled={!canReview}
+          disabled={locked || quoteBusy}
           onClick={openReview}
         >
           {quoteBusy
@@ -66,13 +61,6 @@ export function SwapActions({
           <ArrowRight size={17} />
         </button>
       )}
-      <button
-        className={styles.backButton}
-        disabled={locked || quoteBusy}
-        onClick={refresh}
-      >
-        Refresh quote and balances
-      </button>
       {quote && (
         <p className={styles.noWallet}>
           {fresh

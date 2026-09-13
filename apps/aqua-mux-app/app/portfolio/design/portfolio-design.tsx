@@ -18,6 +18,7 @@ import {
   Waves,
   X,
 } from "lucide-react";
+import { MainLayout } from "@/components/layouts/MainLayout";
 import s from "./portfolio.module.css";
 
 const assets = [
@@ -165,32 +166,9 @@ export function PortfolioDesign() {
     URL.revokeObjectURL(url);
   }
   return (
-    <div className={s.root}>
-      <header className={s.header}>
-        <Link href="/" className={s.brand}>
-          <span className={s.brandMark}>
-            <Waves size={22} />
-          </span>
-          Aqua<span>Mux</span>
-        </Link>
-        <nav aria-label="Main navigation">
-          <Link href="/swap/design">Swap</Link>
-          <Link href="/lp/design">Liquidity</Link>
-          <Link href="/strategies/design">Strategies</Link>
-          <Link
-            href="/portfolio/design"
-            aria-current="page"
-            className={s.activeNav}
-          >
-            Portfolio
-          </Link>
-        </nav>
-        <div className={s.wallet}>
-          <span className={s.online} />
-          <span>0x71C…9a42</span>
-          <span className={s.demo}>Demo</span>
-        </div>
-      </header>
+    <MainLayout activePage="portfolio">
+      <div className={s.root}>
+
       <main className={s.main}>
         <div className={s.heading}>
           <div>
@@ -693,16 +671,7 @@ export function PortfolioDesign() {
             Explore liquidity <ArrowRight size={16} />
           </Link>
         </section>
-        <footer className={s.footer}>
-          <span>
-            © 2025 AquaMux <span className={s.footerSeparator}>/</span> Built on
-            1inch Aqua
-          </span>
-          <span>
-            <span className={s.online} /> Design preview · Mock data · No live
-            transactions
-          </span>
-        </footer>
+
       </main>
       {selected && (
         <div className={s.modalBackdrop} onClick={() => setSelected(null)}>
@@ -782,6 +751,7 @@ export function PortfolioDesign() {
           </dialog>
         </div>
       )}
-    </div>
+      </div>
+    </MainLayout>
   );
 }

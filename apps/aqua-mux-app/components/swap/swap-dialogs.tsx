@@ -10,7 +10,7 @@ export function SwapDialogs({ workspace: w }: { workspace: SwapWorkspace }) {
     dialog?.type === "tokens"
       ? `Select ${dialog.target.side} token`
       : dialog?.type === "slippage"
-        ? "Global slippage"
+        ? "Slippage"
         : "Review your swap";
   const description =
     dialog?.type === "tokens"

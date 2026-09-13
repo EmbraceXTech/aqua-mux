@@ -30,6 +30,7 @@ import {
   type WalletMode,
 } from "@/lib/managed-client/wallet-execution";
 import { useTransactionHistory } from "@/hooks/useTransactionHistory";
+import { selectedChainId } from "@/lib/selected-chain";
 import type { Health, Leg, TransactionRecord } from "@/types/swap";
 import {
   api,
@@ -40,7 +41,7 @@ import {
   transactionState,
 } from "@/lib/utils/swap";
 export function useTradeWorkspace(initialMode: "swap" | "liquidity") {
-  const [chainId, setChainId] = useState<ChainId>(42161),
+  const [chainId, setChainId] = useState<ChainId>(selectedChainId),
     mode = initialMode,
     [source, setSource] = useState<Address>(NATIVE),
     [amount, setAmount] = useState("1"),

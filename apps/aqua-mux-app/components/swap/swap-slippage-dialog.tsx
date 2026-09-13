@@ -35,7 +35,7 @@ export function SwapSlippageDialog({
         <label>
           <input
             disabled={locked}
-            aria-label="Custom global slippage percent"
+            aria-label="Custom slippage percent"
             inputMode="decimal"
             value={value}
             onChange={(event) => onChange(event.target.value)}

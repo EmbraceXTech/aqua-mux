@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Check, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { liveTokens, type Row, type Side } from "@/lib/live-swap";
 import type { SwapDraftAction, TokenPickerTarget } from "@/lib/swap-draft";
 import { SwapTokenRow } from "./swap-token-row";
@@ -46,10 +46,6 @@ export function SwapTokenSection({
             {rows.length} {rows.length === 1 ? "token" : "tokens"}
           </span>
         </div>
-        <span className={exact ? styles.exactBadge : styles.estimateBadge}>
-          {exact ? <Check size={11} /> : "≈"}{" "}
-          {exact ? "Exact amounts" : "Estimated amounts"}
-        </span>
       </div>
       <div className={styles.tokenRows}>
         {rows.map((item, index) => (
@@ -87,13 +83,6 @@ export function SwapTokenSection({
           </span>
         </button>
       )}
-      <div className={styles.sectionTotal}>
-        <span>
-          {side === "input"
-            ? "Spend limits include slippage"
-            : "Pool fees included in quotes"}
-        </span>
-      </div>
     </section>
   );
 }

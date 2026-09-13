@@ -108,27 +108,33 @@
 .composerHeader > span svg {
   color: #3468f5;
 }
-.slippageButton {
+.headerActions {
   display: flex;
   align-items: center;
+  gap: 6px;
+}
+.slippageButton,
+.refreshButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 7px;
   background: #f8f9fc;
   border: 1px solid var(--line);
   border-radius: 7px;
-  padding: 8px 9px;
-  font-size: 10px;
   color: #65738c;
 }
-.slippageButton:hover {
-  background: #edf2ff;
+.slippageButton {
+  padding: 8px 9px;
+  font-size: 10px;
 }
-.globalTag {
-  background: #eaf0ff;
-  color: #5b78b5;
-  border-radius: 4px;
-  font-size: 8px;
-  padding: 2px 4px;
-  font-weight: 500;
+.refreshButton {
+  width: 31px;
+  height: 31px;
+}
+.slippageButton:hover,
+.refreshButton:hover {
+  background: #edf2ff;
 }
 .builderControls {
   display: grid;
@@ -151,48 +157,20 @@
 }
 .modeSwitch > button {
   min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 11px;
   padding: 12px;
-  text-align: left;
+  text-align: center;
   background: transparent;
   color: #8590a4;
-  border-radius: 8px;
-  position: relative;
   border: 1px solid transparent;
-}
-.modeSwitch > button span:not(.modeCheck) {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.modeSwitch strong {
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 560;
-}
-.modeSwitch small {
-  font-size: 9px;
-  font-weight: 400;
-  color: #8b96a9;
 }
 .modeSwitch > .activeMode {
   background: white;
   color: #3468f5;
   box-shadow: 0 2px 5px #2d46760b;
   border-color: #dfe6f5;
-}
-.modeCheck {
-  position: absolute;
-  right: 9px;
-  top: 11px;
-  display: grid;
-  place-items: center;
-  color: white;
-  background: #3468f5;
-  width: 15px;
-  height: 15px;
-  border-radius: 50%;
 }
 .exactControl {
   display: flex;
@@ -242,19 +220,6 @@
 .count {
   color: #929bad;
   font-size: 9px;
-}
-.exactBadge,
-.estimateBadge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 9px;
-}
-.exactBadge {
-  color: #648174;
-}
-.estimateBadge {
-  color: #8894a7;
 }
 .tokenRows {
   display: flex;
@@ -464,18 +429,6 @@
   font-size: 9px;
   color: #9aa7bd;
 }
-.sectionTotal {
-  display: flex;
-  justify-content: space-between;
-  margin: 11px 1px 0;
-  font-size: 10px;
-  color: #8793a8;
-}
-.sectionTotal strong {
-  color: #64738e;
-  font-weight: 500;
-  font-variant-numeric: tabular-nums;
-}
 .tokenColumns {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
@@ -588,23 +541,6 @@
   max-width: 420px;
   margin-inline: auto;
 }
-.atomic {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  font-size: 9px;
-  color: #8a96aa;
-  margin: 20px 0 13px;
-}
-.atomic svg {
-  color: #6e87bd;
-}
-.liveBadge {
-  border-left: 1px solid #dce3ef;
-  padding-left: 7px;
-  color: #a2abbb;
-}
 .primaryButton {
   display: flex;
   align-items: center;
@@ -637,6 +573,35 @@
   font-size: 11px;
   line-height: 1.7;
   color: #b65353;
+}
+.toast {
+  position: fixed;
+  z-index: 30;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  width: min(380px, calc(100vw - 32px));
+  padding: 13px 14px;
+  border: 1px solid #efcfcf;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 14px 32px #25365824;
+  color: #a84b4b;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.toast > div {
+  flex: 1;
+}
+.toast > button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  padding: 2px;
+  color: #a84b4b;
+  background: transparent;
 }
 .errorText {
   color: #b65353 !important;
@@ -834,14 +799,11 @@
   margin: 10px 0 25px;
 }
 /* Keep secondary information readable on the pale token cards. */
-.prototypeBar,
 .intro p,
 .modeSwitch > button,
-.modeSwitch small,
 .exactControl,
 .amountHint,
 .count,
-.estimateBadge,
 .tokenSelector small,
 .amountBox small,
 .rowMeta,
@@ -849,9 +811,6 @@
 .feePresets button,
 .customFee,
 .addToken > span,
-.sectionTotal,
-.atomic,
-.liveBadge,
 .noWallet,
 .pickerList small,
 .empty,
@@ -864,10 +823,6 @@
 .complete p {
   color: #62718a;
 }
-.exactBadge {
-  color: #507562;
-}
-.globalTag,
 .settingsInfo {
   color: #526d9b;
 }
@@ -1001,27 +956,13 @@
     gap: 5px;
     padding: 7px;
   }
-  .slippageButton .globalTag {
-    display: none;
+  .refreshButton {
+    width: 29px;
+    height: 29px;
   }
   .modeSwitch > button {
-    gap: 7px;
     padding: 11px 7px;
-  }
-  .modeSwitch strong {
     font-size: 11px;
-  }
-  .modeSwitch small {
-    font-size: 8px;
-  }
-  .modeSwitch > button > svg {
-    width: 15px;
-  }
-  .modeCheck {
-    right: 5px;
-    top: 6px;
-    width: 12px;
-    height: 12px;
   }
   .tokenRow {
     padding: 12px 10px 0;
@@ -1085,6 +1026,10 @@
   .slippageOptions > button,
   .slippageOptions > label {
     padding: 10px 6px;
+  }
+  .toast {
+    right: 16px;
+    bottom: 16px;
   }
 }
 @media (max-width: 780px) {

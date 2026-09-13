@@ -92,6 +92,8 @@ try {
   });
   const route = process.env.SWAP_TEST_PATH ?? "/swap";
   assert.ok(["/swap", "/swap/design"].includes(route));
+  const waitForQuote = () =>
+    expect(page.getByText("Live pool quote").first()).toBeVisible();
   await page.goto(`${origin}${route}`);
   const pickerTrigger = page.getByRole("button", {
     name: "Select output token 1: USDC",
@@ -117,9 +119,9 @@ try {
   await search.fill("USDC");
   await page.getByRole("button", { name: /^USDC USD Coin/ }).click();
   await expect(pickerTrigger).toBeFocused();
-  await page.getByRole("button", { name: "0.5% slippage Global" }).click();
+  await page.getByRole("button", { name: "0.5% slippage" }).click();
   const slippage = page.getByRole("textbox", {
-    name: "Custom global slippage percent",
+    name: "Custom slippage percent",
   });
   await slippage.fill("0");
   await expect(
@@ -133,9 +135,7 @@ try {
   await page
     .getByRole("textbox", { name: "input ETH amount", exact: true })
     .fill("0.0001");
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   await page.getByRole("button", { name: "Review swap", exact: true }).click();
   await expect(page.getByText("Minimum receive: 0.0995 USDC")).toBeVisible();
   await page.getByRole("button", { name: "Confirm swap in wallet" }).click();
@@ -152,34 +152,30 @@ try {
     .fill("49");
   await expect(
     page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeDisabled();
+  ).toBeEnabled();
+  await page.waitForTimeout(600);
+  await page.getByRole("button", { name: "Review swap", exact: true }).click();
   await expect(
     page.getByRole("alert").filter({ hasText: "total 100%" }),
   ).toBeVisible();
   await page
     .getByRole("textbox", { name: "USDC allocation percent" })
     .fill("50");
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   await page.getByRole("button", { name: "You receive", exact: true }).click();
   await expect(
     page.getByRole("textbox", { name: "input ETH amount", exact: true }),
   ).toHaveAttribute("readonly", "");
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   console.log("PASS exact output and allocation validation");
-  await page.getByRole("button", { name: "Multiple in One or more" }).click();
+  await page.getByRole("button", { name: "Multiple in" }).click();
   await page
     .getByRole("textbox", { name: "input USDC amount", exact: true })
     .fill("0.1");
   await page
     .getByRole("textbox", { name: "input WBTC amount", exact: true })
     .fill("0.000001");
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   await page.getByRole("button", { name: "Review swap", exact: true }).click();
   await expect(
     page.getByRole("button", { name: "Approve USDC in wallet" }),
@@ -189,20 +185,16 @@ try {
   await expect(
     page.getByRole("textbox", { name: "input USDC amount", exact: true }),
   ).toHaveAttribute("readonly", "");
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   console.log(
     "PASS many-to-one exact input/output and bounded approval review",
   );
-  await page.getByRole("button", { name: "Multiple out One token" }).click();
+  await page.getByRole("button", { name: "Multiple out" }).click();
   await page.getByRole("button", { name: "You pay", exact: true }).click();
   await page
     .getByRole("textbox", { name: "input ETH amount", exact: true })
     .fill("0.0001");
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   await page.evaluate(() => {
     (
       window as unknown as { testWallet: { behavior: string } }
@@ -219,9 +211,7 @@ try {
       window as unknown as { testWallet: { behavior: string } }
     ).testWallet.behavior = "revert";
   });
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   await page.getByRole("button", { name: "Review swap", exact: true }).click();
   await page.getByRole("button", { name: "Confirm swap in wallet" }).click();
   await expect(
@@ -233,9 +223,7 @@ try {
       window as unknown as { testWallet: { behavior: string } }
     ).testWallet.behavior = "missing";
   });
-  await expect(
-    page.getByRole("button", { name: "Review swap", exact: true }),
-  ).toBeEnabled();
+  await waitForQuote();
   await page.getByRole("button", { name: "Review swap", exact: true }).click();
   await page.getByRole("button", { name: "Confirm swap in wallet" }).click();
   await expect(

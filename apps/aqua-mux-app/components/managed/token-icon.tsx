@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { TokenImage } from "@/components/token-image";
 import { NATIVE, network, tokens, type Token } from "@/lib/config";
 
 export function TokenIcon({
@@ -8,24 +8,12 @@ export function TokenIcon({
   token: Token;
   size?: number;
 }) {
-  if (!token.logo) {
-    return (
-      <span
-        className="token-initial"
-        style={{ width: size, height: size }}
-        aria-label={`${token.symbol} icon`}
-      >
-        {token.symbol.slice(0, 2)}
-      </span>
-    );
-  }
   return (
-    <Image
+    <TokenImage
       className="token-icon"
-      src={token.logo}
-      alt={`${token.symbol} icon`}
-      width={size}
-      height={size}
+      logo={token.logo}
+      symbol={token.symbol}
+      size={size}
     />
   );
 }
@@ -39,23 +27,13 @@ export function NetworkIcon({
 }) {
   const net = network(chainId);
   const logo = tokens(chainId).find((item) => item.address === NATIVE)!.logo;
-  if (!logo)
-    return (
-      <span
-        className="network-icon network-initial"
-        style={{ width: size, height: size }}
-        aria-label={`${net.name} network icon`}
-      >
-        {net.mark}
-      </span>
-    );
   return (
-    <Image
+    <TokenImage
       className="network-icon"
-      src={logo}
-      alt={`${net.name} token logo`}
-      width={size}
-      height={size}
+      logo={logo}
+      symbol={net.symbol}
+      size={size}
+      alt={`${net.name} network icon`}
     />
   );
 }

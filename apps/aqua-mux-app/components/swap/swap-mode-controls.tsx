@@ -1,4 +1,3 @@
-import { Check, GitBranch, GitMerge } from "lucide-react";
 import type { Mode, Side } from "@/lib/live-swap";
 import styles from "./swap.module.css";
 
@@ -19,7 +18,7 @@ export function SwapModeControls({
   return (
     <div className={styles.builderControls}>
       <div className={styles.modeSwitch} role="group" aria-label="Swap mode">
-        {(["multi-in", "multi-out"] as const).map((value) => (
+        {(["multi-out", "multi-in"] as const).map((value) => (
           <button
             key={value}
             disabled={locked}
@@ -27,26 +26,7 @@ export function SwapModeControls({
             className={mode === value ? styles.activeMode : ""}
             onClick={() => onModeChange(value)}
           >
-            {value === "multi-in" ? (
-              <GitMerge size={18} />
-            ) : (
-              <GitBranch size={18} />
-            )}
-            <span>
-              <strong>
-                {value === "multi-in" ? "Multiple in" : "Multiple out"}
-              </strong>
-              <small>
-                {value === "multi-in"
-                  ? "One or more → one token"
-                  : "One token → one or more"}
-              </small>
-            </span>
-            {mode === value && (
-              <span className={styles.modeCheck}>
-                <Check size={11} />
-              </span>
-            )}
+            {value === "multi-in" ? "Multiple in" : "Multiple out"}
           </button>
         ))}
       </div>

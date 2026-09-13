@@ -21,9 +21,9 @@ import {
   RotateCcw,
   ShieldCheck,
   SlidersHorizontal,
-  Wallet,
   Waves,
 } from "lucide-react";
+import { MainLayout } from "@/components/layouts/MainLayout";
 import s from "./strategy-design.module.css";
 import c from "./custom-strategy.module.css";
 import {
@@ -195,7 +195,6 @@ export type LiveStrategyDesign = {
 };
 
 export function StrategyDesign({ live }: { live?: LiveStrategyDesign }) {
-  const [walletOpen, setWalletOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [tab, setTab] = useState<"discover" | "positions">("discover");
   const [config, setConfig] = useState<Config>(initial);
@@ -290,47 +289,9 @@ export function StrategyDesign({ live }: { live?: LiveStrategyDesign }) {
   };
 
   return (
-    <div className={s.shell}>
-      <header className={s.header}>
-        <a
-          className={s.brand}
-          href={live ? "/strategies" : "/strategies/design"}
-          aria-label="AquaMux strategies home"
-        >
-          <Waves size={29} strokeWidth={2.4} />
-          <span>
-            Aqua<span>Mux</span>
-          </span>
-          {!live && <small>DESIGN</small>}
-        </a>
-        <nav className={s.nav} aria-label="Main navigation">
-          <a href={live ? "/swap" : "/swap/design"}>Swap</a>
-          <a href={live ? "/lp" : "/lp/design"}>Multi-LP</a>
-          <a
-            href={live ? "/strategies" : "/strategies/design"}
-            aria-current="page"
-          >
-            Strategies
-          </a>
-        </nav>
-        <div className={s.demoWallet}>
-          <span className={s.networkDot} />
-          {live ? "Multi-chain" : "Arbitrum"}{" "}
-          <span className={s.headerDivider} />
-          <Wallet size={15} />
-          {live ? (
-            <button
-              aria-expanded={walletOpen}
-              aria-controls="strategy-wallet"
-              onClick={() => setWalletOpen((open) => !open)}
-            >
-              {live.walletLabel}
-            </button>
-          ) : (
-            <span>Demo wallet</span>
-          )}
-        </div>
-      </header>
+    <MainLayout activePage="strategies">
+      <div className={s.shell}>
+
       {live ? (
         <div className={s.previewBar}>
           <ShieldCheck size={14} />
@@ -437,11 +398,7 @@ export function StrategyDesign({ live }: { live?: LiveStrategyDesign }) {
           </ol>
         )}
         {live?.status}
-        {live && (
-          <div id="strategy-wallet" hidden={!walletOpen}>
-            {live.wallet}
-          </div>
-        )}
+        {live && live.wallet}
         {live &&
           (step === 1 || step === 2) &&
           live.configure(config.recipe, !!config.custom, {
@@ -1305,19 +1262,9 @@ export function StrategyDesign({ live }: { live?: LiveStrategyDesign }) {
             </div>
           </>
         )}
-        <footer className={s.footer}>
-          <span>
-            <Waves size={15} />
-            Built on Aqua <span>·</span> Powered by 1inch
-          </span>
-          <span>
-            <FlaskConical size={13} />
-            {live
-              ? "Manual approval. Browser-bound reviews."
-              : "Design preview. No real transactions."}
-          </span>
-        </footer>
+
       </main>
-    </div>
+      </div>
+    </MainLayout>
   );
 }
