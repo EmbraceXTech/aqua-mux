@@ -90,6 +90,7 @@ export function swapDraftReducer(
       };
       break;
     case "token": {
+      if (!liveTokens.some((token) => token.id === action.symbol)) return state;
       if (
         [...draft.input, ...draft.output].some(
           (item) => item.symbol === action.symbol,

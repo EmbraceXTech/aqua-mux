@@ -20,6 +20,10 @@ type Props = {
   onRemove: () => void;
   onChange: (values: Partial<Pick<Row, "amount" | "weight" | "fee">>) => void;
 };
+function displayName(name: string) {
+  return name.length > 20 ? `${name.slice(0, 20)}…` : name;
+}
+
 export function SwapTokenRow({
   item,
   selectorId,
@@ -45,19 +49,19 @@ export function SwapTokenRow({
           id={selectorId}
           className={styles.tokenSelector}
           disabled={locked}
-          aria-label={`Select ${side} token ${index + 1}: ${item.symbol}`}
+          aria-label={`Select ${side} token ${index + 1}: ${token.symbol}`}
           onClick={onPick}
         >
           <SwapTokenMark symbol={item.symbol} />
           <span>
-            <strong>{item.symbol}</strong>
-            <small>{token.name}</small>
+            <strong>{token.symbol}</strong>
+            <small title={token.name}>{displayName(token.name)}</small>
           </span>
           <ChevronDown size={14} />
         </button>
         <div className={styles.amountBox}>
           <input
-            aria-label={`${side} ${item.symbol} amount`}
+            aria-label={`${side} ${token.symbol} amount`}
             inputMode="decimal"
             placeholder="0.00"
             readOnly={!exact || locked}
@@ -70,7 +74,7 @@ export function SwapTokenRow({
           <button
             disabled={locked}
             className={styles.remove}
-            aria-label={`Remove ${side} ${item.symbol}`}
+            aria-label={`Remove ${side} ${token.symbol}`}
             onClick={onRemove}
           >
             <X size={14} />
@@ -83,7 +87,7 @@ export function SwapTokenRow({
           {side === "input" &&
             exact &&
             balance !== undefined &&
-            item.symbol !== "ETH" && (
+            token.address !== "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" && (
               <button
                 disabled={locked}
                 onClick={() => onChange({ amount: balance })}
@@ -97,7 +101,7 @@ export function SwapTokenRow({
             Allocation{" "}
             <input
               disabled={locked}
-              aria-label={`${item.symbol} allocation percent`}
+              aria-label={`${token.symbol} allocation percent`}
               inputMode="decimal"
               value={item.weight}
               onChange={(event) => onChange({ weight: event.target.value })}
@@ -109,7 +113,7 @@ export function SwapTokenRow({
       {expanded && (
         <div className={styles.rowFee}>
           <span>
-            <Settings2 size={12} /> {item.symbol} pool fee
+            <Settings2 size={12} /> {token.symbol} pool fee
           </span>
           <div className={styles.feePresets}>
             {(["0.01", "0.05", "0.3", "1"] as const).map((fee) => (
@@ -118,7 +122,7 @@ export function SwapTokenRow({
                 disabled={locked}
                 className={item.fee === fee ? styles.activeFee : ""}
                 aria-pressed={item.fee === fee}
-                aria-label={`${item.symbol} fee ${fee}%`}
+                aria-label={`${token.symbol} fee ${fee}%`}
                 onClick={() => onChange({ fee })}
               >
                 {fee}%

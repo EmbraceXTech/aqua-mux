@@ -13,9 +13,18 @@ export function SwapTokenMark({
     <span
       aria-hidden="true"
       className={`${styles.tokenMark} ${small ? styles.smallMark : ""}`}
-      style={{ background: token.color }}
+      style={{ background: token.logo ? "transparent" : token.color }}
     >
-      {token.mark}
+      {token.logo ? (
+        <img
+          className={styles.tokenLogo}
+          src={token.logo}
+          alt=""
+          referrerPolicy="no-referrer"
+        />
+      ) : (
+        token.mark
+      )}
     </span>
   );
 }

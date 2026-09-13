@@ -6,7 +6,7 @@ import {
   type Address,
 } from "viem";
 import { z } from "zod";
-import { NATIVE } from "./config";
+import { NATIVE, tokens } from "./config";
 
 // Arbitrum deployment references are documented in components/swap/README.md.
 export const SWAP_CHAIN = 42161;
@@ -16,64 +16,16 @@ export const V3_ROUTER =
 export const V3_QUOTER =
   "0xb27308f9f90d607463bb33ea1bebb41c27ce5ab6" as Address;
 export const WETH = "0x82af49447d8a07e3bd95bd0d56f35241523fbab1" as Address;
-export const liveTokens = [
-  {
-    symbol: "ETH",
-    name: "Ether",
-    address: NATIVE,
-    decimals: 18,
-    mark: "♦",
-    color: "#687ce2",
-  },
-  {
-    symbol: "USDC",
-    name: "USD Coin",
-    address: "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-    decimals: 6,
-    mark: "$",
-    color: "#2775ca",
-  },
-  {
-    symbol: "WBTC",
-    name: "Wrapped Bitcoin",
-    address: "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
-    decimals: 8,
-    mark: "₿",
-    color: "#ed982c",
-  },
-  {
-    symbol: "ARB",
-    name: "Arbitrum",
-    address: "0x912ce59144191c1204e64559fe8253a0e49e6548",
-    decimals: 18,
-    mark: "A",
-    color: "#299bd5",
-  },
-  {
-    symbol: "LINK",
-    name: "Chainlink",
-    address: "0xf97f4df75117a78c1a5a0dbb814af92458539fb4",
-    decimals: 18,
-    mark: "⬡",
-    color: "#305bd3",
-  },
-  {
-    symbol: "DAI",
-    name: "Dai",
-    address: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
-    decimals: 18,
-    mark: "◈",
-    color: "#e9b33b",
-  },
-] as const satisfies readonly {
-  symbol: string;
-  name: string;
-  address: Address;
-  decimals: number;
-  mark: string;
-  color: string;
-}[];
-export type Symbol = (typeof liveTokens)[number]["symbol"];
+export const liveTokens = tokens(SWAP_CHAIN).map((token) => ({
+  ...token,
+  id: token.address,
+  mark: token.symbol.slice(0, 1).toUpperCase(),
+  color: "#687ce2",
+}));
+
+// Addresses, rather than ticker symbols, identify rows. Token lists can contain
+// more than one token with the same ticker.
+export type Symbol = string;
 export type Side = "input" | "output";
 export type Mode = "multi-in" | "multi-out";
 export type Row = {
@@ -83,12 +35,23 @@ export type Row = {
   fee: "0.01" | "0.05" | "0.3" | "1";
 };
 export type Draft = { input: Row[]; output: Row[]; exact: Side };
-export const getToken = (symbol: Symbol) =>
-  liveTokens.find((t) => t.symbol === symbol)!;
+export const getToken = (symbol: Symbol) => {
+  const token = liveTokens.find(
+    (token) => token.id === symbol || token.symbol === symbol,
+  );
+  if (!token) throw new Error("Token is not in the Arbitrum token list.");
+  return token;
+};
+export const isNative = (symbol: Symbol) => getToken(symbol).address === NATIVE;
 export const poolAddress = (symbol: Symbol) =>
-  symbol === "ETH" ? WETH : getToken(symbol).address;
+  isNative(symbol) ? WETH : getToken(symbol).address;
+const tokenId = (ticker: string) => {
+  const token = liveTokens.find((candidate) => candidate.symbol === ticker);
+  if (!token) throw new Error(`${ticker} is not in the Arbitrum token list.`);
+  return token.id;
+};
 export const row = (symbol: Symbol, amount = "", weight = "50"): Row => ({
-  symbol,
+  symbol: getToken(symbol).id,
   amount,
   weight,
   fee: "0.05",
@@ -96,19 +59,22 @@ export const row = (symbol: Symbol, amount = "", weight = "50"): Row => ({
 export function initialDrafts(): Record<Mode, Draft> {
   return {
     "multi-out": {
-      input: [row("ETH", "", "100")],
-      output: [row("USDC"), row("WBTC")],
+      input: [row(tokenId("ETH"), "", "100")],
+      output: [row(tokenId("USDC")), row(tokenId("WBTC"))],
       exact: "input",
     },
     "multi-in": {
-      input: [row("USDC"), row("WBTC")],
-      output: [row("ETH", "", "100")],
+      input: [row(tokenId("USDC")), row(tokenId("WBTC"))],
+      output: [row(tokenId("ETH"), "", "100")],
       exact: "input",
     },
   };
 }
 const rowSchema = z.object({
-  symbol: z.enum(["ETH", "USDC", "WBTC", "ARB", "LINK", "DAI"]),
+  symbol: z.string().refine(
+    (address) => liveTokens.some((token) => token.id === address),
+    "Token is not in the Arbitrum token list.",
+  ),
   amount: z.string().max(80),
   weight: z.string().max(10),
   fee: z.enum(["0.01", "0.05", "0.3", "1"]),
@@ -296,7 +262,7 @@ export function buildSwap(
       tokenIn: poolAddress(l.input),
       tokenOut: poolAddress(l.output),
       fee: l.fee,
-      recipient: l.output === "ETH" ? V3_ROUTER : account,
+      recipient: isNative(l.output) ? V3_ROUTER : account,
       deadline,
       sqrtPriceLimitX96: 0n,
     };
@@ -324,7 +290,7 @@ export function buildSwap(
           ],
         });
   });
-  const ethOut = quote.legs.filter((l) => l.output === "ETH");
+  const ethOut = quote.legs.filter((l) => isNative(l.output));
   if (ethOut.length)
     calls.push(
       encodeFunctionData({
@@ -334,7 +300,7 @@ export function buildSwap(
       }),
     );
   const value = quote.legs
-    .filter((l) => l.input === "ETH")
+    .filter((l) => isNative(l.input))
     .reduce((s, l) => s + BigInt(l.maxIn), 0n);
   if (value > 0n)
     calls.push(

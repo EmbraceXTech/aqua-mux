@@ -4,6 +4,7 @@ import { decodeFunctionData, parseUnits, type Address } from "viem";
 import {
   buildSwap,
   finishQuote,
+  getToken,
   initialDrafts,
   routeLegs,
   row,
@@ -23,12 +24,12 @@ function request(
   const draft = initialDrafts()[mode];
   draft.exact = exact;
   draft.input.forEach((r) => {
-    r.amount =
-      r.symbol === "ETH" ? "0.0001" : r.symbol === "USDC" ? "0.1" : "0.000001";
+    const symbol = getToken(r.symbol).symbol;
+    r.amount = symbol === "ETH" ? "0.0001" : symbol === "USDC" ? "0.1" : "0.000001";
   });
   draft.output.forEach((r) => {
-    r.amount =
-      r.symbol === "ETH" ? "0.0001" : r.symbol === "USDC" ? "0.1" : "0.000001";
+    const symbol = getToken(r.symbol).symbol;
+    r.amount = symbol === "ETH" ? "0.0001" : symbol === "USDC" ? "0.1" : "0.000001";
   });
   return { chainId: SWAP_CHAIN, mode, draft, slippageBps: 50 };
 }
@@ -40,14 +41,14 @@ function quote(mode: SwapRequest["mode"], exact: "input" | "output") {
     legs.map((l) =>
       tokenUnits(
         exact === "input"
-          ? l.output === "ETH"
+          ? getToken(l.output).symbol === "ETH"
             ? "0.00001"
-            : l.output === "USDC"
+            : getToken(l.output).symbol === "USDC"
               ? "0.1"
               : "0.000001"
-          : l.input === "ETH"
+          : getToken(l.input).symbol === "ETH"
             ? "0.00001"
-            : l.input === "USDC"
+            : getToken(l.input).symbol === "USDC"
               ? "0.1"
               : "0.000001",
         exact === "input" ? l.output : l.input,
@@ -179,7 +180,7 @@ test("reject invalid amounts without silently rounding token precision", () => {
 });
 test("reject duplicates, invalid allocation, arbitrary fees, and wrong mode shape", () => {
   const duplicate = request();
-  duplicate.draft.output[0].symbol = "ETH";
+  duplicate.draft.output[0].symbol = duplicate.draft.input[0].symbol;
   assert.throws(() => routeLegs(duplicate), /different token/);
   const weights = request();
   weights.draft.output[0].weight = "49";

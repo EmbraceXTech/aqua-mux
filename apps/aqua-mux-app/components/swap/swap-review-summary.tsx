@@ -1,6 +1,7 @@
 import {
   V3_ROUTER,
   SWAP_DEADLINE_SECONDS,
+  getToken,
   type LiveQuote,
 } from "@/lib/live-swap";
 import { SwapTokenMark } from "./swap-token-mark";
@@ -27,7 +28,7 @@ export function SwapReviewSummary({
             <div key={item.symbol}>
               <SwapTokenMark symbol={item.symbol} small />
               <strong>
-                {quote.amounts[side][index]} {item.symbol}
+                {quote.amounts[side][index]} {getToken(item.symbol).symbol}
               </strong>
             </div>
           ))}
@@ -35,7 +36,7 @@ export function SwapReviewSummary({
             quote.request.draft[side].map((item, index) => (
               <p className={styles.settingsNote} key={item.symbol}>
                 {side === "input" ? "Maximum spend" : "Minimum receive"}:{" "}
-                {quote.limits[side][index]} {item.symbol}
+                {quote.limits[side][index]} {getToken(item.symbol).symbol}
               </p>
             ))}
         </div>
@@ -44,7 +45,7 @@ export function SwapReviewSummary({
         <strong>Pool routes</strong>
         {quote.legs.map((leg) => (
           <span key={`${leg.input}-${leg.output}`}>
-            {leg.input} → {leg.output}
+            {getToken(leg.input).symbol} → {getToken(leg.output).symbol}
             <b>{leg.fee / 10000}%</b>
           </span>
         ))}

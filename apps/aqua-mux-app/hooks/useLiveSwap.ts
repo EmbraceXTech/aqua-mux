@@ -21,6 +21,7 @@ import { swapTransactionStatus } from "@/lib/swap-transaction-status";
 import {
   buildSwap,
   getToken,
+  isNative,
   routeLegs,
   SWAP_CHAIN,
   SWAP_DEADLINE_SECONDS,
@@ -128,16 +129,24 @@ export function useLiveSwap(request: SwapRequest) {
       p.removeListener?.("chainChanged", sync);
     };
   }, []);
+  const selectedTokens = request.draft.input
+    .concat(request.draft.output)
+    .map((row) => row.symbol)
+    .join(",");
   const refreshHoldings = useCallback(async () => {
     if (!account) return;
-    const value = await api<Holdings>(`/api/live-swap?account=${account}`);
+    const value = await api<Holdings>(
+      `/api/live-swap?account=${account}&tokens=${encodeURIComponent(selectedTokens)}`,
+    );
     if (current.current.account === account) setHoldings(value);
     return value;
-  }, [account]);
+  }, [account, selectedTokens]);
   useEffect(() => {
     let alive = true;
     if (!account) return;
-    api<Holdings>(`/api/live-swap?account=${account}`)
+    api<Holdings>(
+      `/api/live-swap?account=${account}&tokens=${encodeURIComponent(selectedTokens)}`,
+    )
       .then((value) => {
         if (alive) setHoldings(value);
       })
@@ -147,7 +156,7 @@ export function useLiveSwap(request: SwapRequest) {
     return () => {
       alive = false;
     };
-  }, [account, revision]);
+  }, [account, revision, selectedTokens]);
   useEffect(() => {
     const controller = new AbortController();
     let alive = true;
@@ -255,7 +264,7 @@ export function useLiveSwap(request: SwapRequest) {
   const approvalsFor = (q?: LiveQuote) =>
     q
       ? q.request.draft.input.flatMap((r, i) => {
-          if (r.symbol === "ETH") return [];
+          if (isNative(r.symbol)) return [];
           const cap = tokenUnits(q.limits.input[i], r.symbol);
           const allowance = holdings[r.symbol]?.allowance;
           return allowance !== undefined && BigInt(allowance) < cap
@@ -340,7 +349,7 @@ export function useLiveSwap(request: SwapRequest) {
           throw new Error(`Not enough ${r.symbol}.`);
         if (
           !approval &&
-          r.symbol !== "ETH" &&
+          !isNative(r.symbol) &&
           BigInt(held.allowance) <
             tokenUnits(reviewed.limits.input[i], r.symbol)
         )

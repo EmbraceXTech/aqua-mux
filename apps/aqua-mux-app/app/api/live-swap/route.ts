@@ -3,6 +3,7 @@ import { addressSchema } from "@/lib/model";
 import { client, failure } from "@/lib/server/rpc";
 import {
   finishQuote,
+  isNative,
   liveTokens,
   poolAddress,
   quoterAbi,
@@ -63,14 +64,24 @@ export async function GET(request: Request) {
     const account = addressSchema.parse(
       new URL(request.url).searchParams.get("account"),
     );
+    const requestedTokens = new URL(request.url).searchParams
+      .get("tokens")
+      ?.split(",")
+      .filter(Boolean);
+    if (!requestedTokens?.length || requestedTokens.length > 10)
+      throw new Error("Choose one to ten tokens.");
+    const selected = new Set(requestedTokens);
+    const tokenList = liveTokens.filter((token) => selected.has(token.id));
+    if (tokenList.length !== selected.size)
+      throw new Error("A selected token is not in the Arbitrum token list.");
     const c = client(SWAP_CHAIN);
     if ((await c.getChainId()) !== SWAP_CHAIN)
       throw new Error("RPC network does not match Arbitrum.");
     const entries = await Promise.all(
-      liveTokens.map(async (t) => {
+      tokenList.map(async (t) => {
         try {
           const balance =
-            t.symbol === "ETH"
+            isNative(t.id)
               ? await c.getBalance({ address: account })
               : await c.readContract({
                   address: t.address,
@@ -79,7 +90,7 @@ export async function GET(request: Request) {
                   args: [account],
                 });
           const allowance =
-            t.symbol === "ETH"
+            isNative(t.id)
               ? 0n
               : await c.readContract({
                   address: t.address,
@@ -88,14 +99,14 @@ export async function GET(request: Request) {
                   args: [account, V3_ROUTER],
                 });
           return [
-            t.symbol,
+            t.id,
             {
               balance: formatUnits(balance, t.decimals),
               allowance: String(allowance),
             },
           ];
         } catch {
-          return [t.symbol, null];
+          return [t.id, null];
         }
       }),
     );

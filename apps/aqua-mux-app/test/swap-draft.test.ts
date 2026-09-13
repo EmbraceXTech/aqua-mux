@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { getToken } from "../lib/live-swap";
 import {
   createSwapDraftState,
   isValidSlippage,
@@ -56,7 +57,7 @@ test("token additions rebalance allocations and reject duplicates", () => {
   const added = swapDraftReducer(state, {
     type: "token",
     target: { side: "output" },
-    symbol: "ARB",
+    symbol: getToken("ARB").id,
   });
   assert.deepEqual(
     added.drafts["multi-out"].output.map((r) => r.weight),
@@ -66,7 +67,7 @@ test("token additions rebalance allocations and reject duplicates", () => {
     swapDraftReducer(added, {
       type: "token",
       target: { side: "output" },
-      symbol: "ETH",
+      symbol: getToken("ETH").id,
     }),
     added,
   );
@@ -74,7 +75,7 @@ test("token additions rebalance allocations and reject duplicates", () => {
     swapDraftReducer(added, {
       type: "token",
       target: { side: "input" },
-      symbol: "DAI",
+      symbol: getToken("DAI").id,
     }),
     added,
   );
@@ -109,10 +110,10 @@ test("token replacement clears amount but preserves fee and allocation", () => {
   const replaced = swapDraftReducer(state, {
     type: "token",
     target: { side: "output", index: 0 },
-    symbol: "ARB",
+    symbol: getToken("ARB").id,
   });
   assert.deepEqual(replaced.drafts["multi-out"].output[0], {
-    symbol: "ARB",
+    symbol: getToken("ARB").id,
     amount: "",
     fee: "0.3",
     weight: "70",

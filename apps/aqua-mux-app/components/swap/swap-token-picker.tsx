@@ -10,6 +10,10 @@ type Props = {
   balances: Partial<Record<Symbol, { balance: string } | null>>;
   onPick: (symbol: Symbol) => void;
 };
+function displayName(name: string) {
+  return name.length > 20 ? `${name.slice(0, 20)}…` : name;
+}
+
 // Mounted for one picker session, so search resets on close without an effect.
 export function SwapTokenPicker({ draft, locked, balances, onPick }: Props) {
   const [search, setSearch] = useState("");
@@ -36,23 +40,23 @@ export function SwapTokenPicker({ draft, locked, balances, onPick }: Props) {
       <div className={styles.pickerList}>
         {available.map((token) => (
           <button
-            key={token.symbol}
-            disabled={selected.has(token.symbol) || locked}
-            onClick={() => onPick(token.symbol)}
+            key={token.id}
+            disabled={selected.has(token.id) || locked}
+            onClick={() => onPick(token.id)}
           >
-            <SwapTokenMark symbol={token.symbol} />
+            <SwapTokenMark symbol={token.id} />
             <span>
               <strong>{token.symbol}</strong>
-              <small>{token.name}</small>
+              <small title={token.name}>{displayName(token.name)}</small>
               <small title={token.address}>
                 {token.address.slice(0, 6)}…{token.address.slice(-4)}
               </small>
             </span>
             <span>
               <strong>
-                {selected.has(token.symbol)
+                {selected.has(token.id)
                   ? "Already selected"
-                  : (balances[token.symbol]?.balance ?? "Unavailable")}
+                  : (balances[token.id]?.balance ?? "")}
               </strong>
             </span>
           </button>
