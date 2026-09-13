@@ -10,7 +10,7 @@ export type Source = {
 };
 export const sources: Source[] = registry;
 export type Coverage = Source & {
-  status: "ready" | "stale" | "unavailable";
+  status: "ready" | "stale" | "degraded" | "unavailable";
   checkedAt: number;
   indexedBlock?: number;
   indexedAt?: number;
@@ -23,6 +23,7 @@ export type Coverage = Source & {
   verified: number;
   rejected: number;
   error?: string;
+  errorCode?: "no_allocations" | "retryable" | "schema";
 };
 export type VerifiedPosition = {
   id: string;
@@ -127,9 +128,10 @@ export function rankMarketPools(
   filters: MarketFilters,
 ): MarketPoolRow[] {
   const bySource = new Map(sources.map((source) => [source.id, source]));
+  const coverage = new Map(data.coverage.map((source) => [source.id, source]));
   const rows = data.pools.flatMap((pool) => {
     const source = bySource.get(pool.sourceId);
-    if (!source) return [];
+    if (!source || coverage.get(pool.sourceId)?.status !== "ready") return [];
     if (filters.chain !== "all" && source.chain !== filters.chain) return [];
     if (filters.dex !== "all" && source.dex !== filters.dex) return [];
     if (filters.version !== "all" && source.version !== filters.version)

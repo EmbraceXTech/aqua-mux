@@ -7,6 +7,7 @@ import {
 import {
   rankMarketPools,
   rankWallets,
+  sources,
   defaultMarketFilters,
   defaultFilters,
   type VerifiedPosition,
@@ -150,6 +151,19 @@ const data = {
 test("ranks market pools using pool-level metrics without creating wallet claims", () => {
   const markets = {
     ...data,
+    coverage: sources
+      .filter((source) =>
+        ["uniswap-v3-ethereum", "sushiswap-v3-arbitrum"].includes(source.id),
+      )
+      .map((source) => ({
+        ...source,
+        status: "ready" as const,
+        checkedAt: 100,
+        walletStatus: "Pool scan available",
+        candidates: 0,
+        verified: 0,
+        rejected: 0,
+      })),
     pools: [
       {
         id: "uniswap-v3-ethereum:pool-a",

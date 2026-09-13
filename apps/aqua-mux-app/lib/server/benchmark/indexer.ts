@@ -1,6 +1,7 @@
 import { sources, type Coverage, type Source } from "../../benchmark/model";
 import {
   graph,
+  GraphQueryError,
   protocolQuery,
   candidatesQuery,
   poolsQuery,
@@ -203,7 +204,15 @@ export async function indexBenchmarks(
         }
       }
     } catch (error) {
-      row.status = "unavailable";
+      const errorCode =
+        error instanceof GraphQueryError ? error.failure : "schema";
+      // A successful metadata read proves the deployment is live. Preserve its
+      // last good pool scan and retry the failed market query on the next run.
+      row.status =
+        errorCode === "retryable" && row.indexedBlock !== undefined
+          ? "degraded"
+          : "unavailable";
+      row.errorCode = errorCode;
       row.error = error instanceof Error ? error.message : "Source unavailable";
       options.log?.(`${source.id}: ${row.error}`);
     }

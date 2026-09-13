@@ -594,13 +594,15 @@ export function BenchmarkView() {
                         </td>
                         <td>
                           <span
-                            className={`${s.status} ${source.status === "ready" ? s.ready : source.status === "stale" ? s.stale : s.unavailable}`}
+                            className={`${s.status} ${source.status === "ready" ? s.ready : source.status === "stale" || source.status === "degraded" ? s.stale : s.unavailable}`}
                           >
                             {source.status === "ready"
                               ? "Indexed"
                               : source.status === "stale"
                                 ? "Stale"
-                                : "Unavailable"}
+                                : source.status === "degraded"
+                                  ? "Retrying"
+                                  : "Unavailable"}
                           </span>
                           <small>
                             {source.indexedAt
@@ -624,7 +626,9 @@ export function BenchmarkView() {
                           <span>
                             {source.status === "ready"
                               ? "Pool scan available"
-                              : "Awaiting a healthy source"}
+                              : source.status === "degraded"
+                                ? "Last scan retained; retry pending"
+                                : "Awaiting a healthy source"}
                           </span>
                           <small>
                             {source.error ?? "Standardized fields only"}
